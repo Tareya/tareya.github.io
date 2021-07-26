@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第2章、Helm3 安装部署">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第2章、Helm3 安装部署 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第2章、Helm3 安装部署">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-24 16:24" pubdate>
+        2021年7月24日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      719 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      10
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第2章、Helm3 安装部署</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第2章、Helm3-安装部署"><a href="#第2章、Helm3-安装部署" class="headerlink" title="第2章、Helm3 安装部署"></a>第2章、Helm3 安装部署</h1><span id="more"></span>
+
+<h2 id="一、各环境安装部署"><a href="#一、各环境安装部署" class="headerlink" title="一、各环境安装部署"></a>一、各环境安装部署</h2><h3 id="1、Linux"><a href="#1、Linux" class="headerlink" title="1、Linux"></a>1、Linux</h3><h4 id="1）二进制包安装"><a href="#1）二进制包安装" class="headerlink" title="1）二进制包安装"></a>1）二进制包安装</h4><h5 id="1⃣️-下载二进制包"><a href="#1⃣️-下载二进制包" class="headerlink" title="1⃣️ 下载二进制包"></a>1⃣️ 下载二进制包</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget -c https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz<br></code></pre></td></tr></table></figure>
+
+<h5 id="2⃣️-下载校验文件"><a href="#2⃣️-下载校验文件" class="headerlink" title="2⃣️ 下载校验文件"></a>2⃣️ 下载校验文件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget -c https://github.com/helm/helm/releases#:~:text=Linux%20amd64%20(-,checksum,-/%20a8ddb4e30435b5fd45308ecce5eaad676d64a5de9c89660b56face3fe990b318)<br></code></pre></td></tr></table></figure>
+
+<h5 id="3⃣️-md5校验"><a href="#3⃣️-md5校验" class="headerlink" title="3⃣️ md5校验"></a>3⃣️ md5校验</h5><blockquote>
+<p>如果没有<code>shasum</code>命令，需先行安装，执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum install -y perl-Digest-SHA <br></code></pre></td></tr></table></figure>
+
+<p>安装完成后，进行校验</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">shasum -a 256 -c helm-v3.5.4-linux-amd64.tar.gz.sha256sum <br></code></pre></td></tr></table></figure>
+
+<p>如果验证通过，返回：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm-v3.5.4-linux-amd64.tar.gz: OK<br></code></pre></td></tr></table></figure>
+
+<p>如果验证失败，返回：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm-v3.5.4-linux-amd64.tar.gz: FAILED<br>shasum: WARNING: 1 computed checksum did NOT match<br></code></pre></td></tr></table></figure>
+
+<h5 id="4⃣️-解压安装"><a href="#4⃣️-解压安装" class="headerlink" title="4⃣️ 解压安装"></a>4⃣️ 解压安装</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">tar xf helm-v3.5.4-linux-amd64.tar.gz &amp;&amp; \<br>cd linux-amd64 &amp;&amp; \<br>install -o root -g root -m 0755 helm /usr/local/bin/helm<br></code></pre></td></tr></table></figure>
+
+<h5 id="5⃣️-验证版本"><a href="#5⃣️-验证版本" class="headerlink" title="5⃣️ 验证版本"></a>5⃣️ 验证版本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm version<br></code></pre></td></tr></table></figure>
+
+<p>正常返回如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">version.BuildInfo&#123;Version:&quot;v3.5.4&quot;, GitCommit:&quot;1b5edb69df3d3a08df77c9902dc17af864ff05d1&quot;, GitTreeState:&quot;clean&quot;, GoVersion:&quot;go1.15.11&quot;&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）Apt-安装（Debian-Ubuntu）"><a href="#2）Apt-安装（Debian-Ubuntu）" class="headerlink" title="2）Apt 安装（Debian/Ubuntu）"></a>2）Apt 安装（Debian/Ubuntu）</h4><blockquote>
+<p>官方提供了针对Apt的一个 <code>Helm包</code>，可以使用 <code>Apt命令</code> 自动安装最新版本的 helm。</p>
+</blockquote>
+<h5 id="1⃣️-添加镜像源"><a href="#1⃣️-添加镜像源" class="headerlink" title="1⃣️ 添加镜像源"></a>1⃣️ 添加镜像源</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -<br>sudo apt-get install apt-transport-https --yes<br>echo &quot;deb https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list<br></code></pre></td></tr></table></figure>
+
+<h5 id="2⃣️-更新缓存"><a href="#2⃣️-更新缓存" class="headerlink" title="2⃣️ 更新缓存"></a>2⃣️ 更新缓存</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get update<br></code></pre></td></tr></table></figure>
+
+<h5 id="3⃣️-安装"><a href="#3⃣️-安装" class="headerlink" title="3⃣️ 安装"></a>3⃣️ 安装</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo apt-get install helm<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）自动脚本安装"><a href="#3）自动脚本安装" class="headerlink" title="3）自动脚本安装"></a>3）自动脚本安装</h4><blockquote>
+<p>官方提供了一个可以自动在本地安装最新版本 Helm 的脚本，在版本库的 <code>helm/scripts</code> 下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210628144033780.png" srcset="/img/loading.gif" lazyload alt="image-20210628144033780"></p>
+<p>🚩 <strong>该脚本会自动识别系统环境，进行下载安装，其他系统环境也可以使用。</strong></p>
+</blockquote>
+<p>执行如下命令，直接自动安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）添加命令补全"><a href="#4）添加命令补全" class="headerlink" title="4）添加命令补全"></a>4）添加命令补全</h4><p>安装命令补全功能</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum install -y bash-completion<br></code></pre></td></tr></table></figure>
+
+<p>新增文件 <code>/etc/profile.d/helm.sh</code>，编辑以下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">source &lt;(helm completion bash)<br></code></pre></td></tr></table></figure>
+
+<p>生效环境变量配置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">source /etc/profile.d/helm.sh<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、macOS"><a href="#2、macOS" class="headerlink" title="2、macOS"></a>2、macOS</h3><h4 id="使用-Homebrew-安装"><a href="#使用-Homebrew-安装" class="headerlink" title="使用 Homebrew 安装"></a>使用 Homebrew 安装</h4><blockquote>
+<p>官方提供了针对 <code>Homebrew</code> 构建 Helm 的方案，可以使用 <code>brew命令</code> 自动安装最新版本的 helm。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">brew install helm<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、Windows"><a href="#3、Windows" class="headerlink" title="3、Windows"></a>3、Windows</h3><h4 id="使用-Chocolatey-安装"><a href="#使用-Chocolatey-安装" class="headerlink" title="使用 Chocolatey 安装"></a>使用 Chocolatey 安装</h4><blockquote>
+<p>官方提供了针对 <code>Chocolatey</code> 的一个 <code>Helm包</code>，可以使用 <code>choco命令</code> 自动安装最新版本的 helm。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">choco install kubernetes-helm<br></code></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="二、添加公共仓库"><a href="#二、添加公共仓库" class="headerlink" title="二、添加公共仓库"></a>二、添加公共仓库</h2><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>首次安装 Helm3 是没有指定默认仓库的，需要手动添加仓库才可以正常使用。</p>
+</blockquote>
+<h3 id="1、添加常用仓库"><a href="#1、添加常用仓库" class="headerlink" title="1、添加常用仓库"></a>1、添加常用仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> helm repo add stable https://charts.helm.sh/stable													<span class="hljs-comment"># Helm 官方源</span></span><br>helm repo add stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts		# 阿里云国内源(用于加速)<br>helm repo add bitnami https://charts.bitnami.com/bitnami											# Helm 官方源（Helm3默认使用）<br>helm repo add incubator https://charts.helm.sh/incubator<br>helm repo add jetstack https://charts.jetstack.io<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>微软也提供了 stable 的镜像仓库，地址为 <code>http://mirror.azure.cn/kubernetes/charts/</code></p>
+</blockquote>
+<h3 id="2、删除仓库"><a href="#2、删除仓库" class="headerlink" title="2、删除仓库"></a>2、删除仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm repo remove stable<br></code></pre></td></tr></table></figure>
+
+<h3 id="3、更新仓库"><a href="#3、更新仓库" class="headerlink" title="3、更新仓库"></a>3、更新仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm repo update<br></code></pre></td></tr></table></figure>
+
+<h3 id="4、查看仓库"><a href="#4、查看仓库" class="headerlink" title="4、查看仓库"></a>4、查看仓库</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm repo list<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210630154956853.png" srcset="/img/loading.gif" lazyload alt="image-20210630154956853"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Helm3-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E6%89%8B%E5%86%8C/">Helm3 快速入门手册</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/07/24/%E7%AC%AC3%E7%AB%A0%E3%80%81%E5%88%9D%E8%AF%86-Chart%20/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第3章、初识 Chart</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/07/24/%E7%AC%AC1%E7%AB%A0%E3%80%81Helm-%E7%AE%80%E4%BB%8B/">
+                        <span class="hidden-mobile">第1章、Helm 简介</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

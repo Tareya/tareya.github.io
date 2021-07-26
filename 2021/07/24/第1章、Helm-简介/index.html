@@ -1,0 +1,731 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第1章、Helm 简介">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第1章、Helm 简介 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第1章、Helm 简介">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-24 16:19" pubdate>
+        2021年7月24日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      49
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第1章、Helm 简介</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第1章、Helm-简介"><a href="#第1章、Helm-简介" class="headerlink" title="第1章、Helm 简介"></a>第1章、Helm 简介</h1><span id="more"></span>
+
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/helm3.jpg" srcset="/img/loading.gif" lazyload alt="helm logo"></p>
+<p><a target="_blank" rel="noopener" href="https://helm.sh/">Helm 官网</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/helm/helm">Helm 官方GitHub</a></p>
+<h2 id="一、什么是-Helm？"><a href="#一、什么是-Helm？" class="headerlink" title="一、什么是 Helm？"></a>一、什么是 Helm？</h2><p>就像 Java 使用 maven；node 使用 npm；python 使用 pip；Linux 使用 yum 或 Apt 一样，不管是什么样的工作，技术人员都会希望有一种资源管理器/包管理器，以此来方便得查找、下载、安装、使用和分发软件包。</p>
+<p>所以 Helm 即可以说是 <code>K8S的包管理器</code>，它使得我们对于 K8S 的操作不再需要细化到资源对象，而是可以作为一个实例进行管理。不再需要去写 <code>deployment</code> 、<code>service</code> 、<code>ingress</code> 的 yaml，而是可以直接通过 <code>install</code> 命令实现服务实例的安装。</p>
+<h3 id="Helm-的主要功能总结："><a href="#Helm-的主要功能总结：" class="headerlink" title="Helm 的主要功能总结："></a>Helm 的主要功能总结：</h3><blockquote>
+<ul>
+<li>查找要安装和使用的预打包软件</li>
+<li>轻松创建和托管自己的软件包</li>
+<li>将软件包安装到任何 K8S 集群中</li>
+<li>查询集群以查看已安装和正在运行的程序包</li>
+<li>更新、删除、回滚或查看已安装软件包的历史记录</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="二、Helm-中的基本概念"><a href="#二、Helm-中的基本概念" class="headerlink" title="二、Helm 中的基本概念"></a>二、Helm 中的基本概念</h2><h3 id="1、Chart"><a href="#1、Chart" class="headerlink" title="1、Chart"></a>1、<em>Chart</em></h3><p>Helm 使用的包格式称为 <code>chart</code>，它是一个描述 Kubernetes 相关资源对象的文件集合。它的技术特点类似 jinja模版，以渲染模版的方式，生成运行一个服务实例所需的一系列资源对象文件，并以此进行服务的发布。通过这种方式，我们也可以十分简单的制作自定义的 chart。</p>
+<p>Chart 有自已特定的目录布局，我们以官方提供的 <code>wordpress</code>为例说明，chart 的文件目录结构如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell">wordpress/<br>  Chart.yaml          		# 包含了chart信息的YAML文件<br>  LICENSE             		# 可选: 包含chart许可证的纯文本文件<br>  README.md           		# 可选: 可读的README文件<br>  values.yaml         		# chart 默认的配置值<br>  values.schema.json  		# 可选: 一个使用JSON结构的values.yaml文件<br>  charts/             		# 包含chart依赖的其他chart<br>  crds/               		# 自定义资源的定义<br>  templates/          		# 模板目录， 当和values 结合时，可生成有效的Kubernetes manifest文件<br>  templates/NOTES.txt 		# 可选: 包含简要使用说明的纯文本文件<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>Helm Chart 基本元素为 <code>charts/</code>、<code>Chart.yaml </code>、<code>templates/</code>、<code>values.yaml</code>，并保留 <code>crds/</code> ，要正确的使用 chart 进行发布，该元素是必不可少的。</p>
+</blockquote>
+<h3 id="2、Repos"><a href="#2、Repos" class="headerlink" title="2、Repos"></a>2、<em>Repos</em></h3><p>Helm chart 可以被存储在专用的 HTTP 服务器上，称为 <code>chart 仓库（repositories)</code>，和 <code>yum repository</code>类似，chart 仓库提供了一个 <code>index.yaml</code> 来描述一批 chart，并且提供了每个 chart 的下载地址信息。</p>
+<p>Helm 客户端可以指向多个 chart 仓库，默认情况下是没有配置仓库的，需要使用 <code>helm repo add</code> 来进行添加。helm3 中对于一些常用服务的下载安装，用 <code>bitnami 仓库</code>  取代了原来的<code>stable 仓库</code>，但是仍保留了 <code>stable 仓库</code>的使用。</p>
+<h3 id="3、Release"><a href="#3、Release" class="headerlink" title="3、Release"></a>3、<em>Release</em></h3><p>当 chart 被发布后，Helm 库会创建一个 <code>release</code> 来跟踪这个发布的对象，它的实质是在 Kubernetes 中运行的各种资源，<code>service</code>、<code>deployment</code>、<code>configmap</code>、<code>secret</code> 等，在 K8S 集群中的直接的表现就是一个或多个 pod。</p>
+<blockquote>
+<p>⚠️ <strong>注意:</strong>  </p>
+<p>Helm 的 release 是允许启动多个不同服务的，且每个服务之间遵循依赖关系，这点就比较类似 docker compose。</p>
+</blockquote>
+<hr>
+<h2 id="三、从-Helm2-到-Helm3-的变化"><a href="#三、从-Helm2-到-Helm3-的变化" class="headerlink" title="三、从 Helm2 到 Helm3 的变化"></a>三、从 Helm2 到 Helm3 的变化</h2><h3 id="1、Helm3-新增的功能"><a href="#1、Helm3-新增的功能" class="headerlink" title="1、Helm3 新增的功能"></a>1、Helm3 新增的功能</h3><p>Helm3 有很多新的功能，有个重要功能需要特别指出：</p>
+<blockquote>
+<ul>
+<li>release 的信息以新的形式存储</li>
+<li>移除了 Tiller 组件</li>
+<li>Helm3 包含了对新版本 Helm charts （Charts v2）的支持</li>
+<li>Helm3 支持 <code>library charts</code> —— 一种作为其他 charts 元素的 charts</li>
+<li>将 Chart 推送保存到 OCI 注册中心（类似 DockerRegistry ），以进行复用</li>
+<li>升级Kubernetes资源时将应用3向战略合并补丁</li>
+<li>支持使用 JSON Schema 对 charts 的 values 进行校验</li>
+<li>为了使Helm更安全，可用和健壮，已进行了许多小的改进。</li>
+</ul>
+</blockquote>
+<h3 id="2、重要变化概述"><a href="#2、重要变化概述" class="headerlink" title="2、重要变化概述"></a>2、重要变化概述</h3><h4 id="1）移除-Tiller"><a href="#1）移除-Tiller" class="headerlink" title="1）移除 Tiller"></a>1）移除 Tiller</h4><p><code>Tiller</code> 在 Helm2 中是一个重要的组成部分。Helm2 使用它和 <code>GRPC</code> 来处理 <code>Helm chart</code> 的安装和管理，呈现 <code>chart</code> 并将其推送到 Kubernetes API Server。<code>Tiller</code> 允许团队共享一个 Kubernetes 集群，多个 operator 可以使用同一组发行版，团队成员通过它就可以在一个共享的 Kubernetes 集群中管理复杂的应用发布。</p>
+<p>但是从 Kubernetes 1.6 开始，考虑到安全性，集群默认会开启角色访问控制（<code>RBAC</code>），这使得管理和配置Tiller会变得非常复杂，因为可能的安全策略数量太多了。为了简化安全模型实现方式，并使管理员/SRE不需要去深入研究 Kubernetes 的安全组件，helm 提供了一个不需要太过关注安全规则的默认配置，但是这又会使得授权变得宽松，这反而会导致安全隐患。</p>
+<p>因此在 Helm3 中干脆移除了 Tiller，而是选择从 Kubernetes API Server 中获取信息来渲染 Charts 客户端，并在 Kubernetes 中存在安装记录，这些过程既是没有 Tiller 也可以实现。</p>
+<p>Helm3 可以支持所有的 Kubernetes 认证及鉴权等全部安全特性。Helm和本地的 kubeconfig flie 中的配置使用一致的权限。管理员可以按照自己认为合适的粒度来管理用户权限。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/helm3%E5%8F%98%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="helm3变化"></p>
+<h4 id="2）Chart-仓库升级"><a href="#2）Chart-仓库升级" class="headerlink" title="2）Chart 仓库升级"></a>2）Chart 仓库升级</h4><p>在 Helm3 中，<code>helm search</code> 除了支持本地 repository 搜索外，还支持 <code>helm search hub</code> 搜索 Artifact Hub 中所有公开的 charts。</p>
+<h4 id="3）改进升级策略：使用三路策略合并补丁"><a href="#3）改进升级策略：使用三路策略合并补丁" class="headerlink" title="3）改进升级策略：使用三路策略合并补丁"></a>3）改进升级策略：使用三路策略合并补丁</h4><p>在 Helm2 中，使用了双路策略合并补丁，简单来说就是在使用 <code>helm upgrade</code> 更新过程中，会比对本次发布的 chart manifest 和 最近一次发布的 chart manifest  的差异，以此来决定哪些更改被应用到 Kubernetes 的资源中去。并且，Helm 只会将最后一次应用的 chart manifest 作为 release 的当前状态，如果 chart 状态没有更改，资源的活动状态就不会更改，也就是说使用诸如 <code>kubectl edit</code> 、<code>kubectl scale</code> 这种外部方式进行的修改不会被 Helm 识别的，这种情况下如果发生回滚操作，Helm 会由于 chart 并没有发生变化而导致回滚失败。</p>
+<p>而在 Helm3 中，这种策略被升级成了三路策略合并，Helm 在生成一个补丁时，也会考虑之前老的 manifest 的活动状态。也就是说，在使用老的 chart manifest 生成新的补丁时，Helm 还会考虑当前的活动状态，并将其与之前老的 manifest 进行比对，并再比对新的 manifest 是否有改动，并进行自动补全，以此来生成最终的更新补丁。</p>
+<h6 id="示例说明："><a href="#示例说明：" class="headerlink" title="示例说明："></a>示例说明：</h6><p>用 Chart 渲染生成的 manifest 如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">containers:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">server</span><br>	<span class="hljs-attr">image:</span> <span class="hljs-string">my_app:2.0.0</span><br></code></pre></td></tr></table></figure>
+
+<p>通过非 Helm 的方式将应用的活动状态修改为如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">containers:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">server</span><br>	<span class="hljs-attr">image:</span> <span class="hljs-string">my_app:2.0.0</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">sidecar</span><br>  <span class="hljs-attr">image:</span> <span class="hljs-string">dump_handler:1.0.0</span><br></code></pre></td></tr></table></figure>
+
+<p>而现在我们想要将应用的镜像升级到 <code>2.1.0</code>，通过 chart 进行升级操作。</p>
+<p>在 Helm2 中，由于不会考虑 chart 之外的修改，而是检测 chart 生成的 manifest 之间的区别，因此修改后的状态如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">containers:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">server</span><br>	<span class="hljs-attr">image:</span> <span class="hljs-string">my_app:2.1.0</span><br></code></pre></td></tr></table></figure>
+
+<p>而在 Helm3 中，通过三路合并策略，会检查到除了 chart 的修改外，还多了一个 sidecar 容器，因此会进行补全，最终修改状态如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">containers:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">server</span><br>	<span class="hljs-attr">image:</span> <span class="hljs-string">my_app:2.1.0</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">sidecar</span><br>  <span class="hljs-attr">image:</span> <span class="hljs-string">dump_handler:1.0.0</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）release-名称存储位置改变"><a href="#4）release-名称存储位置改变" class="headerlink" title="4）release 名称存储位置改变"></a>4）release 名称存储位置改变</h4><p>在 Helm2 中，release 的相关信息都被保存在 Tiller 的 namespace下，所以 release 的名称必须是唯一的；而随着 Tiller 组件的移除， Helm3 中release 相关的信息都被保存在了应用自己相对应的 namespace 下，因此根据 namespace 的隔离性质，在不同的 ns 下，release 的名称可以重复。</p>
+<blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>Helm3 中，在执行 <code>helm list</code> 时需要添加 <code>--all-namespaces</code> 参数才能获取到 Helm2 中同样的结果</p>
+</blockquote>
+<h4 id="5）默认存储驱动程序更改为-Secrets"><a href="#5）默认存储驱动程序更改为-Secrets" class="headerlink" title="5）默认存储驱动程序更改为 Secrets"></a>5）默认存储驱动程序更改为 Secrets</h4><p>Helm 2 默认情况下使用 ConfigMaps 存储发行信息，直到 Helm 2.7.0 中，才使用 Secrets 用作存储驱动程序。而在 Helm 3 中默认就使用 Secrets。</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/">静态加密密钥</a> 在Kubernetes 1.7中作为alpha特性可以使用了，在Kubernetes 1.13中变成了稳定特性。 这允许用户静态加密Helm的发布元数据，同时也是一个类似Vault的以后可扩展的良好起点。</p>
+<h4 id="6）Go-导入路径更改"><a href="#6）Go-导入路径更改" class="headerlink" title="6）Go 导入路径更改"></a>6）Go 导入路径更改</h4><p>在 Helm3 中，Go 导入路径从<code>k8s.io/helm</code> 切换为 <code>helm.sh/helm/v3</code>。 如果打算升级到Helm 3 Go客户端库，请确保更改导入路径。</p>
+<h4 id="7）使用-JSONSchema-验证-Chart-的-values"><a href="#7）使用-JSONSchema-验证-Chart-的-values" class="headerlink" title="7）使用 JSONSchema 验证 Chart 的 values"></a>7）使用 JSONSchema 验证 Chart 的 values</h4><p>Helm3 支持用<code> JSONSchema</code>  来校验 Chart 的 values，它会自动检查所有输入的变量格式。这样可以确保用户提供的值遵循 Chart 维护者设计的架构，当用户为 Chart 提供一组错误值时，也能提供更好的错误报告。</p>
+<p>当调用一下命令时会进行 JSON 格式验证：</p>
+<blockquote>
+<ul>
+<li>helm install</li>
+<li>helm upgrade</li>
+<li>helm template</li>
+<li>helm lint</li>
+</ul>
+</blockquote>
+<h4 id="8）requirements-yaml合并入-Chart-yaml"><a href="#8）requirements-yaml合并入-Chart-yaml" class="headerlink" title="8）requirements.yaml合并入 Chart.yaml"></a>8）requirements.yaml合并入 Chart.yaml</h4><p>动态依赖关系的chart 依赖从 <code>requirements.yaml</code> 和 <code>requirements.lock</code> 移至 <code>Chart.yaml</code> 和 <code>Chart.lock</code>。 推荐在 Helm3 的新 chart 中使用 Chart API v2 的新格式，但是 Helm3 中依然可以识别 v1 版本，并且会自动加载已有的 <code>requirements.yaml</code> 文件。</p>
+<p>在 Helm2 中，<code>requirements.yaml</code> 的表达式类似如下形式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">dependencies:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">mariadb</span><br>  <span class="hljs-attr">version:</span> <span class="hljs-number">5.</span><span class="hljs-string">x.x</span><br>  <span class="hljs-attr">repository:</span> <span class="hljs-string">https://charts.helm.sh/stable</span><br>  <span class="hljs-attr">condition:</span> <span class="hljs-string">mariadb.enabled</span><br>  <span class="hljs-attr">tags:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">database</span><br></code></pre></td></tr></table></figure>
+
+<p>而在 Helm3 中，表达式的形式并没有变化，但是现在需要写在 <code>Chart.yaml</code> 中。Chart 依然会下载和放置在 <code>charts/</code> 目录，所以 <code>charts/</code> 目录中的子 chart 不需要做任何修改，可以沿用 Helm2 的。</p>
+<h4 id="9）指定名称和命名空间"><a href="#9）指定名称和命名空间" class="headerlink" title="9）指定名称和命名空间"></a>9）指定名称和命名空间</h4><h5 id="1⃣️-发布时必须指定-release-名称"><a href="#1⃣️-发布时必须指定-release-名称" class="headerlink" title="1⃣️ 发布时必须指定 release 名称"></a>1⃣️ 发布时必须指定 release 名称</h5><p>在 Helm2 中，在发布时如果未提供 release 的名称，Helm 会自动生成一个，但是在 Helm3 中，如果未指定 release 名称，安装就会报错，如果仍然希望 Helm 能够自动生成 release 名称，可以使用 <code>--generate-name</code> 参数。</p>
+<h5 id="2⃣️-不再自动创建-namespace"><a href="#2⃣️-不再自动创建-namespace" class="headerlink" title="2⃣️ 不再自动创建 namespace"></a>2⃣️ 不再自动创建 namespace</h5><p>在 Helm2 中，如果在创建版本时，命名空间不存在，Helm2 会自动创建一个命名空间，但是在 Helm3 中，如果命名空间不存在就会报错，需要明确指定 <code>--create-namespace</code> 参数，Helm3 才会自动创建一个命名空间。</p>
+<h4 id="10）将-Chart-推送到-OCI-注册中心"><a href="#10）将-Chart-推送到-OCI-注册中心" class="headerlink" title="10）将 Chart 推送到 OCI 注册中心"></a>10）将 Chart 推送到 OCI 注册中心</h4><p>这是一个 Helm3 中的试验性特性，使用时需要设置环境变量 <code>HELM_EXPERIMENTAL_OCI=1</code>。</p>
+<p>查看 <code>helm help chart</code> 和 <code>helm help registry</code> 了解如何打包chart并推送到Docker注册中心的更多信息。</p>
+<h4 id="11）移除-helm-serve"><a href="#11）移除-helm-serve" class="headerlink" title="11）移除 helm serve"></a>11）移除 <code>helm serve</code></h4><p>在 Helm2 中，可以通过 <code>helm serve</code> 命令在本地临时搭建 <code>Chart Repository </code>，但是由于并没有被开发工具接受，且在设计方面存在较多问题，故在 Helm3 中被删除了。</p>
+<h4 id="12）支持-library-chart"><a href="#12）支持-library-chart" class="headerlink" title="12）支持 library chart"></a>12）支持 library chart</h4><p>Helm3 支持一类称为 <code>library chart</code> 的 chart，其本省不会创建任何应用，只是作为其他 chart 的共享依赖。library chart 只能用于声明定义元素，全局范围内的非定义内容将被忽略。这使用户可以重复使用和共享可在许多chart中重复使用的代码段，从而避免了冗余并使 chart 保持简洁。</p>
+<p>Library chart 在 Chart.yaml 的依赖指令中声明，安装和管理与其他chart一致，其表达式类似如下形式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">dependencies:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">mylib</span><br>    <span class="hljs-attr">version:</span> <span class="hljs-number">1.</span><span class="hljs-string">x.x</span><br>    <span class="hljs-attr">repository:</span> <span class="hljs-string">quay.io</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="13）Chart-yaml-的-apiVersion-升级"><a href="#13）Chart-yaml-的-apiVersion-升级" class="headerlink" title="13）Chart.yaml 的 apiVersion 升级"></a>13）Chart.yaml 的 apiVersion 升级</h4><h5 id="1⃣️-apiVersion-v1-升级至-v2"><a href="#1⃣️-apiVersion-v1-升级至-v2" class="headerlink" title="1⃣️ apiVersion v1 升级至 v2"></a>1⃣️ apiVersion v1 升级至 v2</h5><p>由于 Helm3 中新增了许多新的特性，比如支持 <code>library chart</code> 、<code>requirements.yaml</code> 合并进 <code>Chart.yaml</code>。而客户端虽然可以是别 Helm2 的包格式，却不能理解这些新的特性，因此 Helm3 中的 Chart.yaml 的 apiVersion 也从 v1 升级到可 v2。</p>
+<p>使用 Helm3 的 <code>helm create</code> 创建的 chart 将使用新格式，默认的 apiVersion 也将使用 v2。</p>
+<h5 id="2⃣️-ApiVersion-改为-APIVersion"><a href="#2⃣️-ApiVersion-改为-APIVersion" class="headerlink" title="2⃣️ ApiVersion 改为 APIVersion"></a>2⃣️ ApiVersion 改为 APIVersion</h5><p>Helm3 对于驼峰的命令规范进行了修改，遵循驼峰命名的典型惯例，因此将 <code>.Chart.ApiVersion</code> 更正为了 <code>.Chart.APIVersion</code>，其他诸如 <code>.Capabilities.APIVersions.Has</code> 都进行了更正处理。</p>
+<h4 id="14）XDG-基本目录支持"><a href="#14）XDG-基本目录支持" class="headerlink" title="14）XDG 基本目录支持"></a>14）XDG 基本目录支持</h4><p><a target="_blank" rel="noopener" href="https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html">XDG 基本目录规范</a> 是一个定义了配置、数据和缓存文件应该存储在文件系统什么位置的可移植标准。</p>
+<p>在 Helm2 中，Helm 相关的信息都存储在 <code>~/.helm/</code> 目录下，可以通过设置环境变量 <code>$HELM_HOME</code> 或者 <code>--home</code> 参数指定。而在 Helm3 中，相关的环境变量则变更为了以下规范形式：</p>
+<blockquote>
+<ul>
+<li>$XDG_CACHE_HOME        # 用于存放缓存文件</li>
+<li>$XDG_CONFIG_HOME      # 用于存放配置文件</li>
+<li>$XDG_DATA_HOME          # 用于存放数据文件</li>
+</ul>
+</blockquote>
+<p>但是在 Helm3 中仍保留了 <code>$HELM_HOME</code> 作为 <code>$XDG_DATA_HOME</code> 的别名，以此来保证过渡阶段的兼容性。</p>
+<p>Helm 插件如过要支持 Helm3，也可以用以下环境变量，来适应这种变化：</p>
+<blockquote>
+<ul>
+<li>$HELM_PATH_CACHE       # 用于存放缓存文件</li>
+<li>$HELM_PATH_CONFIG     # 用于存放配置文件</li>
+<li>$HELM_PATH_DATA          # 用于存放数据文件</li>
+</ul>
+</blockquote>
+<h5 id="各环境默认文件存放位置"><a href="#各环境默认文件存放位置" class="headerlink" title="各环境默认文件存放位置"></a>各环境默认文件存放位置</h5><blockquote>
+<p>🚩 可以通过 <code>helm env</code> 查看</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th><strong>Operating System</strong></th>
+<th><strong>Cache Path</strong></th>
+<th><strong>Configuration Path</strong></th>
+<th><strong>Data Path</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Linux</strong></td>
+<td>$HOME/.cache/helm</td>
+<td>$HOME/.config/helm</td>
+<td>$HOME/.local/share/helm</td>
+</tr>
+<tr>
+<td><strong>macOS</strong></td>
+<td>$HOME/Library/Caches/helm</td>
+<td>$HOME/Library/Preferences/helm</td>
+<td>$HOME/Library/helm</td>
+</tr>
+<tr>
+<td><strong>Windows</strong></td>
+<td>%TEMP%\helm</td>
+<td>%APPDATA%\helm</td>
+<td>%APPDATA%\helm</td>
+</tr>
+</tbody></table>
+<h4 id="15）CLI-命令重命名"><a href="#15）CLI-命令重命名" class="headerlink" title="15）CLI 命令重命名"></a>15）CLI 命令重命名</h4><h5 id="1⃣️-helm-delete-更改为-helm-uninstall"><a href="#1⃣️-helm-delete-更改为-helm-uninstall" class="headerlink" title="1⃣️ helm delete 更改为 helm uninstall"></a>1⃣️ <code>helm delete</code> 更改为 <code>helm uninstall</code></h5><p>在 Helm2 中，如果要清楚 release 的各种资源，必须要使用 <code>--purge</code> 参数，Helm3 中默认就会启用次功。</p>
+<p>如果要保留历史行为数据，需执行 <code>helm uninstall --keep-history</code></p>
+<h5 id="2⃣️-helm-inspect-更改为-helm-show"><a href="#2⃣️-helm-inspect-更改为-helm-show" class="headerlink" title="2⃣️ helm inspect 更改为 helm show"></a>2⃣️ <code>helm inspect</code> 更改为 <code>helm show</code></h5><h5 id="3⃣️-helm-fetch-更改为-helm-pull"><a href="#3⃣️-helm-fetch-更改为-helm-pull" class="headerlink" title="3⃣️ helm fetch 更改为 helm pull"></a>3⃣️ <code>helm fetch</code> 更改为 <code>helm pull</code></h5><blockquote>
+<p>🚩 <strong>这些命令还保留了它们较旧的命令作为别名，因此您可以继续以任何一种形式使用它们。</strong></p>
+</blockquote>
+<h4 id="16）简化模板对象-Capabilities"><a href="#16）简化模板对象-Capabilities" class="headerlink" title="16）简化模板对象 .Capabilities"></a>16）简化模板对象 .Capabilities</h4><p><code>Capabilities</code> 是 Helm 模版可以访问的内置对象之一，其提供了关于 Kubernetes 集群支持的功能的信息，包含以下内容：</p>
+<table>
+<thead>
+<tr>
+<th>对象名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Capabilities.APIVersions</td>
+<td>集群的版本信息</td>
+</tr>
+<tr>
+<td>Capabilities.APIVersions.Has $version</td>
+<td>说明集群中的版本 (例如, <code>batch/v1</code>) 或是资源 (例如, <code>apps/v1/Deployment</code>) 是否可用</td>
+</tr>
+<tr>
+<td>Capabilities.KubeVersion</td>
+<td>提供了查找 Kubernetes 版本的方法。可以获取到 <code>Major</code>，<code>Minor</code>，<code>GitVersion</code>，<code>GitCommit</code>，<code>GitTreeState</code>，<code>BuildDate</code>，<code>GoVersion</code>，<code>Compiler</code>和<code>Platform</code>。</td>
+</tr>
+<tr>
+<td>Capabilities.TillerVersion</td>
+<td>提供了查找Tiller版本的方法。可以获取到<code>SemVer</code>, <code>GitCommit</code>, and <code>GitTreeState</code>.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="四、Helm版本支持策略"><a href="#四、Helm版本支持策略" class="headerlink" title="四、Helm版本支持策略"></a>四、Helm版本支持策略</h2><h3 id="1、-版本形式"><a href="#1、-版本形式" class="headerlink" title="1、 版本形式"></a>1、 版本形式</h3><blockquote>
+<p>Helm 的版本用 <code>x.y.z</code> 的形式描述，<code>x</code> 是主版本，<code>y</code> 是次版本，<code>z</code> 是补丁版本。当一个 Helm 的新版本发布时，都是针对 Kubernetes 的一个特定版本编译的，比如 <code>3.0.0</code> 基于 Kubernetes 的 <code>1.16.2</code> 的客户端API版本构建，则可以兼容 Kubernetes 1.16。</p>
+</blockquote>
+<h3 id="2、可支持的版本偏差"><a href="#2、可支持的版本偏差" class="headerlink" title="2、可支持的版本偏差"></a>2、可支持的版本偏差</h3><blockquote>
+<p>相较于 Helm2 对于 Kubernetes 次版本变更支持的严格（<code>n-1</code>），Helm3 可以向下兼容 <code>n-3</code> 的次版本，比如你使用一个针对 Kubernetes 1.18 客户端 API 版本编译的 Helm3 版本，那么它可以支持的 Kubernetes 版本为 1.18、1.17、1.16、1.15 ；</p>
+<p>如果你使用一个针对 Kubernetes 1.15 客户端 API 版本编译的 Helm2 版本，那么它可以支持的 Kubernetes 版本为 1.15、1.14。</p>
+<p>⚠️ <strong>注意：</strong> Helm 没有向上兼容机制，故推荐安装下表进行版本选择。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Helm 版本</th>
+<th>支持的 Kubernetes 版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3.6.x</td>
+<td>1.21.x - 1.18.x</td>
+</tr>
+<tr>
+<td>3.5.x</td>
+<td>1.20.x - 1.17.x</td>
+</tr>
+<tr>
+<td>3.4.x</td>
+<td>1.19.x - 1.16.x</td>
+</tr>
+<tr>
+<td>3.3.x</td>
+<td>1.18.x - 1.15.x</td>
+</tr>
+<tr>
+<td>3.2.x</td>
+<td>1.18.x - 1.15.x</td>
+</tr>
+<tr>
+<td>3.1.x</td>
+<td>1.17.x - 1.14.x</td>
+</tr>
+<tr>
+<td>3.0.x</td>
+<td>1.16.x - 1.13.x</td>
+</tr>
+<tr>
+<td>2.16.x</td>
+<td>1.16.x - 1.15.x</td>
+</tr>
+<tr>
+<td>2.15.x</td>
+<td>1.15.x - 1.14.x</td>
+</tr>
+<tr>
+<td>2.14.x</td>
+<td>1.14.x - 1.13.x</td>
+</tr>
+<tr>
+<td>2.13.x</td>
+<td>1.13.x - 1.12.x</td>
+</tr>
+<tr>
+<td>2.12.x</td>
+<td>1.12.x - 1.11.x</td>
+</tr>
+<tr>
+<td>2.11.x</td>
+<td>1.11.x - 1.10.x</td>
+</tr>
+<tr>
+<td>2.10.x</td>
+<td>1.10.x - 1.9.x</td>
+</tr>
+<tr>
+<td>2.9.x</td>
+<td>1.10.x - 1.9.x</td>
+</tr>
+<tr>
+<td>2.8.x</td>
+<td>1.9.x - 1.8.x</td>
+</tr>
+<tr>
+<td>2.7.x</td>
+<td>1.8.x - 1.7.x</td>
+</tr>
+<tr>
+<td>2.6.x</td>
+<td>1.7.x - 1.6.x</td>
+</tr>
+<tr>
+<td>2.5.x</td>
+<td>1.6.x - 1.5.x</td>
+</tr>
+<tr>
+<td>2.4.x</td>
+<td>1.6.x - 1.5.x</td>
+</tr>
+<tr>
+<td>2.3.x</td>
+<td>1.5.x - 1.4.x</td>
+</tr>
+<tr>
+<td>2.2.x</td>
+<td>1.5.x - 1.4.x</td>
+</tr>
+<tr>
+<td>2.1.x</td>
+<td>1.5.x - 1.4.x</td>
+</tr>
+<tr>
+<td>2.0.x</td>
+<td>1.4.x - 1.3.x</td>
+</tr>
+</tbody></table>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Helm3-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E6%89%8B%E5%86%8C/">Helm3 快速入门手册</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/07/24/%E7%AC%AC2%E7%AB%A0%E3%80%81Helm3-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第2章、Helm3 安装部署</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

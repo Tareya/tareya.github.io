@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第4章、Chart 模版详解">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第4章、Chart 模版详解 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第4章、Chart 模版详解">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-24 17:12" pubdate>
+        2021年7月24日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      39
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第4章、Chart 模版详解</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第4章、Chart-模版详解"><a href="#第4章、Chart-模版详解" class="headerlink" title="第4章、Chart 模版详解"></a>第4章、Chart 模版详解</h1><span id="more"></span>
+
+
+<h2 id="一、编写第一个模版"><a href="#一、编写第一个模版" class="headerlink" title="一、编写第一个模版"></a>一、编写第一个模版</h2><h3 id="1、前期准备"><a href="#1、前期准备" class="headerlink" title="1、前期准备"></a>1、前期准备</h3><blockquote>
+<p>🚩 <strong>写在开始之前</strong></p>
+<p>上一章中我们说到过，Helm 出来可以安装官方或者三方提供的 <em>chart</em> 包外，更重要的是支持创建自己的 <code>chart</code>，就行 <em>docker image</em> 和 <em>dockerfile</em>，通过自定义编排，方能实现通过 Helm 来管理我们自己的应用。</p>
+<p>从之前的学习中，我们不难得出 <code>chart</code> 的核心是资源模版 <code>templates</code> 和渲染 <code>.Values</code>，而其中的关键，则是如何写资源模版，虽然其整体声明式和 K8s 的 <em>yaml</em> 表达式是一样的，但是既然模版，自然就要为需要渲染的地方保留变量，并通过语法去获取对应的值，最终才能发生渲染的效果。这个章节我们就来学习如何通过 <code>Chart 模版</code> 的语法来写我们自己的模版。</p>
+</blockquote>
+<h4 id="1）创建一个空的-chart"><a href="#1）创建一个空的-chart" class="headerlink" title="1）创建一个空的 chart"></a>1）创建一个空的 chart</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm create mychart<br></code></pre></td></tr></table></figure>
+
+<h4 id="2）删除所有默认生成的模版"><a href="#2）删除所有默认生成的模版" class="headerlink" title="2）删除所有默认生成的模版"></a>2）删除所有默认生成的模版</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">\rm -rf mychart/templates/*<br></code></pre></td></tr></table></figure>
+
+<p>然后，我们就可以开始这一章的学习之旅了！！</p>
+<h3 id="2、创建-ConfigMap-模版"><a href="#2、创建-ConfigMap-模版" class="headerlink" title="2、创建 ConfigMap 模版"></a>2、创建 ConfigMap 模版</h3><h4 id="1）创建文件"><a href="#1）创建文件" class="headerlink" title="1）创建文件"></a>1）创建文件</h4><p>文件路径: <code>mychart/templates/configmap.yaml</code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">myvalue:</span> <span class="hljs-string">&quot;Hello World&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="表达式说明"><a href="#表达式说明" class="headerlink" title="表达式说明"></a>表达式说明</h5><p>1⃣️ <code>&#123;&#123; &#125;&#125;</code> 和 <code>.</code> 是什么？</p>
+<p>相较于经典的 yaml 声明式，我们可以发现，最大的变化在于 <code>&#123;&#123; .Release.Name &#125;&#125;</code>。<code>&#123;&#123; &#125;&#125;</code> 就是模版调用的方法，其中加上要引用的元素，模版命令就会将其对用的值作为一个对象注入模版之中，其中 <code>.</code> 用于分割每个命令空间内需要搜索元素，最前面的 <code>.</code>表示从作用域的最顶层搜索对象。模版会从最顶层的命令空间开始搜索 <code>.</code> 指定的对象。</p>
+<p>由此，<code>&#123;&#123; .Release.Name &#125;&#125;</code> 就应当解读为 “<strong>从最顶层的命名空间开始搜索 <code>Release</code> 对象，然后在其中搜索 <code>Name</code> 对象</strong>“。<code>Relase</code> 是 Helm 的内置对象，表示发布本身。</p>
+<p>2⃣️ 为什么要这么处理？</p>
+<p>模版的意义在于复用。通过传入不同的值来渲染出不同的结果，才是模版存在的意义，因此针对模版我们应当坚持 “<strong>可变量化</strong>“的原则，将非通用性的字段进行变量化处理，这样才能使得我们的模版更具备泛用性，增加复用的可能。</p>
+<blockquote>
+<p>⚠️ <strong>注意: Release 名称的长度限制</strong>  </p>
+<p>DNS 系统限制 <code>name</code> 字段的长度不能超过 <strong>63</strong> 个字符，因此 Helm 对 <code>Release</code> 的名称是有长度限制的，<strong>Helm3 对于其长度限制为 53 个字符</strong>。</p>
+</blockquote>
+<h4 id="2）发布-chart"><a href="#2）发布-chart" class="headerlink" title="2）发布 chart"></a>2）发布 chart</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p>返回值如下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210705160256966.png" srcset="/img/loading.gif" lazyload alt="image-20210705160256966"></p>
+<p>查看发布:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm list<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210705161041080.png" srcset="/img/loading.gif" lazyload alt="image-20210705161041080"></p>
+<h4 id="3）查看-manifest"><a href="#3）查看-manifest" class="headerlink" title="3）查看 manifest"></a>3）查看 manifest</h4><blockquote>
+<p>执行 <code>helm get manifest</code> 可以打印出 <code>release</code> 已经上传到 <code>api server</code> 的资源。每个文件都会以 <code>---</code> `开头，并自动生成注释。</p>
+</blockquote>
+<p>我们可以发现模版中的 <code>&#123;&#123; .Release.Name &#125;&#125;</code> 调用已经渲染成了 Release 的名称。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm get manifest &lt;release_name&gt;</span><br>helm get manifest test-chart<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210705160402893.png" srcset="/img/loading.gif" lazyload alt="image-20210705160402893"></p>
+<h4 id="4）查看渲染效果（不发布）"><a href="#4）查看渲染效果（不发布）" class="headerlink" title="4）查看渲染效果（不发布）"></a>4）查看渲染效果（不发布）</h4><h5 id="1-卸载应用"><a href="#1-卸载应用" class="headerlink" title="1. 卸载应用"></a>1. 卸载应用</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm uninstall test-chart<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-渲染测试"><a href="#2-渲染测试" class="headerlink" title="2. 渲染测试"></a>2. 渲染测试</h5><h6 id="1⃣️-dry-run"><a href="#1⃣️-dry-run" class="headerlink" title="1⃣️ --dry-run"></a>1⃣️ <code>--dry-run</code></h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p>返回如下:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210705162015141.png" srcset="/img/loading.gif" lazyload alt="image-20210705162015141"></p>
+<h6 id="2⃣️-debug"><a href="#2⃣️-debug" class="headerlink" title="2⃣️ --debug"></a>2⃣️ <code>--debug</code></h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run --debug test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p>返回如下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210705161728732.png" srcset="/img/loading.gif" lazyload alt="image-20210705161728732"></p>
+<h3 id="3、Values-的使用"><a href="#3、Values-的使用" class="headerlink" title="3、Values 的使用"></a>3、Values 的使用</h3><p>确切的说，<code>Values</code> 是一个对象，它提供了对于传递到 chart 模版的值的访问方法。其内容的主要来源如下:</p>
+<blockquote>
+<ul>
+<li>chart 中默认的 <code>values.yaml</code> 文件</li>
+<li>如果是<em>子 chart</em>，则为<em>父 chart</em> 的 <code>values.yaml</code> 文件</li>
+<li>命令行使用 <code>-f</code> 指定的 values 文件</li>
+<li>命令行使用 <code>--set</code> 传入的单个参数</li>
+</ul>
+<p>🚩其优先级顺序按照上述列表自下而上，依次减弱。</p>
+</blockquote>
+<h4 id="1）删除默认的-values-yaml"><a href="#1）删除默认的-values-yaml" class="headerlink" title="1）删除默认的 values.yaml"></a>1）删除默认的 values.yaml</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">rm -f mychart/values.yaml <br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）基本使用"><a href="#2）基本使用" class="headerlink" title="2）基本使用"></a>2）基本使用</h4><h5 id="1-创建-values-yaml"><a href="#1-创建-values-yaml" class="headerlink" title="1. 创建 values.yaml"></a>1. 创建 values.yaml</h5><p>文件路径: <code>mychart/values.yaml</code>，添加以下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">aaa:</span> <span class="hljs-string">bbb</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-在-ConfigMap-模版中引用"><a href="#2-在-ConfigMap-模版中引用" class="headerlink" title="2. 在 ConfigMap 模版中引用"></a>2. 在 <code>ConfigMap</code> 模版中引用</h5><p>文件路径: <code>mychart/templates/configmap.yaml </code>，内容如下:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">myvalue:</span> <span class="hljs-string">&quot;Hello World&quot;</span><br>  <span class="hljs-attr">aaa:</span> &#123;&#123; <span class="hljs-string">.Values.aaa</span> &#125;&#125;				<span class="hljs-comment"># 追加内容</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版"><a href="#3-渲染模版" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p><strong>渲染结果如下：</strong></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707143605000.png" srcset="/img/loading.gif" lazyload alt="image-20210707143605000"></p>
+<h4 id="3）多结构化表达式"><a href="#3）多结构化表达式" class="headerlink" title="3）多结构化表达式"></a>3）多结构化表达式</h4><h5 id="1-创建-values-yaml-1"><a href="#1-创建-values-yaml-1" class="headerlink" title="1. 创建 values.yaml"></a>1. 创建 values.yaml</h5><p>文件路径：<code>mychart/other_values.yaml</code>，添加以下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">person:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">Tareya</span><br>  <span class="hljs-attr">gender:</span> <span class="hljs-string">male</span><br>  <span class="hljs-attr">age:</span> <span class="hljs-number">18</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-在模版中引用"><a href="#2-在模版中引用" class="headerlink" title="2. 在模版中引用"></a>2. 在模版中引用</h5><p>文件路径：<code>mychart/templates/configmap.yaml</code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">myvalue:</span> <span class="hljs-string">&quot;Hello World&quot;</span><br>  <span class="hljs-attr">aaa:</span> &#123;&#123; <span class="hljs-string">.Values.aaa</span> &#125;&#125;<br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Values.person.name</span> &#125;&#125;				<span class="hljs-comment"># 追加内容</span><br>  <span class="hljs-attr">gender:</span> &#123;&#123; <span class="hljs-string">.Values.person.gender</span> &#125;&#125;<br>  <span class="hljs-attr">age:</span> &#123;&#123; <span class="hljs-string">.Values.person.age</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版-1"><a href="#3-渲染模版-1" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><p>你可以发现我们创建的文件名并非默认的 <code>values.yaml</code>。还记得我们之前说过，可以通过 <code>-f</code> 的方式指定 <code>Values</code> 的配置文件吗？这边我们来试验下，执行如下命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install -f mychart/other_values.yaml --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p><strong>渲染结果如下：</strong></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707145708150.png" srcset="/img/loading.gif" lazyload alt="image-20210707145708150"></p>
+<p>可以发现，渲染结果不但读取了默认的 <code>values.yaml</code> ，还读取了我们指定的 <code>other_values.yaml</code>。</p>
+<h4 id="4）使用-set-指定配置参数"><a href="#4）使用-set-指定配置参数" class="headerlink" title="4）使用 --set 指定配置参数"></a>4）使用 <code>--set</code> 指定配置参数</h4><p>还记得我们上面说的 Values 的优先级吗？我们在这边做个简单的验证，上面我们已经在 <code>values.yaml</code> 中设置了 <code>aaa</code> 的值为 <code>bbb</code>，接下来，让我们执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --set aaa=abcdefg --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p>渲染结果如下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707144128673.png" srcset="/img/loading.gif" lazyload alt="image-20210707144128673"></p>
+<p>可以发现，原本 <code>values.yaml</code> 中的默认配置被我们命令行指定的配置覆盖了。</p>
+<h4 id="5）通过设置-null-删除默认配置"><a href="#5）通过设置-null-删除默认配置" class="headerlink" title="5）通过设置 null 删除默认配置"></a>5）通过设置 <code>null</code> 删除默认配置</h4><p>我们知道 <code>Values</code> 的配置其实就是一个 Key:Vaule 对，所以如果要从默认的 <code>Values</code> 中删除配置，其实只要将 Key 设置为 <code>null</code>，Helm 在进行渲染的过程中，就会合并并删除对应的 Key。</p>
+<h5 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h5><p>下面我们用一个示例来说明。比如，稳定的 <code>Drupal</code> chart 允许在配置自定义镜像时配置动态探针，默认值如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">livenessProbe:</span><br>  <span class="hljs-attr">httpGet:</span><br>    <span class="hljs-attr">path:</span> <span class="hljs-string">/user/login</span><br>    <span class="hljs-attr">port:</span> <span class="hljs-string">http</span><br>  <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">120</span><br></code></pre></td></tr></table></figure>
+
+<p>如果我们想用 <code>exec</code> 来代替 <code>httpGet</code> 重写动态探针，我们可以使用 <code>--set livenessProbe.exec.command=[cat,docroot/CHANGELOG.txt]</code> ，在进行最终渲染合并后，生产的 manifest 内容会如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">livenessProbe:</span><br>  <span class="hljs-attr">httpGet:</span><br>    <span class="hljs-attr">path:</span> <span class="hljs-string">/user/login</span><br>    <span class="hljs-attr">port:</span> <span class="hljs-string">http</span><br>  <span class="hljs-attr">exec:</span><br>    <span class="hljs-attr">command:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">cat</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">docroot/CHANGELOG.txt</span><br>  <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">120</span><br></code></pre></td></tr></table></figure>
+
+<p>但是，由于同时存在2个动态探针句柄，所以 K8s 在部署时会报错，这个时候可以执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install stable/drupal --set image=my-registry/drupal:0.1.0 --set livenessProbe.exec.command=[cat,docroot/CHANGELOG.txt] --set livenessProbe.httpGet=null<br></code></pre></td></tr></table></figure>
+
+<p>这种情况下，最终生成的 manifest 如下，<code>httpGet</code> 句柄会被删除：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">livenessProbe:</span><br>  <span class="hljs-attr">exec:</span><br>    <span class="hljs-attr">command:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">cat</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">docroot/CHANGELOG.txt</span><br>  <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">120</span><br></code></pre></td></tr></table></figure>
+
+<p>如此，K8s 才能够正常安装。</p>
+<hr>
+<h2 id="二、Helm-的内置对象列表"><a href="#二、Helm-的内置对象列表" class="headerlink" title="二、Helm 的内置对象列表"></a>二、Helm 的内置对象列表</h2><h3 id="1、Release"><a href="#1、Release" class="headerlink" title="1、Release"></a>1、Release</h3><p>该对象描述了版本发布本身，内部元素对象如下：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>.Release.Name</strong></td>
+<td>release 的名称</td>
+</tr>
+<tr>
+<td><strong>.Release.Namespace</strong></td>
+<td>当次版包含的命名空间</td>
+</tr>
+<tr>
+<td><strong>.Release.IsInstall</strong></td>
+<td>如果当前操作为安装，则该值会设置为 <code>true</code></td>
+</tr>
+<tr>
+<td><strong>.Release.IsUpgrade</strong></td>
+<td>如果当前操作为升级或者回滚，则该值会设置为 <code>true</code></td>
+</tr>
+<tr>
+<td><strong>.Release.Revision</strong></td>
+<td>此次修订的版本号，初次安装时为1，每次升级或回滚操作都会自增1</td>
+</tr>
+<tr>
+<td><strong>.Release.Service</strong></td>
+<td>用于渲染当前模版的 service，Helm 中一般为 <code>helm</code></td>
+</tr>
+</tbody></table>
+<h3 id="2、Files"><a href="#2、Files" class="headerlink" title="2、Files"></a>2、Files</h3><p>该对象其实是一组方法，通过其可以访问 <em>chart</em> 中文件（如，<code>.helmignore</code>），内部方法对象如下：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>.Files.Get</strong></td>
+<td>通过文件名获取文件内容的方法，使用方法如 <code>.Files.Getconfig.ini</code>，<em>config.ini</em> 为文件名</td>
+</tr>
+<tr>
+<td><strong>.Files.GetBytes</strong></td>
+<td>用字节数组代替字符串获取文件内容的方法。 对图片之类的文件很有用</td>
+</tr>
+<tr>
+<td><strong>.Files.Glob</strong></td>
+<td>用给定的 shell glob 模式匹配文件名，并返回一个列表</td>
+</tr>
+<tr>
+<td><strong>.Files.Lines</strong></td>
+<td>逐行读取文件内容的方法。迭代文件中每一行时很有用</td>
+</tr>
+<tr>
+<td><strong>.Files.AsSecrets</strong></td>
+<td>使用Base 64编码字符串返回文件体的方法</td>
+</tr>
+<tr>
+<td><strong>.Files.AsConfig</strong></td>
+<td>使用YAML格式返回文件体的方法</td>
+</tr>
+</tbody></table>
+<h3 id="3、Capabilities"><a href="#3、Capabilities" class="headerlink" title="3、Capabilities"></a>3、Capabilities</h3><p>该对象提供了关于 Kubernetes 集群支持功能的信息，内部元素对象如下：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>.Capabilities.APIVersions</strong></td>
+<td>Kubernetes 内部使用的版本集合</td>
+</tr>
+<tr>
+<td><strong>.Capabilities.APIVersions.Has $version</strong></td>
+<td>说明集群中的版本 (如, <code>batch/v1</code>) 或是资源 (如, <code>apps/v1/Deployment</code>) 是否可用</td>
+</tr>
+<tr>
+<td><strong>.Capabilities.KubeVersion</strong></td>
+<td>Kubernetes的版本号</td>
+</tr>
+<tr>
+<td><strong>.Capabilities.KubeVersion.Version</strong></td>
+<td>Kubernetes的版本号</td>
+</tr>
+<tr>
+<td><strong>.Capabilities.KubeVersion.Major</strong></td>
+<td>Kubernetes的主版本</td>
+</tr>
+<tr>
+<td><strong>.Capabilities.KubeVersion.Minor</strong></td>
+<td>Kubernetes的次版本</td>
+</tr>
+</tbody></table>
+<h3 id="4、Template"><a href="#4、Template" class="headerlink" title="4、Template"></a>4、Template</h3><p>该对象包含了已经被执行的当前模版的信息，内部元素对象如下:</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>.Template.Name</strong></td>
+<td>当前模板的命名空间文件路径 (如， <code>mychart/templates/configmap.yaml</code>)</td>
+</tr>
+<tr>
+<td><strong>.Template.BasePath</strong></td>
+<td>当前chart模板目录的路径 (如，<code>mychart/templates</code>)</td>
+</tr>
+</tbody></table>
+<h3 id="5、Values"><a href="#5、Values" class="headerlink" title="5、Values"></a>5、Values</h3><p>该对象是从 <code>values.yaml</code> 文件，用户通过 <code>-f</code> 参数指定的文件以及命令行 <code>--set</code> 参数传入的方式注入模版的。<code>Values</code> 默认为空。</p>
+<h3 id="6、Chart"><a href="#6、Chart" class="headerlink" title="6、Chart"></a>6、Chart</h3><p>该对象表示的是 <code>Chart.yaml</code> 文件的内容。其中任意的有效数据都可以以诸诸如 <code>&#123;&#123; .Chart.Nmae &#125;&#125;-&#123;&#123; .Chart.Version&#125;&#125;</code> 这样的方式访问。</p>
+<hr>
+<h2 id="三、常用模版函数"><a href="#三、常用模版函数" class="headerlink" title="三、常用模版函数"></a>三、常用模版函数</h2><h3 id="1、quote-函数和-squote-函数"><a href="#1、quote-函数和-squote-函数" class="headerlink" title="1、quote 函数和 squote 函数"></a>1、quote 函数和 squote 函数</h3><p><code>quote</code> 函数是 <code>Sprig</code> 模版库提供的一种字符串函数，它的用途实际上就是用双引号将字符串扩起来（转字符串），如果需要 <code>&quot;</code> ，则需要添加 <code>\</code> 来进行转译。</p>
+<p><code>squote</code> 函数的用途是用单引号将字符串扩起来，它和 <code>quote</code> 函数唯一的区别在于，<code>squote</code> 函数不会对内容进行转译。</p>
+<h4 id="示例说明："><a href="#示例说明：" class="headerlink" title="示例说明："></a>示例说明：</h4><h5 id="1-模版文件"><a href="#1-模版文件" class="headerlink" title="1. 模版文件"></a>1. 模版文件</h5><p>路径: <code>mychart/templates/configmap.yaml</code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">aaa:</span> &#123;&#123; <span class="hljs-string">.Values.aaa</span> &#125;&#125;<br>  <span class="hljs-attr">bbb:</span> &#123;&#123; <span class="hljs-string">quote</span> <span class="hljs-string">.Values.bbb</span> &#125;&#125;<br>  <span class="hljs-attr">ccc:</span> &#123;&#123; <span class="hljs-string">squote</span> <span class="hljs-string">.Values.ccc</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-values-文件"><a href="#2-values-文件" class="headerlink" title="2. values 文件"></a>2. values 文件</h5><p>路径: <code>mychart/values.yaml </code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">aaa:</span> <span class="hljs-string">bbb</span><br><span class="hljs-attr">bbb:</span> <span class="hljs-string">ccc</span><br><span class="hljs-attr">ccc:</span> <span class="hljs-string">ddd</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版-2"><a href="#3-渲染模版-2" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test_chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p><strong>渲染效果如下：</strong></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707180036706.png" srcset="/img/loading.gif" lazyload alt="image-20210707180036706"></p>
+<h3 id="2、upper-函数-和-title-函数"><a href="#2、upper-函数-和-title-函数" class="headerlink" title="2、upper 函数 和 title 函数"></a>2、upper 函数 和 title 函数</h3><p><code>upper</code> 函数也是 <code>Sprig</code> 模版库提供的，它的作用是将所有小写字母转成大写；<code>title</code> 函数与其类似，但是只将首字母转大写。</p>
+<h4 id="示例说明：-1"><a href="#示例说明：-1" class="headerlink" title="示例说明："></a>示例说明：</h4><h5 id="1-模版文件-1"><a href="#1-模版文件-1" class="headerlink" title="1. 模版文件"></a>1. 模版文件</h5><p>路径: <code>mychart/templates/configmap.yaml</code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">aaa:</span> &#123;&#123; <span class="hljs-string">.Values.aaa</span> &#125;&#125;<br>  <span class="hljs-attr">bbb:</span> &#123;&#123; <span class="hljs-string">upper</span> <span class="hljs-string">.Values.bbb</span> &#125;&#125;<br>  <span class="hljs-attr">ccc:</span> &#123;&#123; <span class="hljs-string">title</span> <span class="hljs-string">.Values.ccc</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-values-文件-1"><a href="#2-values-文件-1" class="headerlink" title="2. values 文件"></a>2. values 文件</h5><p>路径: <code>mychart/values.yaml </code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">aaa:</span> <span class="hljs-string">bbb</span><br><span class="hljs-attr">bbb:</span> <span class="hljs-string">ccc</span><br><span class="hljs-attr">ccc:</span> <span class="hljs-string">ddd</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版-3"><a href="#3-渲染模版-3" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test_chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p><strong>渲染效果如下:</strong></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707181049656.png" srcset="/img/loading.gif" lazyload alt="image-20210707181049656"></p>
+<h3 id="3、default-函数"><a href="#3、default-函数" class="headerlink" title="3、default 函数"></a>3、default 函数</h3><p>实际上，在模版函数中最被常用的函数就是 <code>default</code> 函数，它允许模版的编写者在模版中指定一个默认值，以防没有在 Values 中预设而导致参数被忽略。</p>
+<h4 id="示例说明：-2"><a href="#示例说明：-2" class="headerlink" title="示例说明："></a>示例说明：</h4><h5 id="1-模版文件-2"><a href="#1-模版文件-2" class="headerlink" title="1. 模版文件"></a>1. 模版文件</h5><p>路径: <code>mychart/templates/configmap.yaml</code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">service:</span> &#123;&#123; <span class="hljs-string">quote</span> <span class="hljs-string">.Values.service.name</span> &#125;&#125;<br>  <span class="hljs-attr">protocol:</span> &#123;&#123; <span class="hljs-string">.Values.service.protocol</span> <span class="hljs-string">|</span> <span class="hljs-string">default</span> <span class="hljs-string">&quot;http&quot;</span> <span class="hljs-string">|</span> <span class="hljs-string">quote</span> &#125;&#125;<br>  <span class="hljs-attr">port:</span> &#123;&#123; <span class="hljs-string">.Values.service.port</span> <span class="hljs-string">|</span> <span class="hljs-string">default</span> <span class="hljs-number">80</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-values-文件-2"><a href="#2-values-文件-2" class="headerlink" title="2. values 文件"></a>2. values 文件</h5><p>路径: <code>mychart/values.yaml </code>，内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">service:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span><br>  <span class="hljs-attr">protocol:</span> <span class="hljs-string">https</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">443</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版-4"><a href="#3-渲染模版-4" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test_chart ./mychart<br></code></pre></td></tr></table></figure>
+
+<p><strong>渲染效果如下:</strong></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707182537495.png" srcset="/img/loading.gif" lazyload alt="image-20210707182537495"></p>
+<h5 id="4-修改-values-文件"><a href="#4-修改-values-文件" class="headerlink" title="4. 修改 values 文件"></a>4. 修改 values 文件</h5><p>路径: <code>mychart/values.yaml </code>，去掉部分内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">service:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span><br></code></pre></td></tr></table></figure>
+
+<p>再次渲染，渲染效果如下:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210707182811994.png" srcset="/img/loading.gif" lazyload alt="image-20210707182811994"></p>
+<p>可以发现，在 Values 中，我们并没有做预设，而渲染结果取了默认值，使用这种方法可以比较有效的减少由于缺少参数导致的发布失败。</p>
+<h3 id="4、管道"><a href="#4、管道" class="headerlink" title="4、管道"></a>4、管道</h3><p>有没有发现，我们在上面的模版文件中，使用了一个类似 UNIX shell 的功能 —— <code>|</code>？是的，它的功能就类似 UNIX 的 <code>管道</code>。还记得 <code>管道</code>  的作用吗？<code>将管道前执行的结果交由管道后的命令执行</code>，这里的效果也类似。下面我们再用示例说明下。</p>
+<h4 id="示例说明：-3"><a href="#示例说明：-3" class="headerlink" title="示例说明："></a>示例说明：</h4><h5 id="1-模版文件-3"><a href="#1-模版文件-3" class="headerlink" title="1. 模版文件"></a>1. 模版文件</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ConfigMap</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Release.Name</span> &#125;&#125;<span class="hljs-string">-configmap</span><br><span class="hljs-attr">data:</span><br>  <span class="hljs-attr">service:</span> &#123;&#123; <span class="hljs-string">.Values.service.name</span> <span class="hljs-string">|</span> <span class="hljs-string">title</span> <span class="hljs-string">|</span> <span class="hljs-string">quote</span> &#125;&#125;									<br>  <span class="hljs-attr">protocol:</span> &#123;&#123; <span class="hljs-string">.Values.service.protocol</span> <span class="hljs-string">|</span> <span class="hljs-string">default</span> <span class="hljs-string">&quot;http&quot;</span> <span class="hljs-string">|</span> <span class="hljs-string">upper</span>  &#125;&#125;<br>  <span class="hljs-attr">port:</span> &#123;&#123; <span class="hljs-string">.Values.service.port</span> <span class="hljs-string">|</span> <span class="hljs-string">default</span> <span class="hljs-number">80</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如上，我们执行了几个管道操作，其执行的含义如下：</p>
+<ul>
+<li><p><code>&#123;&#123; .Values.service.name | title | quote &#125;&#125;</code></p>
+<p>将搜索 <code>.Values.service.name</code> 的结果首字母转大写，并用双引号引起来</p>
+</li>
+<li><p><code>&#123;&#123; .Values.service.protocol | default "http" | upper  &#125;&#125;</code></p>
+<p>将搜索 <code>.Values.service.protocol</code> 的结果（如果没有则默认值为 http）所有字母转大写</p>
+</li>
+</ul>
+</blockquote>
+<h5 id="2-values-文件-3"><a href="#2-values-文件-3" class="headerlink" title="2. values 文件"></a>2. values 文件</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">service:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span><br>  <span class="hljs-attr">protocol:</span> <span class="hljs-string">tcp</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">80</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="3-渲染模版-5"><a href="#3-渲染模版-5" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run mychart ./mychart/<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210708150257165.png" srcset="/img/loading.gif" lazyload alt="image-20210708150257165"></p>
+<blockquote>
+<p>🚩 <strong>在默认的语法规则中，虽然两种方式都可以使用，但是我们较常使用的方法为 <code>.val | quote </code> 而非使用 <code>quote .val</code></strong></p>
+</blockquote>
+<h3 id="5、include-函数-和-template-函数"><a href="#5、include-函数-和-template-函数" class="headerlink" title="5、include 函数 和 template 函数"></a>5、include 函数 和 template 函数</h3><h3 id="6、indent-函数-和-nindent-函数-和-plural-函数"><a href="#6、indent-函数-和-nindent-函数-和-plural-函数" class="headerlink" title="6、indent 函数 和 nindent 函数 和 plural 函数"></a>6、indent 函数 和 nindent 函数 和 plural 函数</h3><h3 id="7、lookup-函数"><a href="#7、lookup-函数" class="headerlink" title="7、lookup 函数"></a>7、lookup 函数</h3><hr>
+<h2 id="四、流程控制"><a href="#四、流程控制" class="headerlink" title="四、流程控制"></a>四、流程控制</h2>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Helm3-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E6%89%8B%E5%86%8C/">Helm3 快速入门手册</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/07/24/%E7%AC%AC3%E7%AB%A0%E3%80%81%E5%88%9D%E8%AF%86-Chart%20/">
+                        <span class="hidden-mobile">第3章、初识 Chart</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
