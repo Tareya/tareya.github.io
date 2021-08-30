@@ -1,0 +1,1188 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="腾讯蓝鲸（Go版） 快速入门手册">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>腾讯蓝鲸（Go版） 快速入门手册 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="腾讯蓝鲸（Go版） 快速入门手册">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-08-30 11:50" pubdate>
+        2021年8月30日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.8k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      66
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">腾讯蓝鲸（Go版） 快速入门手册</h1>
+            
+            <div class="markdown-body">
+              <h1 id="腾讯蓝鲸（Go版）-快速入门手册"><a href="#腾讯蓝鲸（Go版）-快速入门手册" class="headerlink" title="腾讯蓝鲸（Go版） 快速入门手册"></a>腾讯蓝鲸（Go版） 快速入门手册</h1><span id="more"></span>
+
+<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/bk-cmdb.png" srcset="/img/loading.gif" lazyload alt="bk-cmdb"></p>
+<p><a target="_blank" rel="noopener" href="https://bk.tencent.com/">蓝鲸官网</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb">官方github</a></p>
+<h3 id="1、蓝鲸简介"><a href="#1、蓝鲸简介" class="headerlink" title="1、蓝鲸简介"></a>1、蓝鲸简介</h3><p>蓝鲸配置平台（蓝鲸CMDB）是一个面向资产及应用的企业级配置管理平台。</p>
+<p>蓝鲸配置平台提供了全新自定义模型管理，用户不仅可以方便地实现内置模型属性的拓展，同时也能够根据不同的企业需求随时新增模型和关联关系，把网络、中间件、虚拟资源等纳入到CMDB的管理中。除此之外还增加了更多符合场景需要的新功能：机器数据快照、数据自动发现、变更事件主动推送、更加精细的权限管理、可拓展的业务拓扑等功能。</p>
+<p>在技术构建上，架构的核心聚焦于资源，我们把CMDB管理的原子资源分为主机、进程和通用对象三种类型，并构建了对这些资源的原子操作层。在这些原子操作之上，我们构建了更贴近用户操作的场景层，场景层通过对不同资源的组合操作来完成用户的请求。</p>
+<h3 id="2、具体功能"><a href="#2、具体功能" class="headerlink" title="2、具体功能"></a>2、具体功能</h3><ul>
+<li>拓扑化的主机管理：主机基础属性、主机快照数据、主机归属关系管理</li>
+<li>组织架构管理：可扩展的基于业务的组织架构管理</li>
+<li>模型管理：既能管理业务、集群、主机等内置模型，也能自定义模型</li>
+<li>进程管理：基于模块的主机进程管理</li>
+<li>事件注册与推送：提供基于回调方式的事件注册与推送</li>
+<li>通用权限管理：灵活的基于用户组的权限管理</li>
+<li>操作审计：用户操作行为的审计与回溯</li>
+</ul>
+<h3 id="3、架构设计"><a href="#3、架构设计" class="headerlink" title="3、架构设计"></a>3、架构设计</h3><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826102802263.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸架构设计"></p>
+<h3 id="4、服务进程清单"><a href="#4、服务进程清单" class="headerlink" title="4、服务进程清单"></a>4、服务进程清单</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cmdb_webserver</td>
+<td>web server 服务子目录</td>
+</tr>
+<tr>
+<td>cmdb_apiserver</td>
+<td>场景层服务，api 服务</td>
+</tr>
+<tr>
+<td>cmdb_coreservice</td>
+<td>资源管理层，提供原子接口服务</td>
+</tr>
+<tr>
+<td>cmdb_adminserver</td>
+<td>负责系统数据的初始化以及配置管理工作</td>
+</tr>
+<tr>
+<td>cmdb_authserver</td>
+<td>鉴权认证服务</td>
+</tr>
+<tr>
+<td>cmdb_cloudserver</td>
+<td>云数据管理服务</td>
+</tr>
+<tr>
+<td>cmdb_datacollection</td>
+<td>场景层服务，数据采集服务</td>
+</tr>
+<tr>
+<td>cmdb_eventserver</td>
+<td>场景层服务，事件推送服务</td>
+</tr>
+<tr>
+<td>cmdb_hostserver</td>
+<td>场景层服务，主机数据维护</td>
+</tr>
+<tr>
+<td>cmdb_operationserver</td>
+<td>场景层服务，提供与运营统计相关功能服务</td>
+</tr>
+<tr>
+<td>cmdb_procserver</td>
+<td>场景层服务，负责进程数据的维护</td>
+</tr>
+<tr>
+<td>cmdb_synchronizeserver</td>
+<td>场景层服务，数据同步服务</td>
+</tr>
+<tr>
+<td>cmdb_toposerver</td>
+<td>场景层服务，负责模型的定义以及主机、业务、模块及进程等实例数据的维护</td>
+</tr>
+<tr>
+<td>cmdb_taskserver</td>
+<td>场景层服务，异步任务管理服务</td>
+</tr>
+</tbody></table>
+<h3 id="5、代码结构"><a href="#5、代码结构" class="headerlink" title="5、代码结构"></a>5、代码结构</h3><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826103025159.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸代码结构"></p>
+<h4 id="目录结构说明："><a href="#目录结构说明：" class="headerlink" title="目录结构说明："></a>目录结构说明：</h4><table>
+<thead>
+<tr>
+<th>目录</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>web-server</td>
+<td>web层服务后端，基于 golang 的 gin框架</td>
+</tr>
+<tr>
+<td>ui</td>
+<td>web层服务前端，基于 vue.js</td>
+</tr>
+<tr>
+<td>test</td>
+<td>系统服务的测试用例，基于 golang 原生</td>
+</tr>
+<tr>
+<td>tools</td>
+<td>客户端管理工具（基于 golang）以及辅助脚本工具（基于 Javascript）</td>
+</tr>
+<tr>
+<td>apiserver</td>
+<td>接入层 api 服务层，基于 golang 的 go-restful 框架</td>
+</tr>
+<tr>
+<td>scene_server</td>
+<td>接入层 场景微服务层，基于 golang 的 go-restful 框架</td>
+</tr>
+<tr>
+<td>source_controller</td>
+<td>接入层 资源调度层，基于 golang 的 go-restful 框架，提供原子接口服务</td>
+</tr>
+<tr>
+<td>common</td>
+<td>项目公共依赖库，基于 golang 原生</td>
+</tr>
+<tr>
+<td>storage</td>
+<td>存储接入封装，基于 golang 原生</td>
+</tr>
+<tr>
+<td>thirdpartyclient</td>
+<td>第三方客户端接入封装，基于 golang 原生</td>
+</tr>
+</tbody></table>
+<h2 id="二、编译"><a href="#二、编译" class="headerlink" title="二、编译"></a>二、编译</h2><h3 id="1、编译环境准备"><a href="#1、编译环境准备" class="headerlink" title="1、编译环境准备"></a>1、编译环境准备</h3><h4 id="1）环境需求"><a href="#1）环境需求" class="headerlink" title="1）环境需求"></a>1）环境需求</h4><ul>
+<li>golang &gt;= 1.8</li>
+<li>python &gt;= 2.7.5</li>
+<li>nodejs &gt;= 4.0.0（编译过程中需要可以连公网下载依赖包）</li>
+</ul>
+<h4 id="2）安装-Go"><a href="#2）安装-Go" class="headerlink" title="2）安装 Go"></a>2）安装 Go</h4><p>推荐使用 g 进行 Go 的版本管理，参考如下文档</p>
+<p><a href="https://tareya.github.io/2021/08/25/golang-%E5%A4%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7-%E2%80%94-g/#golang-%E5%A4%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7-%E2%80%94-g">golang 多版本管理工具 — g</a></p>
+<h4 id="3）安装-node-js"><a href="#3）安装-node-js" class="headerlink" title="3）安装 node.js"></a>3）安装 node.js</h4><h5 id="1-下载源码包"><a href="#1-下载源码包" class="headerlink" title="1. 下载源码包"></a>1. 下载源码包</h5><p><a target="_blank" rel="noopener" href="https://nodejs.org/zh-cn/download/">官网下载地址</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget -c https://nodejs.org/dist/v14.17.5/node-v14.17.5-linux-x64.tar.xz\<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-解压并设置路径"><a href="#2-解压并设置路径" class="headerlink" title="2. 解压并设置路径"></a>2. 解压并设置路径</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">tar xf node-v14.17.5-linux-x64.tar.xz -C /data/applications/ &amp;&amp; \<br>cd /data/applications &amp;&amp; \<br>ln -s node-v14.17.5-linux-x64 node &amp;&amp; \<br>ln -s /data/applications/node/bin/* /usr/local/bin/<br></code></pre></td></tr></table></figure>
+
+<p>验证:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">node -v <br>npm -v<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-安装-cnpm"><a href="#3-安装-cnpm" class="headerlink" title="3. 安装 cnpm"></a>3. 安装 cnpm</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">npm install -g cnpm --registry=https://registry.npm.taobao.org<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825165451698.png" srcset="/img/loading.gif" lazyload alt="image-20210825165451698"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ln -s /data/applications/node/bin/cnpm /usr/local/bin/<br></code></pre></td></tr></table></figure>
+
+<p>验证:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cnpm -v<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、源码编译"><a href="#2、源码编译" class="headerlink" title="2、源码编译"></a>2、源码编译</h3><h4 id="1）源码下载"><a href="#1）源码下载" class="headerlink" title="1）源码下载"></a>1）源码下载</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir ~/go/src &amp;&amp; \<br>export GOPATH=~/go &amp;&amp; \<br>cd $GOPATH/src &amp;&amp; \<br>git clone git@github.com:Tareya/configcenter.git<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）整体编译"><a href="#2）整体编译" class="headerlink" title="2）整体编译"></a>2）整体编译</h4><blockquote>
+<p>🚩 <strong>三种编译模式</strong></p>
+<p>官方提供的 Makefile 提供了多种编译模式</p>
+<p>1⃣️ <strong>指定版本号的编译</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">VERSION=xxxx make<br></code></pre></td></tr></table></figure>
+
+<p>2⃣️ <strong>本地代码分支编译</strong></p>
+<p>Makefile 默认为支持 darwin 平台，且 默认情况是前后端一起编译</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make <br></code></pre></td></tr></table></figure>
+
+<p>3⃣️ <strong>编译参数</strong></p>
+<p>支持 linux 平台编译，需要指定</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make linux<br></code></pre></td></tr></table></figure>
+
+<p>使用 cnpm 代替 npm 编译前端</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make NPM=cnpm<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h5 id="支持-Linux-平台编译"><a href="#支持-Linux-平台编译" class="headerlink" title="支持 Linux 平台编译"></a>支持 Linux 平台编译</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd $GOPATH/src/configcenter/src &amp;&amp; \<br>export GOPATH=~/go &amp;&amp; \<br>make linux NPM=cnpm<br></code></pre></td></tr></table></figure>
+
+<h5 id="问题记录-解决环境变量识别问题"><a href="#问题记录-解决环境变量识别问题" class="headerlink" title="问题记录: 解决环境变量识别问题"></a>问题记录: 解决环境变量识别问题</h5><h6 id="错误信息："><a href="#错误信息：" class="headerlink" title="错误信息："></a>错误信息：</h6><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825172030664.png" srcset="/img/loading.gif" lazyload alt="image-20210825172030664"></p>
+<h6 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>在官方提供的 Makefile 中，路径是写死的，所以如果路径不一致，会无法读取到对应的文件</p>
+<h6 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案:"></a>解决方案:</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">export GOPATH=~/go<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）后端编译（可选）"><a href="#3）后端编译（可选）" class="headerlink" title="3）后端编译（可选）"></a>3）后端编译（可选）</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make server <br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）前端编译（可选）"><a href="#4）前端编译（可选）" class="headerlink" title="4）前端编译（可选）"></a>4）前端编译（可选）</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make ui NPM=cnpm<br></code></pre></td></tr></table></figure>
+
+<h5 id="问题记录-解决node编译oom问题"><a href="#问题记录-解决node编译oom问题" class="headerlink" title="问题记录: 解决node编译oom问题"></a>问题记录: 解决node编译oom问题</h5><h6 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息:"></a>错误信息:</h6><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825172156810.png" srcset="/img/loading.gif" lazyload alt="image-20210825172156810"></p>
+<h6 id="问题原因-1"><a href="#问题原因-1" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>该问题是由于前端代码问题导致的 node 编译 OOM ，旧版本暂时没有此类问题，故推荐使用 release <a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb/releases/tag/release-v3.9.5">v3.9.5</a> 的源码</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb/issues/5341">官方 github issue 记录</a></p>
+<p><a href="https://tareya.github.io/2021/08/26/node-%E7%BC%96%E8%AF%91-JavaScript-heap-out-of-memory-%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">类似问题解决方法</a></p>
+<h3 id="3、打包镜像"><a href="#3、打包镜像" class="headerlink" title="3、打包镜像"></a>3、打包镜像</h3><h4 id="1）打包前后端编译结果"><a href="#1）打包前后端编译结果" class="headerlink" title="1）打包前后端编译结果"></a>1）打包前后端编译结果</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make package<br></code></pre></td></tr></table></figure>
+
+<p>归档包存放位置：<code>~/go/src/configcenter/src/bin/pub/cmdb.tar.gz</code></p>
+<h4 id="2）镜像制作"><a href="#2）镜像制作" class="headerlink" title="2）镜像制作"></a>2）镜像制作</h4><p>解压cmdb.tar.gz，进入cmdb目录执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> -i 参数后面配置的参数是基础镜像，基础镜像可以自己制作，也可以使用公共镜像。v</span><br>./image.sh -i &lt;base_image&gt;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="三、部署"><a href="#三、部署" class="headerlink" title="三、部署"></a>三、部署</h2><h3 id="1、依赖的三方组件清单"><a href="#1、依赖的三方组件清单" class="headerlink" title="1、依赖的三方组件清单"></a>1、依赖的三方组件清单</h3><ul>
+<li>ZooKeeper &gt;= 3.4.11</li>
+<li>Redis &gt;= 3.2.11</li>
+<li>MongoDB &gt;= 4.2</li>
+<li>Elasticsearch &gt;= 7.0.0 (用于全文检索功能)</li>
+<li>Monstache &gt;= 6.0.0 (用于全文检索功能)</li>
+</ul>
+<h3 id="2、Docker-部署-Zookeeper（单机）"><a href="#2、Docker-部署-Zookeeper（单机）" class="headerlink" title="2、Docker 部署 Zookeeper（单机）"></a>2、Docker 部署 Zookeeper（单机）</h3><p><a target="_blank" rel="noopener" href="https://zookeeper.apache.org/">Zookeeper 官网地址</a></p>
+<h4 id="1）环境准备"><a href="#1）环境准备" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="1-拉取镜像-（官方推荐-3-4-12-版本）"><a href="#1-拉取镜像-（官方推荐-3-4-12-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 3.4.12 版本）"></a>1. 拉取镜像 （官方推荐 3.4.12 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull zookeeper:3.4.12<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建持久化目录"><a href="#2-创建持久化目录" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/zookeepr/&#123;conf,data,log&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）编辑配置文件"><a href="#2）编辑配置文件" class="headerlink" title="2）编辑配置文件"></a>2）编辑配置文件</h4><h5 id="1-新建配置文件"><a href="#1-新建配置文件" class="headerlink" title="1. 新建配置文件"></a>1. 新建配置文件</h5><p>文件路径: <code>/data/bk-cmdb/zookeepr/conf/zoo.cfg</code>，文件内容如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">clientPort=2181<br>dataDir=/data<br>dataLogDir=/datalog<br>tickTime=2000<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-参数说明"><a href="#2-参数说明" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clientPort</td>
+<td>zookeeper 监听端口</td>
+</tr>
+<tr>
+<td>dataDir</td>
+<td>Zookeeper 保存数据的目录</td>
+</tr>
+<tr>
+<td>dataLogDir</td>
+<td>Zookeeper 保存日志的目录</td>
+</tr>
+<tr>
+<td>tickTime</td>
+<td>Zookeeper 服务之间或与客户端之间心跳检测的间隔时间</td>
+</tr>
+</tbody></table>
+<h4 id="3）启动容器"><a href="#3）启动容器" class="headerlink" title="3）启动容器"></a>3）启动容器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name zookeeper -p 2181:2181 -v /data/bk-cmdb/zookeepr/data:/data -v /data/bk-cmdb/zookeepr/log:/datalog -v /etc/localtime:/etc/localtime --restart=always zookeeper:3.4.12<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、部署-Redis"><a href="#3、部署-Redis" class="headerlink" title="3、部署 Redis"></a>3、部署 Redis</h3><h4 id="1）环境准备-1"><a href="#1）环境准备-1" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="1-拉取镜像-（官方推荐-3-2-11-版本）"><a href="#1-拉取镜像-（官方推荐-3-2-11-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 3.2.11 版本）"></a>1. 拉取镜像 （官方推荐 3.2.11 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull redis:3.2.11-alpine<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建持久化目录-1"><a href="#2-创建持久化目录-1" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/redis/&#123;conf,data,log&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）编辑配置文件-1"><a href="#2）编辑配置文件-1" class="headerlink" title="2）编辑配置文件"></a>2）编辑配置文件</h4><h5 id="1-新建配置文件-1"><a href="#1-新建配置文件-1" class="headerlink" title="1. 新建配置文件"></a>1. 新建配置文件</h5><p>文件路径: <code>/data/bk-cmdb/redis/conf/redis.conf</code>，文件内容如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs shell">port 6379<br>bind 0.0.0.0<br>loglevel notice<br>logfile &quot;/tmp/redis.log&quot;<br><br>dbfilename dump.rdb<br>dir ./<br>save 900 1<br>stop-writes-on-bgsave-error yes<br>rdbcompression yes<br>rdbchecksum yes<br><br>daemonize no		<br>protected-mode no<br>requirepass &#x27;PassWord@123&#x27;<br><br>maxmemory 1g<br>maxmemory-policy volatile-lru<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-参数说明-1"><a href="#2-参数说明-1" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>port</td>
+<td>redis 监听端口</td>
+</tr>
+<tr>
+<td>bind</td>
+<td>redis 监听地址，由于容器启动，故使用 0.0.0.0</td>
+</tr>
+<tr>
+<td>loglevel</td>
+<td>日志级别</td>
+</tr>
+<tr>
+<td>logfile</td>
+<td>redis 日志文件保存路径</td>
+</tr>
+<tr>
+<td>dbfilename</td>
+<td>开启 rdb 持久化</td>
+</tr>
+<tr>
+<td>dir</td>
+<td>持久化文件保存路径</td>
+</tr>
+<tr>
+<td>save</td>
+<td>满足条件则刷入持久化文件</td>
+</tr>
+<tr>
+<td>stop-writes-on-bgsave-error</td>
+<td>后台save出错,前台要停止写操作</td>
+</tr>
+<tr>
+<td>rdbcompression</td>
+<td>是否对 rdb 持久化进行数据压缩</td>
+</tr>
+<tr>
+<td>rdbchecksum</td>
+<td>是否对 rdb 持久化进行数据校验</td>
+</tr>
+<tr>
+<td>daemonize</td>
+<td>是否以后台方式启动，容器启动选择 no</td>
+</tr>
+<tr>
+<td>protected-mode</td>
+<td>关闭保护模式，允许所有 IP 访问</td>
+</tr>
+<tr>
+<td>requirepass</td>
+<td>开启认证，设置认证密码</td>
+</tr>
+<tr>
+<td>maxmemory</td>
+<td>允许使用的最大内存</td>
+</tr>
+<tr>
+<td>maxmemory-policy</td>
+<td>内存到达最大值时，key 回收的机制</td>
+</tr>
+</tbody></table>
+<h4 id="3、启动容器"><a href="#3、启动容器" class="headerlink" title="3、启动容器"></a>3、启动容器</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shel">docker run -itd --name redis -p 6379:6379 -v /data/bk-cmdb/redis/conf/redis.conf:/etc/redis/redis.conf -v /data/bk-cmdb/redis/data:/data -v /data/bk-cmdb/redis/log:/tmp -v /etc/localtime:/etc/localtime --restart=always redis:3.2.11-alpine <br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="4、部署-MongoDB"><a href="#4、部署-MongoDB" class="headerlink" title="4、部署 MongoDB"></a>4、部署 MongoDB</h3><h4 id="1）环境准备-2"><a href="#1）环境准备-2" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="1-拉取镜像-（官方推荐-4-2-8-版本）"><a href="#1-拉取镜像-（官方推荐-4-2-8-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 4.2.8 版本）"></a>1. 拉取镜像 （官方推荐 4.2.8 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull mongo:4.2.8<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建持久化目录-2"><a href="#2-创建持久化目录-2" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/mongodb/&#123;conf,data,log&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）编辑配置文件-2"><a href="#2）编辑配置文件-2" class="headerlink" title="2）编辑配置文件"></a>2）编辑配置文件</h4><h5 id="1-新建配置文件-2"><a href="#1-新建配置文件-2" class="headerlink" title="1. 新建配置文件"></a>1. 新建配置文件</h5><p>文件路径: <code>/data/bk-cmdb/mongodb/conf/mongod.conf.orig</code>，文件内容如下:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">storage:</span><br>  <span class="hljs-attr">dbPath:</span> <span class="hljs-string">/data/db</span><br>  <span class="hljs-attr">journal:</span><br>    <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span><br><span class="hljs-comment">#  engine:</span><br><span class="hljs-comment">#  mmapv1:</span><br><span class="hljs-comment">#  wiredTiger:</span><br><br><span class="hljs-comment"># where to write logging data.</span><br><span class="hljs-comment">#systemLog:</span><br><span class="hljs-comment">#  destination: file</span><br><span class="hljs-comment">#  logAppend: true</span><br><span class="hljs-comment">#  path: /var/log/mongodb/mongod.log</span><br><br><span class="hljs-comment"># network interfaces</span><br><span class="hljs-attr">net:</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">27017</span><br><span class="hljs-comment">#开启远程访问</span><br>  <span class="hljs-attr">bindIp:</span> <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><br><br><br><span class="hljs-comment"># how the process runs</span><br><span class="hljs-attr">processManagement:</span><br>  <span class="hljs-attr">timeZoneInfo:</span> <span class="hljs-string">/usr/share/zoneinfo</span><br><br><span class="hljs-attr">setParameter:</span><br>   <span class="hljs-attr">enableLocalhostAuthBypass:</span> <span class="hljs-literal">false</span><br><br><span class="hljs-comment">#security:									</span><br><span class="hljs-comment">#  authorization: enable</span><br>  <br><span class="hljs-comment">#operationProfiling:</span><br><span class="hljs-comment">#副本集配置内容。</span><br><span class="hljs-attr">replication:</span><br>  <span class="hljs-attr">replSetName:</span> <span class="hljs-string">es</span><br>  <span class="hljs-attr">oplogSizeMB:</span> <span class="hljs-number">10240</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-参数说明-2"><a href="#2-参数说明-2" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>storage.dbPath</td>
+<td>mongodb数据文件保存路径</td>
+</tr>
+<tr>
+<td>storage.journal.enabled</td>
+<td>记录操作日志，防止数据丢失</td>
+</tr>
+<tr>
+<td>systemLog.destination</td>
+<td>日志输出目标，file 或 syslog; 不配置则标准输出（容器推荐）</td>
+</tr>
+<tr>
+<td>net.port</td>
+<td>监听端口</td>
+</tr>
+<tr>
+<td>net.bindIp</td>
+<td>监听IP地址</td>
+</tr>
+<tr>
+<td>processManagement.timeZoneInfo</td>
+<td>时区配置</td>
+</tr>
+<tr>
+<td>security.authorization</td>
+<td>开启 auth 认证</td>
+</tr>
+<tr>
+<td>replication.replSetName</td>
+<td>副本集配置，副本集名称</td>
+</tr>
+<tr>
+<td>replication.oplogSizeMB</td>
+<td>副本集配置，指定oplog的最大尺寸</td>
+</tr>
+<tr>
+<td>enableLocalhostAuthBypass</td>
+<td>限制第一个用户也受 auth 认证控制</td>
+</tr>
+</tbody></table>
+<h4 id="3）启动容器-1"><a href="#3）启动容器-1" class="headerlink" title="3）启动容器"></a>3）启动容器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name mongodb -p 27017:27017 -e &quot;TZ=Asia/Shanghai&quot; -v /data/bk-cmdb/mongodb/conf/mongod.conf.orig:/etc/mongod.conf.orig -v /data/bk-cmdb/mongodb/data:/data/db -v /etc/localtime:/etc/localtime --restart=always mongo:4.2.8 --config /etc/mongod.conf.orig<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="5、配置数据库"><a href="#5、配置数据库" class="headerlink" title="5、配置数据库"></a>5、配置数据库</h3><h4 id="1）创建管理用户"><a href="#1）创建管理用户" class="headerlink" title="1）创建管理用户"></a>1）创建管理用户</h4><h5 id="1-进入容器"><a href="#1-进入容器" class="headerlink" title="1. 进入容器"></a>1. 进入容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker exec -it mongodb /bin/bash<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-连接-mongo"><a href="#2-连接-mongo" class="headerlink" title="2. 连接 mongo"></a>2. 连接 mongo</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mongo<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826165034092.png" srcset="/img/loading.gif" lazyload alt="image-20210826165034092"></p>
+<blockquote>
+<p>⚠️ <strong>注意:</strong> </p>
+<p>在启动 mongo 容器中，我们注释掉了 auth 认证，这是为了创建管理用户，否则我们无法进行认证，但是这种情况会导致风险报警，所以在创建完管理用户后，要将认证配置打开。</p>
+</blockquote>
+<h5 id="3-创建管理员用户"><a href="#3-创建管理员用户" class="headerlink" title="3. 创建管理员用户"></a>3. 创建管理员用户</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接 mongo 后，执行</span><br>use admin<br>db.createUser(&#123;user:&#x27;admin&#x27;, pwd:&#x27;admin&#x27;, roles:[&#123;role:&#x27;root&#x27;,db:&#x27;admin&#x27;&#125;]&#125;)<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826165251592.png" srcset="/img/loading.gif" lazyload alt="image-20210826165251592"></p>
+<h5 id="4-打开-auth-配置"><a href="#4-打开-auth-配置" class="headerlink" title="4. 打开 auth 配置"></a>4. 打开 auth 配置</h5><p>文件路径: <code>/data/bk-cmdb/mongodb/conf/mongod.conf.orig</code>，取消 auth 的注释:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> ...</span><br><br>security:<br>  authorization: enabled<br><span class="hljs-meta">  </span><br><span class="hljs-meta">#</span><span class="bash"> ...</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="5-重启mongo容器"><a href="#5-重启mongo容器" class="headerlink" title="5. 重启mongo容器"></a>5. 重启mongo容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker restart mongodb<br></code></pre></td></tr></table></figure>
+
+<h5 id="6-再次进入容器并连接-mongo，并认证"><a href="#6-再次进入容器并连接-mongo，并认证" class="headerlink" title="6. 再次进入容器并连接 mongo，并认证"></a>6. 再次进入容器并连接 mongo，并认证</h5><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826161721885.png" srcset="/img/loading.gif" lazyload alt="image-20210826161721885"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">use admin<br>db.auth(&#x27;admin&#x27;,&#x27;admin&#x27;)<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826165917027.png" srcset="/img/loading.gif" lazyload alt="image-20210826165917027"></p>
+<h4 id="2）配置-mongo-副本集"><a href="#2）配置-mongo-副本集" class="headerlink" title="2）配置 mongo 副本集"></a>2）配置 mongo 副本集</h4><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>如果 mongo 是以副本集的方式启动的，需要对副本集进行初始化</p>
+<p><code>replSetName</code> 即副本集的名称 </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br><span class="hljs-meta">#</span><span class="bash"> _id 即使用 replSetName, host 为实例的 IP:Port</span><br>rs.initiate(&#123; _id : &quot;es&quot;,members: [&#123; _id: 0, host: &quot;192.168.3.206:27017&quot; &#125;]&#125;)<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826171334054.png" srcset="/img/loading.gif" lazyload alt="image-20210826171334054"></p>
+<h4 id="3）创建-cmdb-库和用户"><a href="#3）创建-cmdb-库和用户" class="headerlink" title="3）创建 cmdb 库和用户"></a>3）创建 cmdb 库和用户</h4><h5 id="1-不使用-es-做全文检索"><a href="#1-不使用-es-做全文检索" class="headerlink" title="1. 不使用 es 做全文检索"></a>1. 不使用 es 做全文检索</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br>use cmdb<br>db.createUser(&#123;user: &quot;cc&quot;,pwd: &quot;cc&quot;,roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cmdb&quot; &#125; ]&#125;)<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-使用-mongo-monstache-es-做全文检索（本文选择）"><a href="#2-使用-mongo-monstache-es-做全文检索（本文选择）" class="headerlink" title="2. 使用 mongo + monstache + es 做全文检索（本文选择）"></a>2. 使用 mongo + monstache + es 做全文检索（本文选择）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br>use cmdb<br>db.createUser(&#123;user: &quot;cc&quot;,pwd: &quot;cc&quot;,roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cmdb&quot; &#125;,&#123; role: &quot;readWrite&quot;, db: &quot;monstache&quot; &#125; ]&#125;)<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826170838042.png" srcset="/img/loading.gif" lazyload alt="image-20210826170838042"></p>
+<h3 id="6、部署-Elasticsearch（可选）"><a href="#6、部署-Elasticsearch（可选）" class="headerlink" title="6、部署 Elasticsearch（可选）"></a>6、部署 Elasticsearch（可选）</h3><h4 id="1）环境准备-3"><a href="#1）环境准备-3" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="1-拉取镜像-（官方推荐-7-0-0-版本）"><a href="#1-拉取镜像-（官方推荐-7-0-0-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 7.0.0 版本）"></a>1. 拉取镜像 （官方推荐 7.0.0 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull elasticsearch:7.0.0<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建持久化目录-3"><a href="#2-创建持久化目录-3" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/elasticsearch/&#123;conf,data,log,plugins&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）编辑配置文件-3"><a href="#2）编辑配置文件-3" class="headerlink" title="2）编辑配置文件"></a>2）编辑配置文件</h4><h5 id="1-新建配置文件-3"><a href="#1-新建配置文件-3" class="headerlink" title="1. 新建配置文件"></a>1. 新建配置文件</h5><p>文件路径: <code>/data/bk-cmdb/elasticsearch/conf/elasticsearch.yml</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;network.host: 0.0.0.0&quot; &gt;&gt; /data/bk-cmdb/elasticsearch/conf/elasticsearch.yml<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-参数说明-3"><a href="#2-参数说明-3" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>network.host</td>
+<td>es 监听端口</td>
+</tr>
+</tbody></table>
+<h4 id="3）运行容器"><a href="#3）运行容器" class="headerlink" title="3）运行容器"></a>3）运行容器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name elasticsearch -p 9200:9200 -p 9300:9300  -e &quot;discovery.type=single-node&quot; -e ES_JAVA_OPTS=&quot;-Xms256m -Xmx256m&quot; -v /data/bk-cmdb/elasticsearch/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml -v /data/bk-cmdb/elasticsearch/data:/usr/share/elasticsearch/data -v /data/bk-cmdb/elasticsearch/plugins:/usr/share/elasticsearch/plugins -v /etc/localtime:/etc/localtime  elasticsearch:7.0.0 <br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="7、部署-Monstache（可选）"><a href="#7、部署-Monstache（可选）" class="headerlink" title="7、部署 Monstache（可选）"></a>7、部署 Monstache（可选）</h3><h4 id="1）环境准备-4"><a href="#1）环境准备-4" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="Monstache-Mongodb-Es-版本选择"><a href="#Monstache-Mongodb-Es-版本选择" class="headerlink" title="Monstache-Mongodb-Es 版本选择:"></a><strong>Monstache-Mongodb-Es 版本选择:</strong></h5><table>
+<thead>
+<tr>
+<th>Monstache version</th>
+<th>Git branch (used to build plugin)</th>
+<th>Docker tag</th>
+<th>Description</th>
+<th>Elasticsearch</th>
+<th>MongoDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3</td>
+<td>rel3</td>
+<td>rel3</td>
+<td>mgo community go driver</td>
+<td>Versions 2 and 5</td>
+<td>Version 3</td>
+</tr>
+<tr>
+<td>4</td>
+<td>master</td>
+<td>rel4 (note this used to be latest)</td>
+<td>mgo community go driver</td>
+<td>Version 6</td>
+<td>Version 3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>rel5</td>
+<td>rel5</td>
+<td>MongoDB, Inc. go driver</td>
+<td>Version 6</td>
+<td>Version 4</td>
+</tr>
+<tr>
+<td>6</td>
+<td>rel6</td>
+<td>rel6, latest</td>
+<td>MongoDB, Inc. go driver</td>
+<td>Version 7</td>
+<td>Version 4</td>
+</tr>
+</tbody></table>
+<h5 id="1-拉取镜像-（官方推荐-rel6-版本）"><a href="#1-拉取镜像-（官方推荐-rel6-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 rel6 版本）"></a>1. 拉取镜像 （官方推荐 rel6 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull rwynn/monstache:rel6<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建持久化目录-4"><a href="#2-创建持久化目录-4" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/monstache/&#123;conf,data,log&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）编辑配置文件-4"><a href="#2）编辑配置文件-4" class="headerlink" title="2）编辑配置文件"></a>2）编辑配置文件</h4><h5 id="1-新建配置文件-4"><a href="#1-新建配置文件-4" class="headerlink" title="1. 新建配置文件"></a>1. 新建配置文件</h5><p>文件路径: <code>/data/bk-cmdb/monstache/conf/config.toml</code>，文件内容如下:</p>
+<figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><code class="hljs toml"><span class="hljs-comment"># cmdb connection settings</span><br><br><span class="hljs-comment"># connect to MongoDB using the following URL</span><br><span class="hljs-attr">mongo-url</span> =  <span class="hljs-string">&quot;mongodb://cc:cc@192.168.3.206:27017/cmdb&quot;</span><br><span class="hljs-comment"># connect to the Elasticsearch REST API at the following node URLs</span><br><span class="hljs-attr">elasticsearch-urls</span> = [<span class="hljs-string">&quot;http://192.168.3.206:9200&quot;</span>]<br><br><span class="hljs-comment"># frequently required settings</span><br><br><span class="hljs-comment"># if you need to seed an index from a collection and not just listen and sync changes events</span><br><span class="hljs-comment"># you can copy entire collections or views from MongoDB to Elasticsearch</span><br><span class="hljs-attr">direct-read-namespaces</span> = [<span class="hljs-string">&quot;cmdb.cc_ApplicationBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_HostBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_ObjectBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_ObjDes&quot;</span>]<br><br><span class="hljs-comment"># if you want to use MongoDB change streams instead of legacy oplog tailing use change-stream-namespaces</span><br><span class="hljs-comment"># change streams require at least MongoDB API 3.6+</span><br><span class="hljs-comment"># if you have MongoDB 4+ you can listen for changes to an entire database or entire deployment</span><br><span class="hljs-comment"># in this case you usually don&#x27;t need regexes in your config to filter collections unless you target the deployment.</span><br><span class="hljs-comment"># to listen to an entire db use only the database name.  For a deployment use an empty string.</span><br><span class="hljs-attr">change-stream-namespaces</span> = [<span class="hljs-string">&quot;cmdb.cc_ApplicationBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_HostBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_ObjectBase&quot;</span>,<span class="hljs-string">&quot;cmdb.cc_ObjDes&quot;</span>]<br><br><span class="hljs-comment"># additional settings</span><br><br><span class="hljs-comment"># compress requests to Elasticsearch</span><br><span class="hljs-attr">gzip</span> = <span class="hljs-literal">true</span><br><span class="hljs-comment"># use the following user name for Elasticsearch basic auth</span><br><span class="hljs-attr">elasticsearch-user</span> = <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-comment"># use the following password for Elasticsearch basic auth</span><br><span class="hljs-attr">elasticsearch-password</span> = <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-comment"># use 4 go routines concurrently pushing documents to Elasticsearch</span><br><span class="hljs-attr">elasticsearch-max-conns</span> = <span class="hljs-number">4</span> <br><span class="hljs-comment"># propagate dropped collections in MongoDB as index deletes in Elasticsearch</span><br><span class="hljs-attr">dropped-collections</span> = <span class="hljs-literal">true</span><br><span class="hljs-comment"># propagate dropped databases in MongoDB as index deletes in Elasticsearch</span><br><span class="hljs-attr">dropped-databases</span> = <span class="hljs-literal">true</span><br><span class="hljs-comment"># resume processing from a timestamp saved in a previous run</span><br><span class="hljs-attr">resume</span> = <span class="hljs-literal">true</span><br><span class="hljs-comment"># do not validate that progress timestamps have been saved</span><br><span class="hljs-attr">resume-write-unsafe</span> = <span class="hljs-literal">false</span><br><span class="hljs-comment"># override the name under which resume state is saved</span><br><span class="hljs-attr">resume-name</span> = <span class="hljs-string">&quot;default&quot;</span><br><span class="hljs-comment"># use a custom resume strategy (tokens) instead of the default strategy (timestamps)</span><br><span class="hljs-comment"># tokens work with MongoDB API 3.6+ while timestamps work only with MongoDB API 4.0+</span><br><span class="hljs-attr">resume-strategy</span> = <span class="hljs-number">0</span><br><span class="hljs-comment"># print detailed information including request traces</span><br><span class="hljs-attr">verbose</span> = <span class="hljs-literal">true</span><br><br><span class="hljs-comment"># mapping settings</span><br><br><span class="hljs-section">[[mapping]]</span><br><span class="hljs-attr">namespace</span> = <span class="hljs-string">&quot;cmdb.cc_ApplicationBase&quot;</span><br><span class="hljs-attr">index</span> = <span class="hljs-string">&quot;cmdb.cc_applicationbase&quot;</span><br><br><span class="hljs-section">[[mapping]]</span><br><span class="hljs-attr">namespace</span> = <span class="hljs-string">&quot;cmdb.cc_HostBase&quot;</span><br><span class="hljs-attr">index</span> = <span class="hljs-string">&quot;cmdb.cc_hostbase&quot;</span><br><br><span class="hljs-section">[[mapping]]</span><br><span class="hljs-attr">namespace</span> = <span class="hljs-string">&quot;cmdb.cc_ObjectBase&quot;</span><br><span class="hljs-attr">index</span> = <span class="hljs-string">&quot;cmdb.cc_objectbase&quot;</span><br><br><span class="hljs-section">[[mapping]]</span><br><span class="hljs-attr">namespace</span> = <span class="hljs-string">&quot;cmdb.cc_ObjDes&quot;</span><br><span class="hljs-attr">index</span> = <span class="hljs-string">&quot;cmdb.cc_objdes&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-参数说明-4"><a href="#2-参数说明-4" class="headerlink" title="2. 参数说明"></a>2. 参数说明</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>mongo-url</td>
+<td>MongoDB实例的主节点访问地址。详情请参见。<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#mongo-url">mongo-url</a>，开启认证后配置为 <code>mongodb://user:password@host/dbname</code></td>
+</tr>
+<tr>
+<td>elasticsearch-urls</td>
+<td>Elasticsearch的访问地址。详情请参见 <a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#elasticsearch-urls">elasticsearch-urls</a></td>
+</tr>
+<tr>
+<td>direct-read-namespaces</td>
+<td>指定待同步的集合，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#direct-read-namespaces">direct-read-namespaces</a>。</td>
+</tr>
+<tr>
+<td>change-stream-namespaces</td>
+<td>如果要使用MongoDB变更流功能，需要指定此参数。启用此参数后，oplog追踪会被设置为无效，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#change-stream-namespaces">change-stream-namespaces</a>。</td>
+</tr>
+<tr>
+<td>namespace-regex</td>
+<td>通过正则表达式指定需要监听的集合。此设置可以用来监控符合正则表达式的集合中数据的变化。</td>
+</tr>
+<tr>
+<td>elasticsearch-user</td>
+<td>访问Elasticsearch的用户名。</td>
+</tr>
+<tr>
+<td>elasticsearch-password</td>
+<td>访问Elasticsearch的用户密码。</td>
+</tr>
+<tr>
+<td>elasticsearch-max-conns</td>
+<td>定义连接ES的线程数。默认为4，即使用4个Go线程同时将数据同步到ES。</td>
+</tr>
+<tr>
+<td>dropped-collections</td>
+<td>默认为true，表示当删除MongoDB集合时，会同时删除ES中对应的索引。</td>
+</tr>
+<tr>
+<td>dropped-databases</td>
+<td>默认为true，表示当删除MongoDB数据库时，会同时删除ES中对应的索引。</td>
+</tr>
+<tr>
+<td>resume</td>
+<td>默认为false。设置为true，Monstache会将已成功同步到ES的MongoDB操作的时间戳写入monstache.monstache集合中。当Monstache因为意外停止时，可通过该时间戳恢复同步任务，避免数据丢失。如果指定了cluster-name，该参数将自动开启，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#resume">resume</a>。</td>
+</tr>
+<tr>
+<td>resume-strategy</td>
+<td>指定恢复策略。仅当resume为true时生效，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#resume-strategy">resume-strategy</a>。</td>
+</tr>
+<tr>
+<td>verbose</td>
+<td>默认为false，表示不启用调试日志。</td>
+</tr>
+<tr>
+<td>cluster-name</td>
+<td>指定集群名称。指定后，Monstache将进入高可用模式，集群名称相同的进程将进行协调，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/config/#cluster-name">cluster-name</a>。</td>
+</tr>
+<tr>
+<td>mapping</td>
+<td>指定ES索引映射。默认情况下，数据从MongoDB同步到ES时，索引会自动映射为<code>数据库名.集合名</code>。如果需要修改索引名称，可通过该参数设置，详情请参见<a target="_blank" rel="noopener" href="https://rwynn.github.io/monstache-site/advanced/#index-mapping">Index Mapping</a>。</td>
+</tr>
+</tbody></table>
+<h4 id="3）启动容器-2"><a href="#3）启动容器-2" class="headerlink" title="3）启动容器"></a>3）启动容器</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker run -itd --name monstache -v /data/bk-cmdb/monstache/conf/config.toml:/app/monstache.config.toml -v /etc/localtime:/etc/localtime --restart=always rwynn/monstache:rel6 -f /app/monstache.config.toml<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="8、部署蓝鲸"><a href="#8、部署蓝鲸" class="headerlink" title="8、部署蓝鲸"></a>8、部署蓝鲸</h3><h4 id="1）解压编译后的-cmdb-tar-gz"><a href="#1）解压编译后的-cmdb-tar-gz" class="headerlink" title="1）解压编译后的 cmdb.tar.gz"></a>1）解压编译后的 <code>cmdb.tar.gz</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">tar xf ~/go/src/configcenter/src/bin/pub/cmdb.tar.gz -C /data/softwares &amp;&amp; \<br>cd /data/softwares/cmdb<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）初始化配置"><a href="#2）初始化配置" class="headerlink" title="2）初始化配置"></a>2）初始化配置</h4><h5 id="1-初始化"><a href="#1-初始化" class="headerlink" title="1. 初始化"></a>1. 初始化</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell">python init.py  \<br>      --discovery          192.168.3.206:2181 \<br>      --database           cmdb \<br>      --redis_ip           192.168.3.206 \<br>      --redis_port         6379 \<br>      --redis_pass         PassWord@123 \<br>      --mongo_ip           192.168.3.206 \<br>      --mongo_port         27017 \<br>      --mongo_user         cc \<br>      --mongo_pass         cc \<br>      --rs_name            es \<br>      --blueking_cmdb_url  http://bk-cmdb.example.com:80 \<br>      --listen_port        8083 \<br>      --auth_scheme        internal \<br>      --auth_enabled       false \<br>      --auth_sync_workers  1 \<br>      --auth_sync_interval_minutes  45 \<br>      --full_text_search   on \<br>      --es_url             http://192.168.3.206:9200 \<br>      --es_user            cc \<br>      --es_pass            cc \<br>      --log_level          3 \<br>      --register_ip        192.168.3.206 \<br>      --user_info          admin:admin<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826175509596.png" srcset="/img/loading.gif" lazyload alt="image-20210826175509596"></p>
+<p>生成的配置文件如下:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210826175651688.png" srcset="/img/loading.gif" lazyload alt="image-20210826175651688"></p>
+<h5 id="2-init-py-参数详解："><a href="#2-init-py-参数详解：" class="headerlink" title="2. init.py 参数详解："></a>2. init.py 参数详解：</h5><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>用途说明</th>
+<th>必填</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>–discovery</td>
+<td>服务发现组件，ZooKeeper 服务地址</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–database</td>
+<td>数据库名字</td>
+<td>mongodb 中数据库名</td>
+<td>否</td>
+</tr>
+<tr>
+<td>–redis_ip</td>
+<td>Redis监听的IP</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–redis_port</td>
+<td>Redis监听的端口</td>
+<td>否</td>
+<td>6379</td>
+</tr>
+<tr>
+<td>–redis_pass</td>
+<td>Redis登陆密码</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–mongo_ip</td>
+<td>MongoDB服务监听的IP</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–mongo_port</td>
+<td>MongoDB端口</td>
+<td>否</td>
+<td>27017</td>
+</tr>
+<tr>
+<td>–mongo_user</td>
+<td>MongoDB中CMDB数据库用户名</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–mongo_pass</td>
+<td>MongoDB中CMDB数据库用户名密码</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–blueking_cmdb_url</td>
+<td>该值表示部署完成后,输入到浏览器中访问的cmdb 网址, 格式: <a target="_blank" rel="noopener" href="http://xx.xxx.com/">http://xx.xxx.com:80</a>, 用户自定义填写;在没有配置 DNS 解析的情况下, 填写服务器的 IP:PORT。端口为当前cmdb_webserver监听的端口。</td>
+<td>是</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–blueking_paas_url</td>
+<td>蓝鲸PAAS 平台的地址，对于独立部署的CC版本可以不配置</td>
+<td>否</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–listen_port</td>
+<td>cmdb_webserver服务监听的端口，默认是8083</td>
+<td>是</td>
+<td>8083</td>
+</tr>
+<tr>
+<td>–full_text_search</td>
+<td>全文检索功能开关(取值：off/on)，默认是off，开启是on</td>
+<td>否</td>
+<td>off</td>
+</tr>
+<tr>
+<td>–es_url</td>
+<td>elasticsearch服务监听url，默认是<a target="_blank" rel="noopener" href="http://192.168.3.206:9200/">http://192.168.3.206:9200</a></td>
+<td>否</td>
+<td><a target="_blank" rel="noopener" href="http://192.168.3.206:9200/">http://192.168.3.206:9200</a></td>
+</tr>
+<tr>
+<td>–auth_scheme</td>
+<td>权限模式，web页面使用，可选值: internal, iam</td>
+<td>否</td>
+<td>internal</td>
+</tr>
+<tr>
+<td>–auth_enabled</td>
+<td>是否采用蓝鲸权限中心鉴权</td>
+<td>否</td>
+<td>false</td>
+</tr>
+<tr>
+<td>–auth_address</td>
+<td>蓝鲸权限中心地址</td>
+<td>auth_enabled 为真时必填</td>
+<td><a target="_blank" rel="noopener" href="https://iam.domain.com/">https://iam.domain.com/</a></td>
+</tr>
+<tr>
+<td>–auth_app_code</td>
+<td>cmdb项目在蓝鲸权限中心的应用编码</td>
+<td>auth_enabled 为真时必填</td>
+<td>bk_cmdb</td>
+</tr>
+<tr>
+<td>–auth_app_secret</td>
+<td>cmdb项目在蓝鲸权限中心的应用密钥</td>
+<td>auth_enabled 为真时必填</td>
+<td>xxxxxxx</td>
+</tr>
+<tr>
+<td>–log_level</td>
+<td>日志级别0-9, 9日志最详细</td>
+<td>否</td>
+<td>3</td>
+</tr>
+<tr>
+<td>–register_ip</td>
+<td>进程注册到zookeeper上的IP地址，可以是域名</td>
+<td>否</td>
+<td>无</td>
+</tr>
+<tr>
+<td>–user_info</td>
+<td>登陆 web 页面的账号密码</td>
+<td>否</td>
+<td>无</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🚩 init.py 执行成功后会自动生成cmdb各服务进程所需要的配置。</p>
+</blockquote>
+<h4 id="3）启动服务"><a href="#3）启动服务" class="headerlink" title="3）启动服务"></a>3）启动服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./start.sh<br></code></pre></td></tr></table></figure>
+
+<h5 id="问题记录-adminserver-redis-认证问题"><a href="#问题记录-adminserver-redis-认证问题" class="headerlink" title="问题记录: adminserver redis 认证问题"></a>问题记录: adminserver redis 认证问题</h5><h6 id="错误信息-1"><a href="#错误信息-1" class="headerlink" title="错误信息:"></a>错误信息:</h6><p>启动服务时，部分服务无法正常启动，特别是管理配置的 adminserver</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210827130549678.png" srcset="/img/loading.gif" lazyload alt="image-20210827130549678"></p>
+<p>查看日志后，问题的原因在于 redis 的认证上</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210827130612873.png" srcset="/img/loading.gif" lazyload alt="image-20210827130612873"></p>
+<h6 id="问题原因-2"><a href="#问题原因-2" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>redis 开启认证后，在内存中并没有确实的生成对应的key，导致程序在加载配置时，无法正确加载认证配置（程序读取的是本地 redis 的 config 中的 key <code>requirepass</code>）</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210827130902618.png" srcset="/img/loading.gif" lazyload alt="image-20210827130902618"></p>
+<h6 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案:"></a>解决方案:</h6><p>因此只要将 key 对应的值（也就是我们设置的密码） set 到 redis 中，即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">CONFIG SET requirepass myPassword<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）初始化数据库"><a href="#4）初始化数据库" class="headerlink" title="4）初始化数据库"></a>4）初始化数据库</h4><blockquote>
+<p>⚠️ <strong>注意:</strong>  <strong>此步骤必需要所有cmdb进程成功启动后执行。</strong></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./init_db.sh<br></code></pre></td></tr></table></figure>
+
+<p>返回值中返回 <code>migrate_success</code>，即数据库初始化成功</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210827131349118.png" srcset="/img/loading.gif" lazyload alt="image-20210827131349118"></p>
+<h4 id="5）停止服务"><a href="#5）停止服务" class="headerlink" title="5）停止服务"></a>5）停止服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./stop.sh<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="四、效果展示"><a href="#四、效果展示" class="headerlink" title="四、效果展示"></a>四、效果展示</h2><p><strong>打开浏览器:</strong> 输入 cmdb_webserver 监听的地址，如本文档中示例服务监听的地址: <a target="_blank" rel="noopener" href="http://bk-cmdb.example.com/">http://bk-cmdb.example.com</a></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210827141908936.png" srcset="/img/loading.gif" lazyload alt="image-20210827141908936"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Devops/">Devops</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/CMDB/">CMDB</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/30/%E5%B0%86%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8F%8D%E5%90%91%E6%8C%81%E4%B9%85%E5%8C%96%E8%87%B3-Kubernetes-Configmap-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+                        <span class="hidden-mobile">将配置文件反向持久化至 Kubernetes Configmap 解决方案</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
