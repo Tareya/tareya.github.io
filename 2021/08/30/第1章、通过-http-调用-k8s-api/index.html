@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第1章、通过 http 调用 k8s api">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第1章、通过 http 调用 k8s api - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第1章、通过 http 调用 k8s api">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-08-30 13:51" pubdate>
+        2021年8月30日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第1章、通过 http 调用 k8s api</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第1章、通过-http-调用-k8s-api"><a href="#第1章、通过-http-调用-k8s-api" class="headerlink" title="第1章、通过 http 调用 k8s api"></a>第1章、通过 http 调用 k8s api</h1><span id="more"></span>
+
+
+
+<h2 id="一、K8S-API-认证概述"><a href="#一、K8S-API-认证概述" class="headerlink" title="一、K8S API 认证概述"></a>一、K8S API 认证概述</h2><p>在Kubernetes集群中，Kubernetes 的 API Server 提供了对 K8S 各类资源的增删改查以及 watch 的 Http Rest 接口。API Server是集群管理API的入口，也是整个系统的数据总线和数据中心。它由运行在Master节点上的一个名为 <code>kube-apiserver</code> 的进程提供的服务。</p>
+<p>用户可以通过kubectl、客户端库、http rest，User 或者 ServiceAccount 的形式访问 API Server，但是无论是哪种形式，只有被授权了才能访问这是不变的。当一个请求到达API时， 往往要经过几个阶段的安全控制，在一个典型的应用集群中，API Server通常会使用自签名的CA证书提供HTTPS服务，同时开启认证与授权等安全机制。</p>
+<p>通常，在Kubernetes集群搭建之后，除了使用官方的 kubectl 工具与API Server进行交互外，我们也可以通过 K8S 提供的各语言的 client 进行交互，甚至还可以使用Postman或者curl，有些时候直接使用curl 会有更好的效果。</p>
+<p>当然，上面我们简单的说了一下 K8S 的 API 存在鉴权机制，所以与API Server交互之前，通常需要首先创建一个有正确权限的ServiceAccount，这个 ServiceAccount 通过 ClusterRole/Role、ClusterRoleBinding/RoleBinding 等给其赋予相关资源的操作权限， 而Service Account 对应的 Token 则用于API Server进行基本的认证。与API Server的交互是基于 TLS 安全加密的，所以请求的时候还需要自签名的证书，当然也可以非安全方式连接API Server， 但是不推荐这么做。</p>
+<p>具体的 K8S API 访问控制机制参考: <a target="_blank" rel="noopener" href="http://docs.kubernetes.org.cn/27.html">Kubernetes API 访问控制</a></p>
+<h2 id="二、准备工作"><a href="#二、准备工作" class="headerlink" title="二、准备工作"></a>二、准备工作</h2><h3 id="1、准备-API-调用使用的-ServiceAccount（可选）"><a href="#1、准备-API-调用使用的-ServiceAccount（可选）" class="headerlink" title="1、准备 API 调用使用的 ServiceAccount（可选）"></a>1、准备 API 调用使用的 ServiceAccount（可选）</h3><h4 id="1）创建-ServiceAccount"><a href="#1）创建-ServiceAccount" class="headerlink" title="1）创建 ServiceAccount"></a>1）创建 ServiceAccount</h4><blockquote>
+<p>🚩实际上， 我们所有对于 K8S 资源的操作都需要由一个 “用户” 来进行，这个 “用户” 就是 ServiceAccount，它相当于传统操作系统中的系统用户概念，这样的概念广泛运用于各类程序以及操作系统中。并且，相较于操作系统更加便捷的是，当我们在创建一个 ServiceAccount 的时候，K8S 就会自动生成一个与其关联的 secret，而无需自行再去创建。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl create sa apiviewer<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）创建-RoleBinding"><a href="#2）创建-RoleBinding" class="headerlink" title="2）创建 RoleBinding"></a>2）创建 RoleBinding</h4><blockquote>
+<p>🚩 我们可以重新创建一个 ClusterRole，进行 RBAC 授权，也可以使用 K8S 集群原本已存在的 ClusterRole，这样可以免去较为复杂的资源授权规则，通过 <code>kubectl get clusterrole</code> 可以查看集群中已经存在的 ClusterRole，由于我们需要对API 进行全方位的操作，所以这里使用权限较高的 <code>cluster-admin</code> 来于 ServiceAccount 绑定（这会存在一定的安全风险，正式环境使用建议重新创建 ClusterRole 并最小化授权）。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl create rolebinding apiadmin --clusterrole cluster-admin --serviceaccount default:apiviewer<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、获取Bearer-Token、Certificate、API-Server-URL"><a href="#2、获取Bearer-Token、Certificate、API-Server-URL" class="headerlink" title="2、获取Bearer Token、Certificate、API Server URL"></a>2、获取Bearer Token、Certificate、API Server URL</h3><h4 id="1）获取-ServiceAccount-的-Secret"><a href="#1）获取-ServiceAccount-的-Secret" class="headerlink" title="1）获取 ServiceAccount 的 Secret"></a>1）获取 ServiceAccount 的 Secret</h4><blockquote>
+<p>🌈 我们可以使用 <code>jsonpath</code> 的方式截取对应 json 结构体内的数据，其使用方法和 jq 命令较为类似，但是前提是需要预先知道 json 的具体结构，</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">SECRET=$(kubectl get serviceaccount apiviewer -ojsonpath=&#x27;&#123;.secrets[0].name&#125;&#x27;)<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）获取-Bearer-Token"><a href="#2）获取-Bearer-Token" class="headerlink" title="2）获取 Bearer Token"></a>2）获取 Bearer Token</h4><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>Token 是经过 base64 编码加密过的，需要用 base64 反编码处理</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">TOKEN=$(kubectl get secret $&#123;SECRET&#125; -ojsonpath=&#x27;&#123;.data.token&#125;&#x27;|base64 -d)<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）获取-Secret-使用-CA-证书"><a href="#3）获取-Secret-使用-CA-证书" class="headerlink" title="3）获取 Secret 使用 CA 证书"></a>3）获取 Secret 使用 CA 证书</h4><blockquote>
+<p>🚩 ServiceAccount 的 Secret 都是由 kube-apiserver 的 ca 证书签发的</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl get secret $&#123;SECRET&#125; -o jsonpath=&quot;&#123;.data[&#x27;ca\.crt&#x27;]&#125;&quot; | base64 -d &gt; /tmp/ca.crt<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）获取-API-Server-URL"><a href="#4）获取-API-Server-URL" class="headerlink" title="4）获取 API Server URL"></a>4）获取 API Server URL</h4><blockquote>
+<p>🚩 如果API Server部署在多台Master上，只需访问其中一台即可</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">APISERVER=https://$(kubectl -n default get endpoints kubernetes --no-headers | awk -F &quot;[, ]+&quot; &#x27;&#123;print $2&#125;&#x27;)<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="三、使用-Token-通过-HTTP-方式访问-K8S-集群"><a href="#三、使用-Token-通过-HTTP-方式访问-K8S-集群" class="headerlink" title="三、使用 Token 通过 HTTP 方式访问 K8S 集群"></a>三、使用 Token 通过 HTTP 方式访问 K8S 集群</h2><h3 id="1、获取-K8S-的版本信息-—-version"><a href="#1、获取-K8S-的版本信息-—-version" class="headerlink" title="1、获取 K8S 的版本信息 —/version"></a>1、获取 K8S 的版本信息 —<code>/version</code></h3><blockquote>
+<p>🌈 <code>jq</code> 是一个 shell 命令行解析 json 结构体的神器，Linux 系统使用对应的包管理器就可以直接安装（brew、yum、apt-get）</p>
+<p>使用 <code>-r</code> 参数，返回字符串，不使用的则返回的是 json 结构体的一部分。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s  $APISERVER/version --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq -r &#x27;.gitVersion&#x27;<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830173521373.png" srcset="/img/loading.gif" lazyload alt="image-20210830173521373"></p>
+<h3 id="2、获取所有-pod-的名称-—-api-v1-namespaces-NAMESPACE-pods"><a href="#2、获取所有-pod-的名称-—-api-v1-namespaces-NAMESPACE-pods" class="headerlink" title="2、获取所有 pod 的名称 — /api/v1/namespaces/${NAMESPACE}/pods"></a>2、获取所有 pod 的名称 — <code>/api/v1/namespaces/$&#123;NAMESPACE&#125;/pods</code></h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s  $APISERVER/api/v1/namespaces/default/pods/ --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq &#x27;.items[].metadata.name&#x27;<br></code></pre></td></tr></table></figure>
+
+<p>正常的 json 返回，类似下图，但是由于当前集群的 default 命名空间下并没 pod 资源，所以实际返回值什么也没有。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830181237353.png" srcset="/img/loading.gif" lazyload alt="image-20210830181237353"></p>
+<h3 id="3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错"><a href="#3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错" class="headerlink" title="3、问题记录: 调用 K8S API 返回 cannot list resource 报错"></a>3、问题记录: 调用 K8S API 返回 cannot list resource 报错</h3><h4 id="1）报错信息类似下图"><a href="#1）报错信息类似下图" class="headerlink" title="1）报错信息类似下图:"></a>1）报错信息类似下图:</h4><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830181304648.png" srcset="/img/loading.gif" lazyload alt="image-20210830181304648"></p>
+<h4 id="2）问题原因"><a href="#2）问题原因" class="headerlink" title="2）问题原因:"></a>2）问题原因:</h4><p>这是典型的RBAC权限控制后的结果，也就说我们的 <code>apiviewer</code> 并没有操作 kube-system 命名空间下资源的权限，因为 ServiceAccount 是根据 namespace 隔离的，虽然 <code>cluster-admin</code> 具有较高的权限，但是我们的 <code>apiviewer</code> 却只有 default 命名空间的操作权限。而不具备其他 namespace 的权限。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl describe rolebinding apiadmin<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830175553457.png" srcset="/img/loading.gif" lazyload alt="image-20210830175553457"></p>
+<h4 id="3）解决方案"><a href="#3）解决方案" class="headerlink" title="3）解决方案:"></a>3）解决方案:</h4><p>既然我们知道了问题的原因，解决起来就比较简单了，如果我们要通过 API 操作 <code>kube-system</code> 命名空间下的资源，那么只要重新创建一个具有该命名空间操作权限的 ServiceAccount 就可以了。其他命名空间也是同理的，甚至在不同的命名空间下我们可以用同一个 ServiceAccount 的名称。</p>
+<p>我们在文章开头说过，在 K8S 中对 API 资源的权限划分主要可用通过 <code>Role</code> 或者 <code>ClusterRole</code> 来绑定 <code>ServiceAccount</code>。上面我们使用里系统默认的 ClusterRole 进行了 RBAC 授权，这里我们通过从新创建 Role-RoleBinding 的方式来解决这个问题。</p>
+<h5 id="1-创建-RBAC-授权规则"><a href="#1-创建-RBAC-授权规则" class="headerlink" title="1. 创建 RBAC 授权规则"></a>1. 创建 RBAC 授权规则</h5><p>具体的 yaml 声明文件如下:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-meta">---</span><br><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span><br><span class="hljs-meta">---</span><br><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Role</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-role</span><br>  <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span><br><span class="hljs-attr">rules:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;&quot;</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">configmaps</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">secrets</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">nodes</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">pods</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">services</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">resourcequotas</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">replicationcontrollers</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">limitranges</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">persistentvolumeclaims</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">persistentvolumes</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">namespaces</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">endpoints</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">extensions</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">daemonsets</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">deployments</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">replicasets</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">ingresses</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">apps</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">statefulsets</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">daemonsets</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">deployments</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">replicasets</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">batch</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">cronjobs</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">jobs</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">autoscaling</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">horizontalpodautoscalers</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">authentication.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">tokenreviews</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">authorization.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">subjectaccessreviews</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">policy</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">poddisruptionbudgets</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">certificates.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">certificatesigningrequests</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">storage.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">storageclasses</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">volumeattachments</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">admissionregistration.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">mutatingwebhookconfigurations</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">validatingwebhookconfigurations</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">networking.k8s.io</span><br>  <span class="hljs-attr">resources:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">networkpolicies</span><br>  <span class="hljs-attr">verbs:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">create</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">delete</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">get</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">list</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">patch</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">watch</span><br><span class="hljs-meta">---</span><br><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span><br><span class="hljs-attr">metadata:</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-crb</span><br>    <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span><br><span class="hljs-attr">subjects:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span><br>      <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>      <span class="hljs-attr">namespace:</span> <span class="hljs-string">kube-system</span><br><span class="hljs-attr">roleRef:</span><br>    <span class="hljs-attr">kind:</span> <span class="hljs-string">Role</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-role</span><br>    <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意:</strong> 这里处于后期学习目的，授权是过大的，大多数权限对于非系统层面的命名空间来说并不需要，实际情况下，建议按需最小化授权。</p>
+</blockquote>
+<h5 id="2-获取必要的信息"><a href="#2-获取必要的信息" class="headerlink" title="2. 获取必要的信息"></a>2. 获取必要的信息</h5><p>按照上面的步骤，再是获取我们新创建的 ServiceAccount 的相关信息（注意 namespace 的区别）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">SECRET=$(kubectl get serviceaccount apiadmin -n kube-system -ojsonpath=&#x27;&#123;.secrets[0].name&#125;&#x27;)<br>TOKEN=$(kubectl get secret $&#123;SECRET&#125; -n kube-system -ojsonpath=&#x27;&#123;.data.token&#125;&#x27;|base64 -d)<br>kubectl get secret $&#123;SECRET&#125; -n kube-system -o jsonpath=&quot;&#123;.data[&#x27;ca\.crt&#x27;]&#125;&quot; | base64 -d &gt; /tmp/ca.crt<br>APISERVER=https://$(kubectl -n default get endpoints kubernetes --no-headers | awk -F &quot;[, ]+&quot; &#x27;&#123;print $2&#125;&#x27;)<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-再次访问验证"><a href="#3-再次访问验证" class="headerlink" title="3. 再次访问验证"></a>3. 再次访问验证</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s $APISERVER/api/v1/namespaces/kube-system/pods/ --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq -r &#x27;.items[].metadata.name&#x27;<br></code></pre></td></tr></table></figure>
+
+<p>可以发现正常返回了 kube-system 下的 pod 列表，如下图：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831104138845.png" srcset="/img/loading.gif" lazyload alt="image-20210831104138845"></p>
+<h3 id="4、思考：如果我这边需要新建一个命名空间，并期望通过-HTTP-REST-API-对该命名空间的资源进行操作，你会了吗？"><a href="#4、思考：如果我这边需要新建一个命名空间，并期望通过-HTTP-REST-API-对该命名空间的资源进行操作，你会了吗？" class="headerlink" title="4、思考：如果我这边需要新建一个命名空间，并期望通过 HTTP REST API 对该命名空间的资源进行操作，你会了吗？"></a>4、思考：如果我这边需要新建一个命名空间，并期望通过 HTTP REST API 对该命名空间的资源进行操作，你会了吗？</h3><h4 id="思路提示"><a href="#思路提示" class="headerlink" title="思路提示:"></a>思路提示:</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Namespace</span><br><span class="hljs-attr">metadata:</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">xxx</span><br>    <span class="hljs-attr">labels:</span><br>        <span class="hljs-attr">name:</span> <span class="hljs-string">xxx</span><br><span class="hljs-meta">---</span><br><span class="hljs-comment"># ...</span><br></code></pre></td></tr></table></figure>
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Golang-K8S-API-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/">Golang K8S API 快速入门</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/30/%E7%AC%AC2%E7%AB%A0%E3%80%81%E9%80%9A%E8%BF%87-go-client-%E8%B0%83%E7%94%A8-k8s-api/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第2章、通过 go-client 调用 k8s api</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/30/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8%EF%BC%88Go%E7%89%88%EF%BC%89-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E6%89%8B%E5%86%8C/">
+                        <span class="hidden-mobile">腾讯蓝鲸（Go版） 快速入门手册</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
