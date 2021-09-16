@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第2章、通过 go-client 调用 k8s api">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第2章、通过 client-go 调用 k8s api - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第2章、通过 client-go 调用 k8s api">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-09-16 14:07" pubdate>
+        2021年9月16日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.7k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      98
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第2章、通过 client-go 调用 k8s api</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第2章、通过-go-client-调用-k8s-api"><a href="#第2章、通过-go-client-调用-k8s-api" class="headerlink" title="第2章、通过 go-client 调用 k8s api"></a>第2章、通过 go-client 调用 k8s api</h1><span id="more"></span>
+
+
+
+<h2 id="一、client-go-简介"><a href="#一、client-go-简介" class="headerlink" title="一、client-go 简介"></a>一、client-go 简介</h2><h3 id="1、client-go-是什么？"><a href="#1、client-go-是什么？" class="headerlink" title="1、client-go 是什么？"></a>1、client-go 是什么？</h3><blockquote>
+<p>🚩 <strong>官方解释:</strong></p>
+<p>Go clients for talking to a kubernetes cluster.</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/kubernetes/client-go">官方 github</a></p>
+</blockquote>
+<p>简单的说，client-go 就是 kubernetes 官方提供的 Go语言 SDK，类似的还有 java、python 等语言的client SDK，不过 client-go 是其中最古老的一个，毕竟 K8S 本身基于 Go开发的。并且，client-go 没有使用 Swagger 生成器，而是使用了 K8S 源代码的生成工具，这使得使用 client-go 生成的会是 K8S 风格的对象和序列化程序。</p>
+<p>事实上，client-go 是一组包的集合，提供了四种访问 APIserver 的方式（从 REST 风格原语到复杂 client），并提供了丰富的 API 以此满足不同程度的编程需求。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/client-go%E7%BB%93%E6%9E%84.jpg" srcset="/img/loading.gif" lazyload alt="client-go结构"></p>
+<h3 id="2、client-go-可以做什么？"><a href="#2、client-go-可以做什么？" class="headerlink" title="2、client-go 可以做什么？"></a>2、client-go 可以做什么？</h3><p>首先，通过 client-go 的 client ，Go 应用就可以访问 Kubernetes 的 APIserver，然后我们就可以通过编程的方式对 kubernetes 的资源进行 crud 操作了。</p>
+<p>其次，client-go 还为 controller 和 operator 提供了重要的支持，使得自定义客户端（也是类 kubectl 工具）成为可能。如下图，使用 client-go 的 informer 机制就可以将 controller 关注的资源变化及时反馈回来，使得 controller 能够及时得去响应变化。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/client-go%20%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.jpeg" srcset="/img/loading.gif" lazyload alt="client-go 工作原理"></p>
+<h3 id="3、环境说明"><a href="#3、环境说明" class="headerlink" title="3、环境说明"></a>3、环境说明</h3><h4 id="1）学习-client-go-重要前提条件"><a href="#1）学习-client-go-重要前提条件" class="headerlink" title="1）学习 client-go 重要前提条件"></a>1）学习 client-go 重要前提条件</h4><ul>
+<li>了解并掌握 K8S 的基本原理和操作</li>
+<li>了解并掌握 K8S 的 Group、Version、Resource 等概念</li>
+</ul>
+<h4 id="2）环境信息"><a href="#2）环境信息" class="headerlink" title="2）环境信息"></a>2）环境信息</h4><ul>
+<li>K8S 集群（minikube），版本为 1.18.18</li>
+<li>本地编码环境为 macOS Catalina(10.15.7) </li>
+<li>Go 版本为 1.16.7</li>
+<li>IDE 为 VSCode</li>
+</ul>
+<h3 id="4、安装-client-go"><a href="#4、安装-client-go" class="headerlink" title="4、安装 client-go"></a>4、安装 client-go</h3><h4 id="1）client-go-和-k8s-版本对应关系表"><a href="#1）client-go-和-k8s-版本对应关系表" class="headerlink" title="1）client-go 和 k8s 版本对应关系表"></a>1）client-go 和 k8s 版本对应关系表</h4><table>
+<thead>
+<tr>
+<th>Kubernetes 1.15</th>
+<th>Kubernetes 1.16</th>
+<th>Kubernetes 1.17</th>
+<th>Kubernetes 1.18</th>
+<th>Kubernetes 1.19</th>
+<th>Kubernetes 1.20</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>kubernetes-1.15.0</code></td>
+<td>✓</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+</tr>
+<tr>
+<td><code>kubernetes-1.16.0</code></td>
+<td>+-</td>
+<td>✓</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+</tr>
+<tr>
+<td><code>kubernetes-1.17.0</code>/<code>v0.17.0</code></td>
+<td>+-</td>
+<td>+-</td>
+<td>✓</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+</tr>
+<tr>
+<td><code>kubernetes-1.18.0</code>/<code>v0.18.0</code></td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>✓</td>
+<td>+-</td>
+<td>+-</td>
+</tr>
+<tr>
+<td><code>kubernetes-1.19.0</code>/<code>v0.19.0</code></td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>✓</td>
+<td>+-</td>
+</tr>
+<tr>
+<td><code>kubernetes-1.20.0</code>/<code>v0.20.0</code></td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><code>HEAD</code></td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+<td>+-</td>
+</tr>
+</tbody></table>
+<h4 id="2）如何选择版本"><a href="#2）如何选择版本" class="headerlink" title="2）如何选择版本"></a>2）如何选择版本</h4><h5 id="1-k8s-版本-gt-v1-17-0"><a href="#1-k8s-版本-gt-v1-17-0" class="headerlink" title="1. k8s 版本 &gt;= v1.17.0"></a>1. k8s 版本 &gt;= v1.17.0</h5><p>针对 1.17.0 版本或以上的 k8s 集群，client-go 的配置项版本号形式为 <code>v0.x.y</code>，比如 <code>k8s.io/client-go@v0.20.4</code>，对应的 k8s 版本为 <code>v1.20.4</code>。</p>
+<h5 id="2-k8s-版本-lt-v1-17-0"><a href="#2-k8s-版本-lt-v1-17-0" class="headerlink" title="2. k8s 版本 &lt; v1.17.0"></a>2. k8s 版本 &lt; v1.17.0</h5><p>针对 1.17.0 以下版本的 k8s 集群，client-go 的配置项版本号形式为 <code>kubernetes-1.x.y</code>，比如 <code>k8s.io/client-go@kubernetes-1.16.3</code>，对应的 k8s 版本为 <code>v1.16.3</code>。</p>
+<h4 id="3）获取-client-go"><a href="#3）获取-client-go" class="headerlink" title="3）获取 client-go"></a>3）获取 client-go</h4><blockquote>
+<p>🚩 本文所用环境的 k8s 版本为 v1.18.18</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">go get k8s.io/apimachinery@v0.18.18<br>go get k8s.io/client-go@v0.18.18<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、kubeconfig-管理"><a href="#二、kubeconfig-管理" class="headerlink" title="二、kubeconfig 管理"></a>二、kubeconfig 管理</h2><h3 id="1、RBAC-授权"><a href="#1、RBAC-授权" class="headerlink" title="1、RBAC 授权"></a>1、RBAC 授权</h3><h4 id="1）基于-ServiceAccount-ClusterRole-授权"><a href="#1）基于-ServiceAccount-ClusterRole-授权" class="headerlink" title="1）基于 ServiceAccount - ClusterRole 授权"></a>1）基于 ServiceAccount - ClusterRole 授权</h4><p>新建文件 <code>apiadmin-rbac.yaml</code>，授权常用资源的 crud 权限（根据实际情况增改），具体文件内容如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">namespace:</span> <span class="hljs-string">default</span><br><span class="hljs-meta">---</span><br><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-clusterrole</span><br><span class="hljs-attr">rules:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;&quot;</span>]<br>  <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;configmaps&quot;</span>, <span class="hljs-string">&quot;secrets&quot;</span>, <span class="hljs-string">&quot;nodes&quot;</span>, <span class="hljs-string">&quot;pods&quot;</span>, <span class="hljs-string">&quot;services&quot;</span>, <span class="hljs-string">&quot;resourcequotas&quot;</span>, <span class="hljs-string">&quot;replicationcontrollers&quot;</span>, <span class="hljs-string">&quot;limitranges&quot;</span>, <span class="hljs-string">&quot;persistentvolumeclaims&quot;</span>, <span class="hljs-string">&quot;persistentvolumes&quot;</span>, <span class="hljs-string">&quot;namespaces&quot;</span>, <span class="hljs-string">&quot;endpoints&quot;</span>]<br>  <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;delete&quot;</span>, <span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-string">&quot;patch&quot;</span>, <span class="hljs-string">&quot;watch&quot;</span>]<br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;extensions&quot;</span>]<br>  <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;daemonsets&quot;</span>, <span class="hljs-string">&quot;deployments&quot;</span>, <span class="hljs-string">&quot;replicasets&quot;</span>, <span class="hljs-string">&quot;ingresses&quot;</span>]<br>  <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;delete&quot;</span>, <span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-string">&quot;patch&quot;</span>, <span class="hljs-string">&quot;watch&quot;</span>]<br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;apps&quot;</span>]<br>  <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;statefulsets&quot;</span>, <span class="hljs-string">&quot;daemonsets&quot;</span>, <span class="hljs-string">&quot;deployments&quot;</span>, <span class="hljs-string">&quot;replicasets&quot;</span>]<br>  <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;delete&quot;</span>, <span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-string">&quot;patch&quot;</span>, <span class="hljs-string">&quot;watch&quot;</span>]<br><span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;batch&quot;</span>]<br>  <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;cronjobs&quot;</span>, <span class="hljs-string">&quot;jobs&quot;</span>]<br>  <span class="hljs-attr">verbs:</span> [<span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;delete&quot;</span>, <span class="hljs-string">&quot;get&quot;</span>, <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-string">&quot;patch&quot;</span>, <span class="hljs-string">&quot;watch&quot;</span>]<br><span class="hljs-meta">---</span><br><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">rbac.authorization.k8s.io/v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRoleBinding</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-clusterrole-binding</span><br><span class="hljs-attr">subjects:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">ServiceAccount</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">namespace:</span> <span class="hljs-string">default</span><br><span class="hljs-attr">roleRef:</span><br>  <span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterRole</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-clusterrole</span><br>  <span class="hljs-attr">apiGroup:</span> <span class="hljs-string">rbac.authorization.k8s.io</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）生效文件，创建rbac规则"><a href="#2）生效文件，创建rbac规则" class="headerlink" title="2）生效文件，创建rbac规则"></a>2）生效文件，创建rbac规则</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl apply -f apiadmin-rbac.yaml<br></code></pre></td></tr></table></figure>
+
+<h5 id="权限审计"><a href="#权限审计" class="headerlink" title="权限审计:"></a>权限审计:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i create configmap --as=system:serviceaccount:default:apiadmin -n $&#123;NAMESPACE&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="2、编写-kubeconfig"><a href="#2、编写-kubeconfig" class="headerlink" title="2、编写 kubeconfig"></a>2、编写 kubeconfig</h3><h4 id="1）kubeconfig-中的基础概念"><a href="#1）kubeconfig-中的基础概念" class="headerlink" title="1）kubeconfig 中的基础概念"></a>1）kubeconfig 中的基础概念</h4><blockquote>
+<p>🌈 <strong>kubeconfig 是什么？</strong></p>
+<p>我们知道，在开启了 TLS 的 K8S 集群中，每一次与集群的交互都需要进行身份认证，而 kubeconfig 实际上就是 K8S 集群中一个包含了集群、用户、namespace、认证机制信息的配置文件。它默认生成在 <code>$HOME/.kube</code> 目录下，并且 <code>kubectl</code> 默认情况下，会优先查找该目录下名为 <code>config</code> 的文件，加载其中的集群访问认证配置，也可以通过设置环境变量 <code>KUBECONFIG</code> 指定其他 kubeconfig 。</p>
+<p>K8S 的组件可以使用 kubeconfig 连接 APIserver（比如 bootstrap.kubeconfig），client-go、operator、helm 等也可以使用 kubeconfig 访问 APIserver。</p>
+</blockquote>
+<h5 id="1-一个-kubeconfig-的基本结构（以-minikube-为例）"><a href="#1-一个-kubeconfig-的基本结构（以-minikube-为例）" class="headerlink" title="1. 一个 kubeconfig 的基本结构（以 minikube 为例）"></a>1. 一个 kubeconfig 的基本结构（以 minikube 为例）</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">clusters:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">cluster:</span><br>    <span class="hljs-attr">certificate-authority:</span> <span class="hljs-string">/Users/Tareya/.minikube/ca.crt</span><br>    <span class="hljs-attr">server:</span> <span class="hljs-string">https://127.0.0.1:32769</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">minikube</span><br><span class="hljs-attr">contexts:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">context:</span><br>    <span class="hljs-attr">cluster:</span> <span class="hljs-string">minikube</span><br>    <span class="hljs-attr">user:</span> <span class="hljs-string">minikube</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">minikube</span><br><span class="hljs-attr">current-context:</span> <span class="hljs-string">minikube</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Config</span><br><span class="hljs-attr">preferences:</span> &#123;&#125;<br><span class="hljs-attr">users:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">minikube</span><br>  <span class="hljs-attr">user:</span><br>    <span class="hljs-attr">client-certificate:</span> <span class="hljs-string">/Users/Tareya/.minikube/profiles/minikube/client.crt</span><br>    <span class="hljs-attr">client-key:</span> <span class="hljs-string">/Users/Tareya/.minikube/profiles/minikube/client.key</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="2-集群模块-——-clusters"><a href="#2-集群模块-——-clusters" class="headerlink" title="2. 集群模块 —— clusters"></a>2. 集群模块 —— clusters</h5><blockquote>
+<p>如上例所示，clusters 模块根据 yaml 语法来说，就是一个可包含多个 cluster 信息的列表。每一个 cluster 都需要包含 K8S 集群的端点信息。</p>
+<ul>
+<li>server: K8S 的 apiserver 的完整 url（<a href="https://xxx:6443）">https://xxx:6443）</a></li>
+<li>certificate-authority: K8S 集群的证书颁发机构（CA 证书或证书解码数据）<ul>
+<li>证书形式: certificate-authority: xxx/ca.crt</li>
+<li>解码数据形式: certificate-authority-data: xxx</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 添加或修改 cluster 条目</span><br>kubectl config set-cluster<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 删除 cluster 条目</span><br>kubectl config unset cluster.&lt;cluster_name&gt;<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-用户模块-——-users"><a href="#3-用户模块-——-users" class="headerlink" title="3. 用户模块 —— users"></a>3. 用户模块 —— users</h5><blockquote>
+<p>users 模块，定义的是用于向 K8S 集群进行身份验证的客户端凭证</p>
+<p>可用凭证类型有：</p>
+<ul>
+<li>username/password</li>
+<li>client-certificate/client-key</li>
+<li>client-certificate-data/client-key-data</li>
+<li>token</li>
+</ul>
+<p>其中，用户名/密码的基础认证 和 token 认证两者只能取其一；而 client-certificate 和 client-key 则可以分别与其一组合。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 添加或修改 user 条目</span><br>kubectl config set-credentials <br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 删除 user 条目</span><br>kubectl config unset user.&lt;user_name&gt;<br></code></pre></td></tr></table></figure>
+
+<h5 id="4-上下文模块-——-contexts"><a href="#4-上下文模块-——-contexts" class="headerlink" title="4. 上下文模块 —— contexts"></a>4. 上下文模块 —— contexts</h5><blockquote>
+<p>contexts 模块，即上下文信息，提供了一个包含了 cluster、namesapce 和 user 关系的元组。通过 context，使用指定的认证信息和命名空间将请求发送到集群。cluster、namespace、user 三个元素中任意一个即可指定上下文，未指定的值则会被替换成默认值。</p>
+<p><strong>current-context</strong></p>
+<p>current-context 是 kubectl 在加载配置时默认使用的上下文信息，默认为 cluster1-context（排序第一的集群）</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 添加或修改 context 条目</span><br>kubectl config set-context<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 删除 context 条目</span><br>kubectl config unset context.&lt;context_name&gt;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 使用 context</span><br>kubectl config use-context <br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）自定义一个-kubeconfig"><a href="#2）自定义一个-kubeconfig" class="headerlink" title="2）自定义一个 kubeconfig"></a>2）自定义一个 kubeconfig</h4><h5 id="1-获取-ServiceAccount-相关信息"><a href="#1-获取-ServiceAccount-相关信息" class="headerlink" title="1. 获取 ServiceAccount 相关信息"></a>1. 获取 ServiceAccount 相关信息</h5><p>使用以下方式获取上文 rbac 授权的 ServiceAccount 的 token 以及集群相关信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">SECRET=$(kubectl get serviceaccount apiadmin -ojsonpath=&#x27;&#123;.secrets[0].name&#125;&#x27;)<br>TOKEN=$(kubectl get secret $&#123;SECRET&#125; -ojsonpath=&#x27;&#123;.data.token&#125;&#x27;|base64 -d)<br>CA=$(kubectl get secret $&#123;SECRET&#125; -o jsonpath=&quot;&#123;.data[&#x27;ca\.crt&#x27;]&#125;&quot;)<br>APISERVER=https://$(kubectl -n default get endpoints kubernetes --no-headers | awk -F &quot;[, ]+&quot; &#x27;&#123;print $2&#125;&#x27;)<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建集群信息"><a href="#2-创建集群信息" class="headerlink" title="2. 创建集群信息"></a>2. 创建集群信息</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl config set-cluster kubernetes --certificate-authority=./kubernetes/ssl/ca.pem --embed-certs=true --server=https://$&#123;APISERVER&#125;:6443<br></code></pre></td></tr></table></figure>
+
+<p>生成文件路径: <code>~/.kube/config</code>，文件内容类似下面的形式，具体内容以变量方式隐去了: </p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">clusters:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">cluster:</span><br>    <span class="hljs-attr">certificate-authority-data:</span> <span class="hljs-string">$&#123;CA&#125;</span><br>    <span class="hljs-attr">server:</span> <span class="hljs-string">https://$&#123;APISERVER&#125;:6443</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">kubernetes</span><br><span class="hljs-attr">contexts:</span> []<br><span class="hljs-attr">current-context:</span> <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Config</span><br><span class="hljs-attr">preferences:</span> &#123;&#125;<br><span class="hljs-attr">users:</span> []<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这一步，主要需要 ca 证书 base64 转化后的 <code>certificate-authority-data</code>，这样我们就不需要再通过 ca 证书文件进行认证了。其主要思路就是从 ServiceAccount 相应的 secret 的 json 中获取对应的信息。</p>
+</blockquote>
+<h5 id="3-创建用户认证信息"><a href="#3-创建用户认证信息" class="headerlink" title="3. 创建用户认证信息"></a>3. 创建用户认证信息</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl config set-credentials apiadmin --token=$&#123;TOKEN&#125;<br></code></pre></td></tr></table></figure>
+
+<p>更新的文件内容类似下面的形式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">clusters:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">cluster:</span><br>    <span class="hljs-attr">certificate-authority-data:</span> <span class="hljs-string">$&#123;CA&#125;</span><br>    <span class="hljs-attr">server:</span> <span class="hljs-string">https://$&#123;APISERVER&#125;:6443</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">kubernetes</span><br><span class="hljs-attr">contexts:</span> []<br><span class="hljs-attr">current-context:</span> <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Config</span><br><span class="hljs-attr">preferences:</span> &#123;&#125;<br><span class="hljs-attr">users:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">user:</span><br>    <span class="hljs-attr">token:</span> <span class="hljs-string">$&#123;TOKEN&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="4-创建上下文信息"><a href="#4-创建上下文信息" class="headerlink" title="4. 创建上下文信息"></a>4. 创建上下文信息</h5><blockquote>
+<p>由于我们创建的 ServiceAccount 绑定的是集群资源级别的 ClusterRole，所以不需要设置 namespace，如需添加则使用 <code>--namespace</code> 参数。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl config set-context apiadmin-context --cluster=kubernetes --user=apiadmin <br></code></pre></td></tr></table></figure>
+
+<p>更新的文件内容类似下面的形式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">clusters:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">cluster:</span><br>    <span class="hljs-attr">certificate-authority-data:</span> <span class="hljs-string">$&#123;CA&#125;</span><br>    <span class="hljs-attr">server:</span> <span class="hljs-string">https://$&#123;APISERVER&#125;:6443</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">kubernetes</span><br><span class="hljs-attr">contexts:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">context:</span><br>    <span class="hljs-attr">cluster:</span> <span class="hljs-string">kubernetes</span><br>    <span class="hljs-attr">user:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-context</span><br><span class="hljs-attr">current-context:</span> <span class="hljs-string">&quot;&quot;</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Config</span><br><span class="hljs-attr">preferences:</span> &#123;&#125;<br><span class="hljs-attr">users:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">user:</span><br>    <span class="hljs-attr">token:</span> <span class="hljs-string">$&#123;TOKEN&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="5-使用context"><a href="#5-使用context" class="headerlink" title="5. 使用context"></a>5. 使用context</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl config use-context apiadmin-context<br></code></pre></td></tr></table></figure>
+
+<h5 id="6-查看-current-context"><a href="#6-查看-current-context" class="headerlink" title="6. 查看 current-context"></a>6. 查看 <code>current-context</code></h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl config view<br></code></pre></td></tr></table></figure>
+
+<p>返回内容类似下面的形式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">clusters:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">cluster:</span><br>    <span class="hljs-attr">certificate-authority-data:</span> <span class="hljs-string">$&#123;CA&#125;</span><br>    <span class="hljs-attr">server:</span> <span class="hljs-string">https://$&#123;APISERVER&#125;:6443</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">kubernetes</span><br><span class="hljs-attr">contexts:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">context:</span><br>    <span class="hljs-attr">cluster:</span> <span class="hljs-string">kubernetes</span><br>    <span class="hljs-attr">user:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin-context</span><br><span class="hljs-attr">current-context:</span> <span class="hljs-string">apiadmin-context</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Config</span><br><span class="hljs-attr">preferences:</span> &#123;&#125;<br><span class="hljs-attr">users:</span><br><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">apiadmin</span><br>  <span class="hljs-attr">user:</span><br>    <span class="hljs-attr">token:</span> <span class="hljs-string">$&#123;TOKEN&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）证书转化证书数据"><a href="#3）证书转化证书数据" class="headerlink" title="3）证书转化证书数据"></a>3）证书转化证书数据</h4><blockquote>
+<p>🚩 Kubeconfig 中使用的证书数据实际就是将证书内容进行 base64 转码</p>
+</blockquote>
+<h5 id="1-获取-ca-证书数据"><a href="#1-获取-ca-证书数据" class="headerlink" title="1. 获取 ca 证书数据"></a>1. 获取 ca 证书数据</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">SECRET=$(kubectl get serviceaccount default -ojsonpath=&#x27;&#123;.secrets[0].name&#125;&#x27;)<br>CA=$(kubectl get secret $&#123;SECRET&#125; -o jsonpath=&quot;&#123;.data[&#x27;ca\.crt&#x27;]&#125;&quot;)<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-获取-client-crt-证书数据"><a href="#2-获取-client-crt-证书数据" class="headerlink" title="2. 获取 client.crt 证书数据"></a>2. 获取 client.crt 证书数据</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat client.crt | base64 <br></code></pre></td></tr></table></figure>
+
+<h5 id="3-获取-client-key-证书数据"><a href="#3-获取-client-key-证书数据" class="headerlink" title="3. 获取 client.key 证书数据"></a>3. 获取 client.key 证书数据</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat client.key | base64 <br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="三、连接-API-Sever"><a href="#三、连接-API-Sever" class="headerlink" title="三、连接 API Sever"></a>三、连接 API Sever</h2><h3 id="1、集群外读取配置文件"><a href="#1、集群外读取配置文件" class="headerlink" title="1、集群外读取配置文件"></a>1、集群外读取配置文件</h3><blockquote>
+<p>🚩 如果代码运行在 K8S 集群之外，可以比较简单的通过 <code>clientcmd.BuildConfigFromFlags(&quot;&quot;, ConfigFile)</code>  方法来读取集群外的 <code>kubeconfig</code>，从未实现连接 API Server。 </p>
+</blockquote>
+<h4 id="1）使用本地的-kubeconfig-示例"><a href="#1）使用本地的-kubeconfig-示例" class="headerlink" title="1）使用本地的 kubeconfig 示例"></a>1）使用本地的 kubeconfig 示例</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs go">...<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;log&quot;</span><br><br>  <span class="hljs-string">&quot;k8s.io/client-go/tools/clientcmd&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	kubeconfig := filepath.Join(<br>		os.Getenv(<span class="hljs-string">&quot;HOME&quot;</span>), <span class="hljs-string">&quot;.kube&quot;</span>, <span class="hljs-string">&quot;config&quot;</span>,<br>	)<br><br>	config, err := clientcmd.BuildConfigFromFlags(<span class="hljs-string">&quot;&quot;</span>, kubeconfig)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br>  <br>  fmt.Println(config) <span class="hljs-comment">// 打印配置</span><br>  <br>  <span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）使用自定义配置文件示例"><a href="#2）使用自定义配置文件示例" class="headerlink" title="2）使用自定义配置文件示例"></a>2）使用自定义配置文件示例</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// init client</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">var</span> (<br>		restconf *rest.Config<br>		err      error<br>	)<br><br>	restconf, err = GetRestConf()<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br><br>	fmt.Println(restconf) <span class="hljs-comment">// 打印 restconf 配置</span><br>	<span class="hljs-keyword">return</span><br>&#125;<br><br><span class="hljs-comment">// use config file</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">GetRestConf</span><span class="hljs-params">()</span> <span class="hljs-params">(config *rest.Config, err error)</span></span> &#123;<br>	config, err = clientcmd.BuildConfigFromFlags(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;./admin.conf&quot;</span>) <span class="hljs-comment">// 读取项目根目录的 admin.conf 文件</span><br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br>  <br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="输出结果："><a href="#输出结果：" class="headerlink" title="输出结果："></a>输出结果：</h5><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210906140753390.png" srcset="/img/loading.gif" lazyload alt="image-20210906140753390"></p>
+<blockquote>
+<p>输出的结果实际上就是将 kubeconfig 的 context 转换成了 rest.Config 的类型</p>
+</blockquote>
+<h3 id="2-从集群内获取配置"><a href="#2-从集群内获取配置" class="headerlink" title="2. 从集群内获取配置"></a>2. 从集群内获取配置</h3><h4 id="1）自动获取集群内信息"><a href="#1）自动获取集群内信息" class="headerlink" title="1）自动获取集群内信息"></a>1）自动获取集群内信息</h4><blockquote>
+<p>🚩 当代码运行在集群中是，使用 <code>clientcmd.BuildConfigFromFlags(&quot;&quot;, &quot;&quot;)</code> 函数可以直接通过集群信息连接到 api server。（但是默认的 default 用户不会有那么多的权限。）</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;k8s.io/client-go/tools/clientcmd&quot;</span><br><br>...<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  ...<br>  config, err = clientcmd.BuildConfigFromFlags(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br>	...<br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）使用-ServiceAccount-授权信息"><a href="#2）使用-ServiceAccount-授权信息" class="headerlink" title="2）使用 ServiceAccount 授权信息"></a>2）使用 ServiceAccount 授权信息</h4><blockquote>
+<p>🚩 k8s 的所有 Pod 都会以 Volume 的方式挂载 k8s 中默认的 ServiceAccount，可以是用 <code>rest.InClusterConfig()</code> 函数，它会使用默认的 ServiceAccount 的授权信息去连接 apiserver</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">&quot;k8s.io/client-go/rest&quot;</span><br><br>...<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  ...<br>  rest.InClusterConfig()<br>  ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="四、创建客户端"><a href="#四、创建客户端" class="headerlink" title="四、创建客户端"></a>四、创建客户端</h2><h3 id="1、客户端类型说明"><a href="#1、客户端类型说明" class="headerlink" title="1、客户端类型说明"></a>1、客户端类型说明</h3><p>上文我们说过 client-go 提供了四种访问 APIserver的方式，对应的便是四种客户端对象，其具体的定位如下图所示:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/client-go%20%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%B1%BB%E5%9E%8B.png" srcset="/img/loading.gif" lazyload alt="client-go 客户端类型"></p>
+<h5 id="1-RESTClient"><a href="#1-RESTClient" class="headerlink" title="1. RESTClient"></a>1. RESTClient</h5><p>RESTClient 是最基础的客户端对象，只是对 Httprequest 的基本封装，通过将 api-machinery 库中的类型作为一组 REST 原语来访问 APIserver，具体形式如下:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// Get takes name of the pod, and returns the corresponding pod object, and an error if there is any.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c *pods)</span> <span class="hljs-title">Get</span><span class="hljs-params">(ctx context.Context, name <span class="hljs-keyword">string</span>, options metav1.GetOptions)</span> <span class="hljs-params">(result *v1.Pod, err error)</span></span> &#123;<br>	result = &amp;v1.Pod&#123;&#125;<br>	err = c.client.Get().<br>		Namespace(c.ns).<br>		Resource(<span class="hljs-string">&quot;pods&quot;</span>).<br>		Name(name).<br>		VersionedParams(&amp;options, scheme.ParameterCodec).<br>		Do(ctx).<br>		Into(result)<br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看出，许多参数都需要使用者来设置，使用起来很不方便，于是 client-go 在其基础上又实现了另外三种客户端对象。</p>
+<h5 id="2-ClientSet"><a href="#2-ClientSet" class="headerlink" title="2. ClientSet"></a>2. ClientSet</h5><p>Clientset 可以说是使用 client-go 最常用的客户端对象，它在 RESTClient 的基础上将 K8S 的 Resource 和 Version 也进行了封装，以此实现了一个资源对应一个客户端实例，于是乎，多个客户端（资源对象）的集合就是 Client Set。</p>
+<p>总体来说，Clientset 暴露了K8S公开化的API资源并且实现了其对应的序列化，这使得对于资源的操作变得简单了起来，事实上，clientset 才是我们创建 K8S client 的起点。</p>
+<p>但是需要注意的是，Clientset 只能访问 K8S 内置的资源，并不能访问用户自定义资源（CRD）。</p>
+<h5 id="3-DynamicClient"><a href="#3-DynamicClient" class="headerlink" title="3. DynamicClient"></a>3. DynamicClient</h5><p>Clientset 只能访问内置资源，而往往在基于 K8S 的深入使用和二次开发中都会涉及大量的自定义资源，该怎么办呢？client-go 已经为我们提供了应对的答案 —— DynamicClient。是一种更为高级的上层抽象，获取的内容直接就是 object 类型，需要自行做转换，可能会转换失败。在这里我们只先做简单了解，后面的文章中，我们在具体介绍。</p>
+<h5 id="4-DiscoveryClient"><a href="#4-DiscoveryClient" class="headerlink" title="4. DiscoveryClient"></a>4. DiscoveryClient</h5><p>DiscoveryClient 用于发现 K8S 的 APIServer支持的Group、Version、Resources等信息，先做了解，后面我们再具体介绍。</p>
+<blockquote>
+<p>🌟 <strong>本文本次主要介绍 ClientSet 的使用，对于其他三类客户端对象，在后续的文章中一一介绍</strong>。</p>
+</blockquote>
+<h3 id="2、ClientSet-的使用"><a href="#2、ClientSet-的使用" class="headerlink" title="2、ClientSet 的使用"></a>2、ClientSet 的使用</h3><h4 id="1）创建-ClientSet-客户端"><a href="#1）创建-ClientSet-客户端" class="headerlink" title="1）创建 ClientSet 客户端"></a>1）创建 ClientSet 客户端</h4><p>代码示例:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">//</span> <span class="hljs-string">init</span> <span class="hljs-string">the</span> <span class="hljs-string">clientset</span><br><span class="hljs-string">func</span> <span class="hljs-string">InitClient()</span> <span class="hljs-string">*kubernetes.Clientset</span> &#123;<br>	<span class="hljs-string">//</span> <span class="hljs-string">create</span> <span class="hljs-string">a</span> <span class="hljs-string">kubeconfig</span> <span class="hljs-string">instance</span><br>	<span class="hljs-string">c</span> <span class="hljs-string">:=</span> <span class="hljs-string">LoadConfig()</span><br><br>	<span class="hljs-string">//</span> <span class="hljs-string">init</span> <span class="hljs-string">the</span> <span class="hljs-string">rest</span> <span class="hljs-string">client</span><br>	<span class="hljs-string">clientset</span>, <span class="hljs-string">err</span> <span class="hljs-string">:=</span> <span class="hljs-string">kubernetes.NewForConfig(c)</span><br>	<span class="hljs-string">if</span> <span class="hljs-string">err</span> <span class="hljs-type">!=</span> <span class="hljs-string">nil</span> &#123;<br>		<span class="hljs-string">log.Fatal(err)</span><br>	&#125;<br><br>	<span class="hljs-string">return</span> <span class="hljs-string">clientset</span><br>&#125;<br><br><span class="hljs-string">//</span> <span class="hljs-string">load</span> <span class="hljs-string">the</span> <span class="hljs-string">kubeconfig</span> <span class="hljs-string">file</span><br><span class="hljs-string">func</span> <span class="hljs-string">LoadConfig()</span> <span class="hljs-string">*rest.Config</span> &#123;<br><br>	<span class="hljs-string">config</span>, <span class="hljs-string">err</span> <span class="hljs-string">:=</span> <span class="hljs-string">clientcmd.BuildConfigFromFlags(&quot;&quot;</span>, <span class="hljs-string">&quot;./config&quot;</span><span class="hljs-string">)</span><br>	<span class="hljs-string">if</span> <span class="hljs-string">err</span> <span class="hljs-type">!=</span> <span class="hljs-string">nil</span> &#123;<br>		<span class="hljs-string">log.Fatal(err)</span><br>	&#125;<br>  	<span class="hljs-string">return</span> <span class="hljs-string">config</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）使用-Clientset-进行-K8S-资源的-CRUD-操作"><a href="#2）使用-Clientset-进行-K8S-资源的-CRUD-操作" class="headerlink" title="2）使用 Clientset 进行 K8S 资源的 CRUD 操作"></a>2）使用 Clientset 进行 K8S 资源的 CRUD 操作</h4><h5 id="1-Get-操作-代码示例："><a href="#1-Get-操作-代码示例：" class="headerlink" title="1. Get 操作 代码示例："></a>1. <code>Get 操作</code> 代码示例：</h5><p><strong>示例作用：</strong>获取指定 namespace 下指定 pod 资源的信息并打印</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PodGet</span><span class="hljs-params">()</span> *<span class="hljs-title">corev1</span>.<span class="hljs-title">Pod</span></span> &#123;<br><br>	<span class="hljs-comment">// init the clientset instance</span><br>	client := InitClient()<br><br>	<span class="hljs-comment">// define the api iinterface</span><br>	api := client.CoreV1()<br>	opts := metav1.GetOptions&#123;&#125;<br><br>	namespace := os.Getenv(<span class="hljs-string">&quot;POD_NAMESPACE&quot;</span>)<br>	name := os.Getenv(<span class="hljs-string">&quot;POD_NAME&quot;</span>)<br><br>	podGet, err := api.Pods(namespace).Get(context.TODO(), name, opts)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br>  <br>	PrintPod(podGet)<br>	<span class="hljs-keyword">return</span> podGet<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PrintPod</span><span class="hljs-params">(pod *corev1.Pod)</span></span> &#123;<br>	template := <span class="hljs-string">&quot;%-16s%-16s%-8s\n&quot;</span><br>	fmt.Printf(template, <span class="hljs-string">&quot;NAME&quot;</span>, <span class="hljs-string">&quot;STATUS&quot;</span>, <span class="hljs-string">&quot;IMAGE&quot;</span>)<br><br>	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> pod.Spec.Containers &#123;<br>		fmt.Printf(template, v.Name, pod.Status.Phase, v.Image)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-List-操作-代码示例："><a href="#2-List-操作-代码示例：" class="headerlink" title="2. List 操作 代码示例："></a>2. <code>List 操作</code> 代码示例：</h5><p><strong>示例作用：</strong>获取指定 namespace 下 pod 信息列表并打印（限 500 个）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PodList</span><span class="hljs-params">()</span> *<span class="hljs-title">corev1</span>.<span class="hljs-title">PodList</span></span> &#123;<br><br>	<span class="hljs-comment">// init the clientset instance</span><br>	client := InitClient()<br><br>	<span class="hljs-comment">// define the api iinterface</span><br>	api := client.CoreV1()<br>	opts := metav1.ListOptions&#123;<br>		Limit: <span class="hljs-number">500</span>,<br>	&#125;<br><br>	namespace := os.Getenv(<span class="hljs-string">&quot;POD_NAMESPACE&quot;</span>)<br><br>	podList, err := api.Pods(namespace).List(context.TODO(), opts)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br><br>	PrintPodList(podList)<br><br>	<span class="hljs-keyword">return</span> podList<br>&#125;<br><br><span class="hljs-comment">// pod list print template</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PrintPodList</span><span class="hljs-params">(podList *corev1.PodList)</span></span> &#123;<br>	template := <span class="hljs-string">&quot;%-16s%-36s%-8s\n&quot;</span><br>	fmt.Printf(template, <span class="hljs-string">&quot;NAMESPACE&quot;</span>, <span class="hljs-string">&quot;NAME&quot;</span>, <span class="hljs-string">&quot;STATUS&quot;</span>)<br><br>	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> podList.Items &#123;<br>		fmt.Printf(template, v.Namespace, v.Name, v.Status.Phase)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h5 id="3-增删操作代码示例："><a href="#3-增删操作代码示例：" class="headerlink" title="3. 增删操作代码示例："></a>3. 增删操作代码示例：</h5><p><strong>示例作用：</strong></p>
+<ul>
+<li>新建一个名为 <code>clientset-demo</code> 的 namespace</li>
+<li>在 clientset-demo 下新建一个名为 <code>deployment-demo</code> 的 deployment，镜像使用 tomcat，副本数为 2</li>
+<li>在 clientset-demo 下新建一个名为 <code>service-demo</code> 的 serivce，类型为 NodePort</li>
+<li>一键清空本次创建资源功能</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;context&quot;</span><br>	<span class="hljs-string">&quot;flag&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;os&quot;</span><br>	<span class="hljs-string">&quot;path&quot;</span><br><br>	appsv1 <span class="hljs-string">&quot;k8s.io/api/apps/v1&quot;</span><br>	corev1 <span class="hljs-string">&quot;k8s.io/api/core/v1&quot;</span><br>	metav1 <span class="hljs-string">&quot;k8s.io/apimachinery/pkg/apis/meta/v1&quot;</span><br>	<span class="hljs-string">&quot;k8s.io/utils/pointer&quot;</span><br><br>	<span class="hljs-string">&quot;k8s.io/client-go/kubernetes&quot;</span><br>	<span class="hljs-string">&quot;k8s.io/client-go/rest&quot;</span><br>	<span class="hljs-string">&quot;k8s.io/client-go/tools/clientcmd&quot;</span><br>)<br><br><span class="hljs-keyword">const</span> (<br>	NAMESPACE  = <span class="hljs-string">&quot;clientset-demo&quot;</span><br>	DEPLOYMENT = <span class="hljs-string">&quot;deployment-demo&quot;</span><br>	SERVICE    = <span class="hljs-string">&quot;service-demo&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br><br>	<span class="hljs-comment">// define the operation types</span><br>	operation := flag.String(<span class="hljs-string">&quot;operate&quot;</span>, <span class="hljs-string">&quot;create&quot;</span>, <span class="hljs-string">&quot;operate type: create or clean&quot;</span>)<br><br>	flag.Parse()<br><br>	<span class="hljs-comment">// init the clientset instance</span><br>	clientset := InitClient()<br><br>	fmt.Printf(<span class="hljs-string">&quot;operation is %s\n&quot;</span>, *operation)<br><br>	<span class="hljs-keyword">if</span> <span class="hljs-string">&quot;clean&quot;</span> == *operation &#123;<br>		CleanResource(clientset)<br>	&#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-string">&quot;create&quot;</span> == *operation &#123;<br>		NamespaceCreate(clientset)<br><br>		DeploymentCreate(clientset)<br><br>		ServiceCreate(clientset)<br>	&#125;<br><br>&#125;<br><br><span class="hljs-comment">// init the clientset</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">InitClient</span><span class="hljs-params">()</span> *<span class="hljs-title">kubernetes</span>.<span class="hljs-title">Clientset</span></span> &#123;<br>	<span class="hljs-comment">// create a kubeconfig instance</span><br>	c := LoadConfig()<br><br>	<span class="hljs-comment">// init the rest client</span><br>	clientset, err := kubernetes.NewForConfig(c)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error is returned</span><br>	&#125;<br><br>	<span class="hljs-keyword">return</span> clientset<br>&#125;<br><br><span class="hljs-comment">// load the kubeconfig file</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">LoadConfig</span><span class="hljs-params">()</span> *<span class="hljs-title">rest</span>.<span class="hljs-title">Config</span></span> &#123;<br><br>	config, err := clientcmd.BuildConfigFromFlags(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;./kubeconfig&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error is returned</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> config<br>&#125;<br><br><span class="hljs-comment">// create the namespace</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NamespaceCreate</span><span class="hljs-params">(clientset *kubernetes.Clientset)</span> *<span class="hljs-title">corev1</span>.<span class="hljs-title">Namespace</span></span> &#123;<br><br>	<span class="hljs-comment">// define the api resource</span><br>	api := clientset.CoreV1().Namespaces()<br><br>	opts := metav1.CreateOptions&#123;&#125;<br><br>	<span class="hljs-comment">// serialize the namespace struct</span><br>	namespace := &amp;corev1.Namespace&#123;<br>		ObjectMeta: metav1.ObjectMeta&#123;<br>			Name: NAMESPACE,<br>		&#125;,<br>	&#125;<br><br>	<span class="hljs-comment">// Convert the create operation</span><br>	resource, err := api.Create(context.TODO(), namespace, opts)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br><br>	<span class="hljs-comment">// print the result</span><br>	fmt.Printf(<span class="hljs-string">&quot;Create the namespace %s \n&quot;</span>, resource.GetName())<br><br>	<span class="hljs-keyword">return</span> resource<br>&#125;<br><br><span class="hljs-comment">// create the service</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ServiceCreate</span><span class="hljs-params">(clientset *kubernetes.Clientset)</span> *<span class="hljs-title">corev1</span>.<span class="hljs-title">Service</span></span> &#123;<br><br>	<span class="hljs-comment">// define the api resource</span><br>	api := clientset.CoreV1().Services(NAMESPACE)<br><br>	opts := metav1.CreateOptions&#123;&#125;<br><br>	<span class="hljs-comment">// serialize the service struct</span><br>	service := &amp;corev1.Service&#123;<br>		ObjectMeta: metav1.ObjectMeta&#123;<br>			Name:      SERVICE,<br>			Namespace: NAMESPACE,<br>		&#125;,<br>		Spec: corev1.ServiceSpec&#123;<br>			Ports: []corev1.ServicePort&#123;&#123; <span class="hljs-comment">// [] means it needs a slice, the elements can be some json.</span><br>				Name:     <span class="hljs-string">&quot;http&quot;</span>,<br>				Port:     <span class="hljs-number">8080</span>,<br>				NodePort: <span class="hljs-number">30080</span>,<br>			&#125;,<br>			&#125;,<br>			Selector: <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>&#123;<br>				<span class="hljs-string">&quot;app&quot;</span>: <span class="hljs-string">&quot;tomcat&quot;</span>,<br>			&#125;,<br>			Type: corev1.ServiceTypeNodePort,<br>		&#125;,<br>	&#125;<br><br>	<span class="hljs-comment">// Convert the create operation</span><br>	resource, err := api.Create(context.TODO(), service, opts)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br><br>	<span class="hljs-comment">// print the result</span><br>	fmt.Printf(<span class="hljs-string">&quot;Create the service %s \n&quot;</span>, resource.GetName())<br><br>	<span class="hljs-keyword">return</span> resource<br>&#125;<br><br><span class="hljs-comment">// create the deployment</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">DeploymentCreate</span><span class="hljs-params">(clientset *kubernetes.Clientset)</span> *<span class="hljs-title">appsv1</span>.<span class="hljs-title">Deployment</span></span> &#123;<br><br>	<span class="hljs-comment">// define the api resource</span><br>	api := clientset.AppsV1().Deployments(NAMESPACE)<br><br>	opts := metav1.CreateOptions&#123;&#125;<br><br>	<span class="hljs-comment">// serialize the deployment struct</span><br>	deployment := &amp;appsv1.Deployment&#123;<br>		ObjectMeta: metav1.ObjectMeta&#123;<br>			Name: DEPLOYMENT,<br>		&#125;,<br>		Spec: appsv1.DeploymentSpec&#123;<br>			Replicas: pointer.Int32Ptr(<span class="hljs-number">2</span>), <span class="hljs-comment">// Replicas need *int32, so it should be a pointer</span><br>			Selector: &amp;metav1.LabelSelector&#123;<br>				MatchLabels: <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>&#123;<br>					<span class="hljs-string">&quot;app&quot;</span>: <span class="hljs-string">&quot;tomcat&quot;</span>,<br>				&#125;,<br>			&#125;,<br>			Template: corev1.PodTemplateSpec&#123;<br>				ObjectMeta: metav1.ObjectMeta&#123;<br>					Labels: <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>&#123;<br>						<span class="hljs-string">&quot;app&quot;</span>: <span class="hljs-string">&quot;tomcat&quot;</span>,<br>					&#125;,<br>				&#125;,<br>				Spec: corev1.PodSpec&#123;<br>					Containers: []corev1.Container&#123;&#123; <span class="hljs-comment">// [] means it needs a slice, the elements can be some json.</span><br>						Name:            <span class="hljs-string">&quot;tomcat&quot;</span>,<br>						Image:           <span class="hljs-string">&quot;tomcat:8.0.18-jre8&quot;</span>,<br>						ImagePullPolicy: <span class="hljs-string">&quot;IfNotPresent&quot;</span>,<br>						Ports: []corev1.ContainerPort&#123;&#123;<br>							Name:          <span class="hljs-string">&quot;http&quot;</span>,<br>							Protocol:      corev1.ProtocolTCP,<br>							ContainerPort: <span class="hljs-number">8080</span>,<br>						&#125;,<br>						&#125;,<br>					&#125;,<br>					&#125;,<br>				&#125;,<br>			&#125;,<br>		&#125;,<br>	&#125;<br><br>	<span class="hljs-comment">// Convert the create operation</span><br>	resource, err := api.Create(context.TODO(), deployment, opts)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br><br>	<span class="hljs-comment">// print the result</span><br>	fmt.Printf(<span class="hljs-string">&quot;Create the deployment %s \n&quot;</span>, resource.GetName())<br><br>	<span class="hljs-keyword">return</span> resource<br>&#125;<br><br><span class="hljs-comment">// clean all the created resource</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CleanResource</span><span class="hljs-params">(clientset *kubernetes.Clientset)</span></span> &#123;<br><br>	opts := metav1.DeleteOptions&#123;&#125;<br><br>	<span class="hljs-comment">// delete the service</span><br>	<span class="hljs-keyword">if</span> err := clientset.CoreV1().Services(NAMESPACE).Delete(context.TODO(), SERVICE, opts); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br>	fmt.Printf(<span class="hljs-string">&quot;Delete the service %s \n&quot;</span>, SERVICE)<br><br>	<span class="hljs-comment">// delete the deployment</span><br>	<span class="hljs-keyword">if</span> err := clientset.AppsV1().Deployments(NAMESPACE).Delete(context.TODO(), DEPLOYMENT, opts); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br>	fmt.Printf(<span class="hljs-string">&quot;Delete the deployment %s\n&quot;</span>, DEPLOYMENT)<br><br>	<span class="hljs-comment">// delete the namespace</span><br>	<span class="hljs-keyword">if</span> err := clientset.CoreV1().Namespaces().Delete(context.TODO(), NAMESPACE, opts); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(err.Error()) <span class="hljs-comment">// exit when error</span><br>	&#125;<br>	fmt.Printf(<span class="hljs-string">&quot;Delete the namespace %s \n&quot;</span>, NAMESPACE)<br><br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h6 id="1⃣️-功能验证-—-创建资源："><a href="#1⃣️-功能验证-—-创建资源：" class="headerlink" title="1⃣️ 功能验证 — 创建资源："></a>1⃣️ 功能验证 — 创建资源：</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">go run main.go -operate create<br></code></pre></td></tr></table></figure>
+
+<p>返回结果:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916103730186.png" srcset="/img/loading.gif" lazyload alt="image-20210916103730186"></p>
+<h6 id="2⃣️-kubernetes-dashboard-查看："><a href="#2⃣️-kubernetes-dashboard-查看：" class="headerlink" title="2⃣️ kubernetes dashboard 查看："></a>2⃣️ kubernetes dashboard 查看：</h6><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916104140456.png" srcset="/img/loading.gif" lazyload alt="image-20210916104140456"></p>
+<h6 id="3⃣️-minikube-service-访问-endpoint："><a href="#3⃣️-minikube-service-访问-endpoint：" class="headerlink" title="3⃣️ minikube service 访问 endpoint："></a>3⃣️ minikube service 访问 endpoint：</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">minikube service service-demo -n clientset-demo<br></code></pre></td></tr></table></figure>
+
+<p>返回结果:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916104252394.png" srcset="/img/loading.gif" lazyload alt="image-20210916104252394"></p>
+<p>通过浏览器访问:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916104318784.png" srcset="/img/loading.gif" lazyload alt="image-20210916104318784"></p>
+<h6 id="4⃣️-功能验证-——-清理资源："><a href="#4⃣️-功能验证-——-清理资源：" class="headerlink" title="4⃣️ 功能验证 —— 清理资源："></a>4⃣️ 功能验证 —— 清理资源：</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">go run main.go -operate clean<br></code></pre></td></tr></table></figure>
+
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916104839958.png" srcset="/img/loading.gif" lazyload alt="image-20210916104839958"></p>
+<h2 id="五、经验总结"><a href="#五、经验总结" class="headerlink" title="五、经验总结"></a>五、经验总结</h2><h3 id="1、ClientSet-操作-K8S-常用-API"><a href="#1、ClientSet-操作-K8S-常用-API" class="headerlink" title="1、ClientSet 操作 K8S 常用 API"></a>1、ClientSet 操作 K8S 常用 API</h3><h4 id="1）deployment"><a href="#1）deployment" class="headerlink" title="1）deployment"></a>1）deployment</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 列出 deploymentList</span><br>deploymentList, err := clientset.AppsV1().Deployments(<span class="hljs-string">&quot;default&quot;</span>).List(metav1.ListOptions&#123;&#125;)<br><br><span class="hljs-comment">// 查询 deploymentGet</span><br>deploymentGet, err := clientset.AppsV1().Deployments(<span class="hljs-string">&quot;default&quot;</span>).Get(<span class="hljs-string">&quot;nginx-web-v2&quot;</span>, metav1.GetOptions&#123;&#125;)<br><br><span class="hljs-comment">// 创建 deploymentCreate</span><br>deploymentCreate, err := clientset.AppsV1().Deployments(<span class="hljs-string">&quot;default&quot;</span>).Create(deploymentName)<br><br><span class="hljs-comment">// 更新 deploymentUpdate</span><br>deploymentUpdate, err := clientset.AppsV1().Deployments(<span class="hljs-string">&quot;default&quot;</span>).Update(deploymentName)<br><br><span class="hljs-comment">// 删除deployment</span><br>err = clientset.AppsV1().Deployments(<span class="hljs-string">&quot;default&quot;</span>).Delete(<span class="hljs-string">&quot;deploymentName&quot;</span>, &amp;metav1.DeleteOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<h4 id="2）pod"><a href="#2）pod" class="headerlink" title="2）pod"></a>2）pod</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">//列出pod（不写命令空间  即列出所有pod）</span><br>podList, err := clientset.CoreV1().Pods(<span class="hljs-string">&quot;default&quot;</span>).List(&amp;meta_v1.ListOptions&#123;&#125;)<br><br><span class="hljs-comment">//查询pod</span><br>pod, err := clientset.CoreV1().Pods(<span class="hljs-string">&quot;default&quot;</span>).Get(&lt;podName&gt;, meta_v1.GetOptions&#123;&#125;)<br><br><span class="hljs-comment">//创建pod</span><br>pod, err := clientset.CoreV1().Pods(<span class="hljs-string">&quot;default&quot;</span>).Create(web)<br><br><span class="hljs-comment">//更新pod</span><br>pod, err := clientset.CoreV1().Pods(<span class="hljs-string">&quot;default&quot;</span>).Update(web)<br><br><span class="hljs-comment">//删除pod</span><br>err := clientset.CoreV1().Pods(<span class="hljs-string">&quot;default&quot;</span>).Delete(&lt;podName&gt;, &amp;meta_v1.DeleteOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<h4 id="3）statefulset"><a href="#3）statefulset" class="headerlink" title="3）statefulset"></a>3）statefulset</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 列出 statefulList</span><br>statefulList, err := clientset.AppsV1().StatefulSets(<span class="hljs-string">&quot;default&quot;</span>).List(metav1.ListOptions&#123;&#125;)<br><br><span class="hljs-comment">// 查询 statefulGet</span><br>statefulGet, err := clientset.AppsV1().StatefulSets(<span class="hljs-string">&quot;default&quot;</span>).Get(<span class="hljs-string">&quot;web&quot;</span>, metav1.GetOptions&#123;&#125;)<br><span class="hljs-comment">// 创建 statefulCreate</span><br>statefulCreate, err := clientset.AppsV1().StatefulSets(<span class="hljs-string">&quot;default&quot;</span>).Create(statefulName)<br><br><span class="hljs-comment">// 更新 statefulUpdate</span><br>statefulUpdate, err := clientset.AppsV1().StatefulSets(<span class="hljs-string">&quot;default&quot;</span>).Update(statefulName)<br><br><span class="hljs-comment">// 删除 stateful</span><br>err = clientset.AppsV1().StatefulSets(<span class="hljs-string">&quot;default&quot;</span>).Delete(<span class="hljs-string">&quot;statefulName&quot;</span>, &amp;metav1.DeleteOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<h4 id="4）service"><a href="#4）service" class="headerlink" title="4）service"></a>4）service</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 列出 serviceList</span><br>serviceList, err := clientset.CoreV1().Services(<span class="hljs-string">&quot;default&quot;</span>).List(metav1.ListOptions&#123;&#125;)<br><br><span class="hljs-comment">// 查询 serviceGet</span><br>serviceGet, err := clientset.CoreV1().Services(<span class="hljs-string">&quot;default&quot;</span>).Get(<span class="hljs-string">&quot;web&quot;</span>, metav1.GetOptions&#123;&#125;)<br><br><span class="hljs-comment">// 创建 serviceCreate</span><br>serviceCreate, err := clientset.CoreV1().Services(<span class="hljs-string">&quot;default&quot;</span>).Create(web)<br><br><span class="hljs-comment">// 更新 serviceUpdate</span><br>serviceUpdate, err := clientset.CoreV1().Services(<span class="hljs-string">&quot;default&quot;</span>).Update(web)<br><br><span class="hljs-comment">// 删除 service</span><br>err = clientset.CoreV1().Services.(<span class="hljs-string">&quot;default&quot;</span>).Delete(<span class="hljs-string">&quot;serviceName&quot;</span>, &amp;metav1.DeleteOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<h4 id="5）ingress"><a href="#5）ingress" class="headerlink" title="5）ingress"></a>5）ingress</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs GO"><span class="hljs-comment">// 列出 ingressList</span><br>ingressList, err := clientset.ExtensionsV1beta1().Ingresses(<span class="hljs-string">&quot;default&quot;</span>).List(metav1.ListOptions&#123;&#125;)<br><br><span class="hljs-comment">// 查询 ingressGet</span><br>ingressGet, err := clientset.ExtensionsV1beta1().Ingresses(<span class="hljs-string">&quot;default&quot;</span>).Get(<span class="hljs-string">&quot;web&quot;</span>, metav1.GetOptions&#123;&#125;)<br><br><span class="hljs-comment">// 创建 ingressCreate</span><br>ingressCreate, err := clientset.ExtensionsV1beta1().Ingresses(<span class="hljs-string">&quot;default&quot;</span>).Create(web)<br><br><span class="hljs-comment">// 更新 ingressUpdate</span><br>ingressUpdate, err := clientset.ExtensionsV1beta1().Ingresses(<span class="hljs-string">&quot;default&quot;</span>).Update(web)<br><br><span class="hljs-comment">// 删除 ingress</span><br>err = clientset.ExtensionsV1beta1().Ingresses(<span class="hljs-string">&quot;default&quot;</span>).Delete(<span class="hljs-string">&quot;web&quot;</span>, &amp;metav1.DeleteOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<h4 id="6）configmap"><a href="#6）configmap" class="headerlink" title="6）configmap"></a>6）configmap</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-comment">// 列出 configmapList</span><br>configmapList, err := clientset.CoreV1().ConfigMaps(<span class="hljs-string">&quot;default&quot;</span>).List(context.TODO(), meta_v1.ListOptions)<br><br><span class="hljs-comment">// 查询 configmapGet</span><br>configmapGet, err := clientset.CoreV1().ConfigMaps(<span class="hljs-string">&quot;default&quot;</span>).Get(context.TODO(), <span class="hljs-string">&quot;name&quot;</span>, meta_v1.GetOptions&#123;&#125;)<br><br><span class="hljs-comment">// 创建 configmapCreate</span><br>configmapCreate, err<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、如何查找-ClientSet-的资源对象结构"><a href="#2、如何查找-ClientSet-的资源对象结构" class="headerlink" title="2、如何查找 ClientSet 的资源对象结构"></a>2、如何查找 ClientSet 的资源对象结构</h3><blockquote>
+<p>从上文的示例中，其实我们可以比较清楚的了解几个关键点，其实通过 clientset 进行查询和删除操作，是比较简单的，它的本质还是在执行封装下层的 REST 原语调用 K8S APIServer 进行对应的处理。</p>
+<p>但是在创建资源时是不同的，创建时，除了常用的入 namespace 、context 等参数外，我们是要导入符合 clientset 序列化结构的对象的，这是一个难点，当然通过 IDE 我们是可以简化查找的过程，那么我们就在这里简单的说一下。</p>
+</blockquote>
+<h4 id="1）使用-IDE-的双屏模式"><a href="#1）使用-IDE-的双屏模式" class="headerlink" title="1）使用 IDE 的双屏模式"></a>1）使用 IDE 的双屏模式</h4><p>笔者个人比较推荐的方式是通过 IDE 的双屏功能同时打开2个窗口，方便对应源码的查询，是的，其实我们可以看出其实需要的数据机构都可以从引用的包中查到对应的源码，然后我们根据对应的需求去转化就可以了。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916110720621.png" srcset="/img/loading.gif" lazyload alt="image-20210916110720621"></p>
+<h4 id="2）如何找到需要操作的API"><a href="#2）如何找到需要操作的API" class="headerlink" title="2）如何找到需要操作的API"></a>2）如何找到需要操作的API</h4><p>ClientSet 常用的操作我们再上面已经列出，这块主要是对 K8S 原生资源的转化，所以不再累述，如果对于这边方面上尚不太了解，可以参考官方的 API 文档: <a target="_blank" rel="noopener" href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/">v1.18 官方API文档</a>。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916111600757.png" srcset="/img/loading.gif" lazyload alt="image-20210916111600757"></p>
+<p>我们在上文说过，ClientSet 封装了 Resource 和 Version，再结合我们的代码示例，是否就比较好理解了呢？</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916111808287.png" srcset="/img/loading.gif" lazyload alt="image-20210916111808287"></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916111912629.png" srcset="/img/loading.gif" lazyload alt="image-20210916111912629"></p>
+<h4 id="3）查找对应-API-所封装的函数"><a href="#3）查找对应-API-所封装的函数" class="headerlink" title="3）查找对应 API 所封装的函数"></a>3）查找对应 API 所封装的函数</h4><p>对于 ClientSet API 的使用有了一定了解后，我们就可以通过 IDE 去找源码对应的内容了。鼠标指向对应的资源，通过按住 cmd（Windows一般为 ctrl），我们可以看出 IDE 已经为我们找到了所继承的类。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916112308208.png" srcset="/img/loading.gif" lazyload alt="image-20210916112308208"></p>
+<p>按住 cmd 点击对象后，就会跳转到对应的代码段，如下所示：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916112712437.png" srcset="/img/loading.gif" lazyload alt="image-20210916112712437"></p>
+<p>可以看出，client-go 已经将可能的操作都进行了封装，并且入参需要什么，出参是什么类型都有明确的显示了，比如 service 的 create 操作需要的的入参有：</p>
+<ul>
+<li>上下文 context</li>
+<li>service 对象</li>
+<li>opts 即调用 apimachinery 的参数</li>
+</ul>
+<p>返回值为 service 对象和 error，那么转换成代码即如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs go">serviceCreate, err := clientset.CoreV1().Create(context.TODO(), service, metav1.CreateOptions&#123;&#125;)<br></code></pre></td></tr></table></figure>
+
+<p>返回值有2个，那么就需要2个变量来接收，因此使用 <code>serviceCreate, err</code>；对于 context 来说，使用 <code>context.TODO()</code> 即可，就是使用实例化的 client 所使用的 context；opts，我们要进行什么操作，就用它所需要的参数类型即可，当然要将其转为对象，即 <code>metav1.CreateOptions&#123;&#125;</code>；</p>
+<p>而对于 service 对象，通过阅读源码，我们看出它的类型就是 K8S 定义的 Service 类型，既然有类型，就会有对应的结构体。</p>
+<h4 id="4）查找资源对象对应的-struct"><a href="#4）查找资源对象对应的-struct" class="headerlink" title="4）查找资源对象对应的 struct"></a>4）查找资源对象对应的 struct</h4><p>同样，还是使用 IDE 方便的检索功能，按住 cmd 指向对应的类型，如 <code>*v1.Service</code>，它就会将该类型对应的结构体返回。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916114336129.png" srcset="/img/loading.gif" lazyload alt="image-20210916114336129"></p>
+<p>同样的，按住 cmd 点击，又会跳转到一个新的标签，这个标签定义了类型结构</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916114559010.png" srcset="/img/loading.gif" lazyload alt="image-20210916114559010"></p>
+<p>可以看出，Service 这个类型所包含的内容有以上几个元素对象，它们也是有自己对应的类型的，在这里，我们需要判断哪些是元素是必要的，这就需要结合到 K8S 的知识，因为无论如何封装，都必须要遵循 K8S 资源本身的特性，一个常用的 service yaml 声明一般如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">include</span> <span class="hljs-string">&quot;kube-state-metrics.fullname&quot;</span> <span class="hljs-string">.</span> &#125;&#125;<br>  <span class="hljs-attr">namespace:</span> &#123;&#123; <span class="hljs-string">.Values.namespace</span> &#125;&#125;<br>  &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">with</span> <span class="hljs-string">.Values.labels</span> &#125;&#125;<br>  <span class="hljs-attr">labels:</span><br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">toYaml</span> <span class="hljs-string">.</span> <span class="hljs-string">|</span> <span class="hljs-string">nindent</span> <span class="hljs-number">4</span> &#125;&#125;<br>  &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">end</span> &#125;&#125;<br>  &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">with</span> <span class="hljs-string">.Values.service.annotations</span> &#125;&#125;<br>  <span class="hljs-attr">annotations:</span><br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">toYaml</span> <span class="hljs-string">.</span> <span class="hljs-string">|</span> <span class="hljs-string">nindent</span> <span class="hljs-number">4</span> &#125;&#125;<br>  &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">end</span> &#125;&#125;<br><span class="hljs-attr">spec:</span><br>  <span class="hljs-attr">type:</span> &#123;&#123; <span class="hljs-string">.Values.service.type</span> &#125;&#125;<br>  <span class="hljs-attr">ports:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Values.service.http.name</span> &#125;&#125;<br>      <span class="hljs-attr">port:</span> &#123;&#123; <span class="hljs-string">.Values.service.http.port</span> &#125;&#125;<br>      <span class="hljs-attr">targetPort:</span> &#123;&#123; <span class="hljs-string">.Values.service.http.name</span> &#125;&#125;<br>      <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Values.service.telemetry.name</span> &#125;&#125;<br>      <span class="hljs-attr">port:</span> &#123;&#123; <span class="hljs-string">.Values.service.telemetry.port</span> &#125;&#125;<br>      <span class="hljs-attr">targetPort:</span> &#123;&#123; <span class="hljs-string">.Values.service.telemetry.name</span> &#125;&#125;<br>      <span class="hljs-attr">protocol:</span> <span class="hljs-string">TCP</span><br>  <span class="hljs-attr">selector:</span><br>    <span class="hljs-attr">k8s-app:</span> &#123;&#123; <span class="hljs-string">include</span> <span class="hljs-string">&quot;kube-state-metrics.fullname&quot;</span> <span class="hljs-string">.</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这是一段 helm 的 service 模板，我们只需要理解其中 key 的主体结构即可，无需理会 value 是什么。</p>
+<p>我们先来看一下这个示例，其中 <code>apiVersion</code> 和 <code>kind</code> ，我们在 ClientSet 已经定义好了（我们在定义 api 的过程其实就是在定义这个），那么剩下的 <code>metadata</code> 和 <code>spec</code> 就是必要元素了。</p>
+<p>同样，其实我们也可以从 官方的 API文档中找到对应的信息 <a target="_blank" rel="noopener" href="https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#service-v1-core">传送门</a></p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916120436835.png" srcset="/img/loading.gif" lazyload alt="image-20210916120436835"></p>
+<h4 id="5）查找内容元素对应的-struct"><a href="#5）查找内容元素对应的-struct" class="headerlink" title="5）查找内容元素对应的 struct"></a>5）查找内容元素对应的 struct</h4><p>我们上面说到，service 必要的两个元素为 metadata 和 spec，其在 client-go 的 Service 类型的机构体中即表现为 ``metav1.ObjectMeta<code>和</code>Spec<code>两个对象，其对应的类型为</code>metav1.ObjectMeta<code>和</code>ServiceSpec` ，这也是两种独立的类型，有自己的结构体。通过一样的方法，查找到对应的源码段。</p>
+<h5 id="1-ObjectMeta"><a href="#1-ObjectMeta" class="headerlink" title="1. ObjectMeta"></a>1. ObjectMeta</h5><p>ObjectMeta 的结构体如下，它是一个相对通用型的结构体，对于 metadata 来说，最必要的元素为 <code>Name</code> 和 <code>Namespace</code>，他们即相当于SQL 中的联合唯一键。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916131519088.png" srcset="/img/loading.gif" lazyload alt="image-20210916131519088"></p>
+<p>而作为对象是实例化，也就必须要包含这两个元素，因此其序列化后是这样的，其中包含了必要的 Name、Namespace，至于其他的元素则都是可选项，具体的原理还是一样的。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916131934518.png" srcset="/img/loading.gif" lazyload alt="image-20210916131934518"></p>
+<h5 id="2-Spec"><a href="#2-Spec" class="headerlink" title="2. Spec"></a>2. Spec</h5><p>Spec 的结构体为 corev1.ServiceSpec，通过 cmd 查看其结构体，如下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916132623163.png" srcset="/img/loading.gif" lazyload alt="image-20210916132623163"></p>
+<p>结合 K8S 的知识，对于 Service 的 Spec 来说，必要的元素有三个，即  <code>type</code>、<code>ports</code> 、<code>selector</code>，那么对于一个 Spec 对象来说，也必须包含其三者，其在 ServiceSpec 表现为 <code>Type</code>、<code>Ports</code>、<code>Selector</code> 三个对象。</p>
+<h6 id="1⃣️-Ports："><a href="#1⃣️-Ports：" class="headerlink" title="1⃣️ Ports："></a>1⃣️ Ports：</h6><p>Ports 对象对应的类型为 <code>[]ServicePort </code>，有 <code>[]</code> 表示它是一个 slice，其中会包含多个元素。ServicePort 又是一个独立的类型，还是老方法，查看一下其结构体，如下：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916133359159.png" srcset="/img/loading.gif" lazyload alt="image-20210916133359159"></p>
+<p>在 K8S 中，ports 是一个列表，如果存在多个元素的话，则需要执行 Name 来隔离，而 port 则表示起唯一性，如果使用 NodePort 的形式的话，则需要指定 NodePort 的端口，而其对应的类型为 <code>Name string</code>、<code>Port int32</code> 、<code>NodePort32</code> ，字符串或整型。</p>
+<p>综上所述，起序列化后应该是这样的，由于是一个 slice，所以以一个 json 来囊括。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916133935262.png" srcset="/img/loading.gif" lazyload alt="image-20210916133935262"></p>
+<h6 id="2⃣️-Selector："><a href="#2⃣️-Selector：" class="headerlink" title="2⃣️ Selector："></a>2⃣️ Selector：</h6><p>Selector 对象对应的类型为 map[string]string，直接以一个 json 来实例化即可</p>
+<h6 id="3⃣️-Type："><a href="#3⃣️-Type：" class="headerlink" title="3⃣️ Type："></a>3⃣️ Type：</h6><p>Type 对象对应的类型是 ServiceType，有以下几种，其实对应的就是 K8S service 的类型，只是 client-go 对其进行了进一步的封装，并且其最终定义都是 string，因此直接引用即可。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916134412052.png" srcset="/img/loading.gif" lazyload alt="image-20210916134412052"></p>
+<h4 id="6）最终聚合成资源对象"><a href="#6）最终聚合成资源对象" class="headerlink" title="6）最终聚合成资源对象"></a>6）最终聚合成资源对象</h4><p>结合上面所说的内容，将各个元素对象最终拼凑起来就是资源对象了，这其中还有一点，一般来说，资源对象的类型都是以 *corev1.xxx 的指针类型，所以在实例化它们的时候都要通过 &amp; 来进行对象取址。</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210916135203688.png" srcset="/img/loading.gif" lazyload alt="image-20210916135203688"></p>
+<p>有了资源对象，我们就可以通过 ClientSet 的 API 进行创建资源的操作了。你可以发现这个过程，其实就是将 K8S 的资源对象转化成 client-go 封装的类对象的过程，掌握了以上方法，就基本可以掌握 ClientSet 对于K8S 内置资源的 crud 操作了。</p>
+<h2 id="六、参考文档"><a href="#六、参考文档" class="headerlink" title="六、参考文档"></a>六、参考文档</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/76706821">https://zhuanlan.zhihu.com/p/76706821</a></p>
+<p><a target="_blank" rel="noopener" href="https://xinchen.blog.csdn.net/article/details/113753087">https://xinchen.blog.csdn.net/article/details/113753087</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_34192816/article/details/92382936">https://blog.csdn.net/weixin_34192816/article/details/92382936</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/">Golang</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Golang/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Golang-K8S-API-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/">Golang K8S API 快速入门</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/14/alpine-%E5%AE%9E%E7%8E%B0-selenium-%E7%BD%91%E9%A1%B5%E6%96%87%E4%BB%B6%E8%BD%AC%E5%8C%96%E5%9B%BE%E7%89%87%E7%8E%AF%E5%A2%83/">
+                        <span class="hidden-mobile">alpine 实现 selenium 网页文件转化图片环境</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

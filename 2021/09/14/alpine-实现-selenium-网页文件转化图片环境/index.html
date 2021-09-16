@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="alpine 实现网页文件转化图片环境">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>alpine 实现 selenium 网页文件转化图片环境 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="alpine 实现 selenium 网页文件转化图片环境">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-09-14 12:01" pubdate>
+        2021年9月14日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      36
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">alpine 实现 selenium 网页文件转化图片环境</h1>
+            
+            <div class="markdown-body">
+              <h1 id="alpine-实现网页文件转化图片环境"><a href="#alpine-实现网页文件转化图片环境" class="headerlink" title="alpine 实现网页文件转化图片环境"></a>alpine 实现网页文件转化图片环境</h1><span id="more"></span>
+
+
+
+<h2 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h2><p>近期公司又一个需求，是截取前端页面并生成图片，用于保存一些签名凭证等。可以说是 selenium 比较常见的使用方式了，但是对于没有接触过 selenium 的技术人员来说，就是能通过搜索引擎查询到一些方案，也不知道到底是怎么一回事，实际上，个人认为这的确更加偏向前端工程师或测试、爬虫工程师的工作，有些超出 crud boys 的工作范畴了，于是在基础环境的配置上磨蹭了几天也没有解决问题。那么借着解决并记录这次问题的机会，就大概简单的介绍下相关的知识。</p>
+<h2 id="二、知识讲解"><a href="#二、知识讲解" class="headerlink" title="二、知识讲解"></a>二、知识讲解</h2><h3 id="1、chrome、chrome-driver、selenium-简介"><a href="#1、chrome、chrome-driver、selenium-简介" class="headerlink" title="1、chrome、chrome driver、selenium 简介"></a>1、chrome、chrome driver、selenium 简介</h3><h4 id="1）Chrome-是什么？"><a href="#1）Chrome-是什么？" class="headerlink" title="1）Chrome 是什么？"></a>1）Chrome 是什么？</h4><p>相信一般的技术人员或者PC用户对于 Chrome 都不会陌生，它是Google 推出的一款网页浏览器，是目前市面上使用最广泛的浏览器之一。它基于开源的 WebKit 、Blink 引擎开发（其中也包含的Google 的Gears），采用更强大的 JavaScript <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/V8/6178125">V8</a> 虚拟机进行多线程的 Javascrip t执行加速，这是当前其他Web浏览器所无法实现的，所以可以说 Chrome 是母亲啊最快的 Web 浏览器。</p>
+<p>最早的beta测试版本于 2008年9月2日发布，提供了50中语言的版本，以及对 Windows、macOS、Linux、Android、IOS的跨平台支持。</p>
+<h4 id="2）ChromeDriver-是什么？"><a href="#2）ChromeDriver-是什么？" class="headerlink" title="2）ChromeDriver 是什么？"></a>2）ChromeDriver 是什么？</h4><blockquote>
+<p>🌈 ChromeDriver is the WebDriver for Chrome.</p>
+</blockquote>
+<p>WebDriver是一个开源工具，用于在许多浏览器上自动测试webapps。它提供了导航到网页，用户输入，JavaScript执行等功能。</p>
+<p>ChromeDriver 则是由 Google开发提供的自动化测试接口，是 Chrome 专用的 WebDriver。它是 selenium2 与 chrome 通信的桥梁，为 Chromium 实现了 WebDriver 的 JsonWireProtocol。</p>
+<p>适用于 Android版和桌面版的 Chrome （Mac、Linux、Windows、ChromeOS）</p>
+<h4 id="3）Selenium-是什么？"><a href="#3）Selenium-是什么？" class="headerlink" title="3）Selenium 是什么？"></a>3）Selenium 是什么？</h4><p>Selenium 是 ThoughWorks 提供的一款基于浏览器的开源自动化测试工具，用于模仿用户的在浏览器的手动操作。支持的浏览器包括 IE、Chrome 和 Firefox 等。常用于测试浏览器兼容性、模仿用户行为做回归和爬虫等方面，支持自动录制动作、自动生成 .Net、Perl、Python、Ruby 和 Java 等不同语言的测试脚本。</p>
+<p>而 Selenium 的进阶版 Selenium2 则是对浏览器提供的原生API进行封装，使其成为一套面向对象的 Selenium WebDriver API。使用这套 API 可以操控浏览器的开启、关闭，打开网页，操作界面元素，控制 Cookie，还可以操作浏览器截屏、安装插件、设置代理、配置证书等。</p>
+<p>对于其操作需要基于浏览器厂商提供的驱动，也就是我们说的 driver。由于不同的浏览器厂商会提供的自己的驱动，比如，ChromeDriver、FirefoxDriver(xpi插件)、InternetExplorerDriver(exe) 等，都各有不同，API也并没有形成统一标准（目前都支持 JSON Wire Protocol，正逐步向 W3C 标准靠拢），所以为了方便管理，Selenium 对各个厂商的驱动都进行了封装，如 selenium-chrome-driver、selenium-firefox-driver、selenium-edge-driver等。还包括了对移动应用进行测试的AndroidDriver和iOS WebDriver，以及一个基于HtmlUnit的无界面实现HtmlUnitDriver。</p>
+<p>通过 Python、Ruby、Java、C# 等语言可以访问 Selenium WebDriverAPI。</p>
+<h3 id="2、chrome-driver-和-chrome-对照表"><a href="#2、chrome-driver-和-chrome-对照表" class="headerlink" title="2、chrome driver 和 chrome 对照表"></a>2、chrome driver 和 chrome 对照表</h3><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>chrome driver 的版本需要严格按照版本对应关系，否则会出现无法调用的情况。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>ChromeDriver Version</th>
+<th>Chrome Version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v2.34</td>
+<td>v61-63</td>
+</tr>
+<tr>
+<td>v2.33</td>
+<td>v60-62</td>
+</tr>
+<tr>
+<td>v2.32</td>
+<td>v59-61</td>
+</tr>
+<tr>
+<td>v2.31</td>
+<td>v58-60</td>
+</tr>
+<tr>
+<td>v2.30</td>
+<td>v58-60</td>
+</tr>
+<tr>
+<td>v2.29</td>
+<td>v56-58</td>
+</tr>
+<tr>
+<td>v2.28</td>
+<td>v55-57</td>
+</tr>
+<tr>
+<td>v2.27</td>
+<td>v54-56</td>
+</tr>
+<tr>
+<td>v2.26</td>
+<td>v53-55</td>
+</tr>
+<tr>
+<td>v2.25</td>
+<td>v53-55</td>
+</tr>
+<tr>
+<td>v2.24</td>
+<td>v52-54</td>
+</tr>
+<tr>
+<td>v2.23</td>
+<td>v51-53</td>
+</tr>
+<tr>
+<td>v2.22</td>
+<td>v49-52</td>
+</tr>
+<tr>
+<td>v2.21</td>
+<td>v46-50</td>
+</tr>
+<tr>
+<td>v2.20</td>
+<td>v43-48</td>
+</tr>
+<tr>
+<td>v2.19</td>
+<td>v43-47</td>
+</tr>
+<tr>
+<td>v2.18</td>
+<td>v43-46</td>
+</tr>
+<tr>
+<td>v2.17</td>
+<td>v42-43</td>
+</tr>
+<tr>
+<td>v2.13</td>
+<td>v42-45</td>
+</tr>
+<tr>
+<td>v2.15</td>
+<td>v40-43</td>
+</tr>
+<tr>
+<td>v2.14</td>
+<td>v39-42</td>
+</tr>
+<tr>
+<td>v2.13</td>
+<td>v38-41</td>
+</tr>
+<tr>
+<td>v2.12</td>
+<td>v36-40</td>
+</tr>
+<tr>
+<td>v2.11</td>
+<td>v36-40</td>
+</tr>
+<tr>
+<td>v2.10</td>
+<td>v33-36</td>
+</tr>
+<tr>
+<td>v2.9</td>
+<td>v31-34</td>
+</tr>
+<tr>
+<td>v2.8</td>
+<td>v30-33</td>
+</tr>
+<tr>
+<td>v2.7</td>
+<td>v30-33</td>
+</tr>
+<tr>
+<td>v2.6</td>
+<td>v29-32</td>
+</tr>
+<tr>
+<td>v2.5</td>
+<td>v29-32</td>
+</tr>
+<tr>
+<td>v2.4</td>
+<td>v29-32</td>
+</tr>
+</tbody></table>
+<h3 id="3、chrome、chrome-driver-下载地址"><a href="#3、chrome、chrome-driver-下载地址" class="headerlink" title="3、chrome、chrome driver 下载地址"></a>3、chrome、chrome driver 下载地址</h3><blockquote>
+<p>🚩 由于国内不能直接访问 Chrome 官网，可以通过以下地址来下载</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm">64位 Linux 用 Chrome (rpm)</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.google.cn/chrome/browser/desktop/index.html?standalone=1&platform=win64">64位 Windows 用 Chrome</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.google.cn/chrome/browser/desktop/index.html?standalone=1&platform=win">32位 Windows 用 Chrome</a></p>
+<p><a target="_blank" rel="noopener" href="http://chromedriver.storage.googleapis.com/">chrome driver Google 官方镜像源</a></p>
+<p><a target="_blank" rel="noopener" href="https://npm.taobao.org/mirrors/chromedriver/">chrome driver 淘宝网国内镜像源</a></p>
+<h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2><h3 id="1、构建基础镜像"><a href="#1、构建基础镜像" class="headerlink" title="1、构建基础镜像"></a>1、构建基础镜像</h3><h4 id="Dockerfile："><a href="#Dockerfile：" class="headerlink" title="Dockerfile："></a>Dockerfile：</h4><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> alpine AS final<br><br><span class="hljs-keyword">LABEL</span><span class="bash"> maintainer=<span class="hljs-string">&quot;Tareya&quot;</span> \</span><br><span class="bash">      version=<span class="hljs-string">&quot;1.0&quot;</span> \</span><br><span class="bash">      description=<span class="hljs-string">&quot;alpine with chrome and chrome drivers&quot;</span></span><br><br><span class="hljs-keyword">RUN</span><span class="bash"> sed -i <span class="hljs-string">&#x27;s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g&#x27;</span> /etc/apk/repositories</span><br><br><span class="hljs-keyword">RUN</span><span class="bash"> apk add  --no-cache tzdata libc6-compat ca-certificates &amp;&amp; \</span><br><span class="bash">    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &amp;&amp; \</span><br><span class="bash">    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Asia/Shanghai&quot;</span> &gt; /etc/timezone &amp;&amp; \</span><br><span class="bash">    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;hosts: files dns&quot;</span> &gt; /etc/nsswitch.conf</span><br><br><span class="hljs-keyword">RUN</span><span class="bash"> apk update &amp;&amp; apk upgrade &amp;&amp; \</span><br><span class="bash">    apk add --no-cache chromium \</span><br><span class="bash">          chromium-chromedriver \</span><br><span class="bash">          nss \</span><br><span class="bash">          freetype \</span><br><span class="bash">          harfbuzz \</span><br><span class="bash">          ttf-freefont \</span><br><span class="bash">          ttf-dejavu \</span><br><span class="bash">          fontconfig \</span><br><span class="bash">          dumb-init </span><br>                    <br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、解决中文字体问题"><a href="#2、解决中文字体问题" class="headerlink" title="2、解决中文字体问题"></a>2、解决中文字体问题</h3><h4 id="1）CentOS-7-安装字体库以及中文字体"><a href="#1）CentOS-7-安装字体库以及中文字体" class="headerlink" title="1）CentOS 7 安装字体库以及中文字体"></a>1）CentOS 7 安装字体库以及中文字体</h4><h5 id="1-安装字体库"><a href="#1-安装字体库" class="headerlink" title="1. 安装字体库"></a>1. 安装字体库</h5><p>从 CentOS 4.x 起，系统使用 fontconfig 来安装字体库，通过以下命令下载即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum -y install fontconfig<br></code></pre></td></tr></table></figure>
+
+<p>安装完成后，会生成 <code>/usr/share/fonts</code> 这个默认的系统字体集目录</p>
+<h5 id="2-安装微软字体"><a href="#2-安装微软字体" class="headerlink" title="2. 安装微软字体"></a>2. 安装微软字体</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum install cabextract<br>yum install http://sourceforge.net/projects/mscorefonts2/files/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-安装微软中文字体集"><a href="#3-安装微软中文字体集" class="headerlink" title="3. 安装微软中文字体集"></a>3. 安装微软中文字体集</h5><blockquote>
+<p>⚠️ <strong>注意：</strong></p>
+<p>确切的说，微软的字体使用版权的，在非微软的系统中使用其字体集是违反最终用户协议的，属于违法行为。</p>
+<p><a target="_blank" rel="noopener" href="https://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/%E5%BE%AE%E8%BD%AF%E4%B8%AD%E6%96%87%E5%AD%97%E4%BD%93%E9%9B%86.zip">微软中文字体集下载地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/Simsun.ttf">宋体 Simsun.ttf 下载地址</a></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 下载解压</span><br>wget https://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/%E5%BE%AE%E8%BD%AF%E4%B8%AD%E6%96%87%E5%AD%97%E4%BD%93%E9%9B%86.zip<br>unzip 微软中文字体集.zip <br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 复制到字体集目录</span><br>mkdir -p /usr/share/fonts/truetype/WindowsFonts/<br>cp -a 微软中文字体集/*.ttf /usr/share/fonts/truetype/WindowsFonts/<br>cp -a 微软中文字体集/*.TTF /usr/share/fonts/truetype/WindowsFonts/<br></code></pre></td></tr></table></figure>
+
+<h5 id="5-安装开源中文字体"><a href="#5-安装开源中文字体" class="headerlink" title="5. 安装开源中文字体"></a>5. 安装开源中文字体</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo yum install wqy-microhei-fonts wqy-zenhei-fonts<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）k8s-deployment-中进行挂载"><a href="#2）k8s-deployment-中进行挂载" class="headerlink" title="2）k8s deployment 中进行挂载"></a>2）k8s deployment 中进行挂载</h4><h5 id="helm-deployment-template-示例："><a href="#helm-deployment-template-示例：" class="headerlink" title="helm deployment template 示例："></a>helm deployment template 示例：</h5><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">apps/v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Deployment</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Chart.Name</span>  &#125;&#125;<br><span class="hljs-attr">spec:</span><br>  <span class="hljs-attr">replicas:</span> &#123;&#123; <span class="hljs-string">.Values.replicaCount</span> &#125;&#125;<br>  <span class="hljs-attr">strategy:</span><br>    <span class="hljs-attr">type:</span> <span class="hljs-string">RollingUpdate</span><br>    <span class="hljs-attr">rollingUpdate:</span><br>      <span class="hljs-attr">maxSurge:</span> <span class="hljs-number">50</span><span class="hljs-string">%</span><br>      <span class="hljs-attr">maxUnavailable:</span> <span class="hljs-number">50</span><span class="hljs-string">%</span><br>  <span class="hljs-attr">selector:</span><br>    <span class="hljs-attr">matchLabels:</span><br>      <span class="hljs-attr">app:</span> &#123;&#123; <span class="hljs-string">.Chart.Name</span>  &#125;&#125;<br>  <span class="hljs-attr">template:</span><br>    <span class="hljs-attr">metadata:</span><br>      <span class="hljs-attr">labels:</span><br>        <span class="hljs-attr">app:</span> &#123;&#123; <span class="hljs-string">.Chart.Name</span>  &#125;&#125;<br>    <span class="hljs-attr">spec:</span><br>      <span class="hljs-attr">nodeSelector:</span><br>        <span class="hljs-attr">namespaces:</span> &#123;&#123; <span class="hljs-string">.Values.image.namespace</span> &#125;&#125;<br>      <span class="hljs-attr">imagePullSecrets:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">harborsecret</span> <br>      <span class="hljs-attr">containers:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Chart.Name</span> &#125;&#125;<br>          <span class="hljs-attr">image:</span> <span class="hljs-string">&quot;<span class="hljs-template-variable">&#123;&#123; .Values.image.repository &#125;&#125;</span>:<span class="hljs-template-variable">&#123;&#123; .Values.image.tag &#125;&#125;</span>&quot;</span><br>          <span class="hljs-attr">imagePullPolicy:</span> &#123;&#123; <span class="hljs-string">.Values.image.pullPolicy</span> &#125;&#125;<br>          <span class="hljs-attr">name:</span> &#123;&#123; <span class="hljs-string">.Chart.Name</span>  &#125;&#125;<br>          <span class="hljs-attr">command:</span> [<span class="hljs-string">&quot;/bin/sh&quot;</span>,<span class="hljs-string">&quot;-c&quot;</span>,<span class="hljs-string">&quot;bin/startup.sh&quot;</span>]<br>          <span class="hljs-attr">livenessProbe:</span><br>            <span class="hljs-attr">httpGet:</span><br>              <span class="hljs-attr">port:</span>  &#123;&#123; <span class="hljs-string">.Values.service.port</span> &#125;&#125; <br>              <span class="hljs-attr">path:</span> <span class="hljs-string">/actuator/health</span><br>            <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">100</span><br>            <span class="hljs-attr">periodSeconds:</span> <span class="hljs-number">180</span><br>            <span class="hljs-attr">timeoutSeconds:</span> <span class="hljs-number">10</span><br>            <span class="hljs-attr">successThreshold:</span> <span class="hljs-number">1</span><br>            <span class="hljs-attr">failureThreshold:</span> <span class="hljs-number">3</span><br>          <span class="hljs-attr">readinessProbe:</span><br>            <span class="hljs-attr">tcpSocket:</span><br>              <span class="hljs-attr">port:</span>  &#123;&#123; <span class="hljs-string">.Values.service.port</span> &#125;&#125;<br>            <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">100</span><br>            <span class="hljs-attr">periodSeconds:</span> <span class="hljs-number">30</span><br>            <span class="hljs-attr">timeoutSeconds:</span> <span class="hljs-number">2</span><br>            <span class="hljs-attr">successThreshold:</span> <span class="hljs-number">1</span><br>            <span class="hljs-attr">failureThreshold:</span> <span class="hljs-number">3</span><br>          <span class="hljs-attr">volumeMounts:</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/usr/share/fonts/truetype</span> <span class="hljs-string">//</span> <span class="hljs-string">pod</span> <span class="hljs-string">内挂载路径</span><br>              <span class="hljs-attr">name:</span> <span class="hljs-string">ttf-fonts</span>				 					 		 <span class="hljs-string">//</span> <span class="hljs-string">挂在卷的名字</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/usr/share/fonts/msttcore</span><br>            	<span class="hljs-attr">name:</span> <span class="hljs-string">msttcore</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/usr/share/fonts/wqy-microhei</span><br>              <span class="hljs-attr">name:</span> <span class="hljs-string">wqy-microhei</span><br>            <span class="hljs-bullet">-</span> <span class="hljs-attr">mountPath:</span> <span class="hljs-string">/usr/share/fonts/wqy-zenhei</span><br>            	<span class="hljs-attr">name:</span> <span class="hljs-string">wqy-zenhei</span><br>          <span class="hljs-attr">env:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">POD_NAMESPACE</span><br>            <span class="hljs-attr">valueFrom:</span><br>              <span class="hljs-attr">fieldRef:</span><br>                <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br>                <span class="hljs-attr">fieldPath:</span> <span class="hljs-string">metadata.namespace</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">SPRING_PROFILES_ACTIVE</span><br>            <span class="hljs-attr">value:</span> &#123;&#123; <span class="hljs-string">.Values.SPRING_PROFILES_ACTIVE</span>  &#125;&#125; <br>          <span class="hljs-attr">resources:</span><br>            &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">toYaml</span> <span class="hljs-string">.Values.resources</span> <span class="hljs-string">|</span> <span class="hljs-string">nindent</span> <span class="hljs-number">12</span> &#125;&#125;<br>      <span class="hljs-attr">volumes:</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">ttf-fonts</span>										 <span class="hljs-string">//</span> <span class="hljs-string">挂载卷的名称，和上面要对应</span><br>        <span class="hljs-attr">hostPath:</span><br>          <span class="hljs-attr">path:</span> <span class="hljs-string">/usr/share/fonts/truetype</span>  <span class="hljs-string">//</span> <span class="hljs-string">本地需要挂载的路径</span><br>          <span class="hljs-attr">type:</span> <span class="hljs-string">Directory</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">msttcore</span><br>      	<span class="hljs-attr">hostPath:</span><br>      		<span class="hljs-attr">path:</span> <span class="hljs-string">/usr/share/fonts/msttcore</span><br>      		<span class="hljs-attr">type:</span> <span class="hljs-string">Directory</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">wqy-microhei</span><br>      	<span class="hljs-attr">hostPath:</span><br>      		<span class="hljs-attr">path:</span> <span class="hljs-string">/usr/share/fonts/wqy-microhei</span><br>      		<span class="hljs-attr">type:</span> <span class="hljs-string">Directory</span><br>      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">wqy-zenhei</span><br>      	<span class="hljs-attr">hostPath:</span><br>      		<span class="hljs-attr">path:</span> <span class="hljs-string">/usr/share/fonts/wqy-zenhei</span><br>      		<span class="hljs-attr">type:</span> <span class="hljs-string">Directory</span><br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">with</span> <span class="hljs-string">.Values.affinity</span> &#125;&#125;<br>      <span class="hljs-attr">affinity:</span><br>        &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">toYaml</span> <span class="hljs-string">.</span> <span class="hljs-string">|</span> <span class="hljs-string">nindent</span> <span class="hljs-number">8</span> &#125;&#125;<br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">end</span> &#125;&#125;<br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">with</span> <span class="hljs-string">.Values.tolerations</span> &#125;&#125;<br>      <span class="hljs-attr">tolerations:</span><br>        &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">toYaml</span> <span class="hljs-string">.</span> <span class="hljs-string">|</span> <span class="hljs-string">nindent</span> <span class="hljs-number">8</span> &#125;&#125;<br>    &#123;&#123;<span class="hljs-bullet">-</span> <span class="hljs-string">end</span> &#125;&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="3、引入-selenium-依赖"><a href="#3、引入-selenium-依赖" class="headerlink" title="3、引入 selenium 依赖"></a>3、引入 selenium 依赖</h3><h4 id="1）Springboot-项目"><a href="#1）Springboot-项目" class="headerlink" title="1）Springboot 项目"></a>1）Springboot 项目</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.seleniumhq.selenium<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>selenium-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.141.59<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）Python-项目"><a href="#2）Python-项目" class="headerlink" title="2）Python 项目"></a>2）Python 项目</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">pip install selenium<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="4、网页整页转化成图片代码示例"><a href="#4、网页整页转化成图片代码示例" class="headerlink" title="4、网页整页转化成图片代码示例"></a>4、网页整页转化成图片代码示例</h3><h4 id="1）Springboot-项目-1"><a href="#1）Springboot-项目-1" class="headerlink" title="1）Springboot 项目"></a>1）Springboot 项目</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">convertHtml2Image</span><span class="hljs-params">(String url)</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;　　　　　<br>        System.setProperty(<span class="hljs-string">&quot;webdriver.chrome.driver&quot;</span>, <span class="hljs-string">&quot;/usr/bin/chromedriver&quot;</span>);　　　　<span class="hljs-comment">// 设置 chromedriver 地址</span><br>        System.setProperty(<span class="hljs-string">&quot;webdriver.chrome.silentOutput&quot;</span>, <span class="hljs-string">&quot;true&quot;</span>);									<span class="hljs-comment">// 关闭日志	</span><br>        <span class="hljs-comment">//实例化一个Chrome浏览器的实例</span><br>        ChromeOptions options = <span class="hljs-keyword">new</span> ChromeOptions();<br>        <span class="hljs-comment">// 字符编码 utf-8 支持中文字符</span><br>        options.addArguments(<span class="hljs-string">&quot;lang=zh_CN.UTF-8&quot;</span>);<br>        <span class="hljs-comment">// 开启最大化</span><br>        options.addArguments(<span class="hljs-string">&quot;–start-maximized&quot;</span>);<br>        options.addArguments(<span class="hljs-string">&quot;–no-sandbox&quot;</span>);<br>        <span class="hljs-comment">// 开启无头模式</span><br>        options.addArguments(<span class="hljs-string">&quot;--headless&quot;</span>);<br>        options.addArguments(<span class="hljs-string">&quot;--disable-gpu&quot;</span>);        <br>  			options.addArguments(<span class="hljs-string">&quot;--window-size=1920,1080&quot;</span>);        <br>  			options.addArguments(<span class="hljs-string">&quot;--silent&quot;</span>);             <br>  			options.addArguments(<span class="hljs-string">&quot;--disable-logging&quot;</span>);		<span class="hljs-comment">// 关闭日志   </span><br>        WebDriver driver = <span class="hljs-keyword">new</span> ChromeDriver(options);<br>        driver.get(url);<br>        Thread.sleep(<span class="hljs-number">3000</span>);<br>        <span class="hljs-keyword">int</span> height = Integer.parseInt((String) ((JavascriptExecutor) driver).executeScript(<span class="hljs-string">&quot;return document.body.scrollHeight.toString()&quot;</span>));<br>        <span class="hljs-keyword">int</span> width = Integer.parseInt((String) ((JavascriptExecutor) driver).executeScript(<span class="hljs-string">&quot;return document.body.scrollWidth.toString()&quot;</span>));<br><br>        driver.manage().window().setSize(<span class="hljs-keyword">new</span> Dimension(width, height));<br>        driver.manage().window().maximize();<br>        <span class="hljs-comment">//截屏操作</span><br>        <span class="hljs-comment">//截图到output</span><br>        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);<br>        <span class="hljs-keyword">try</span> &#123;<br>            String desImage = UUID.randomUUID().toString() + <span class="hljs-string">&quot;.png&quot;</span>;<br>            <span class="hljs-comment">//复制内容到指定文件中</span><br>            FileUtil.copyFile(scrFile, <span class="hljs-keyword">new</span> File(desImage));<br>            System.out.println(desImage);<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>        driver.close();<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="2）Python-项目-1"><a href="#2）Python-项目-1" class="headerlink" title="2）Python 项目"></a>2）Python 项目</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding: utf-8 -*-</span><br><span class="hljs-keyword">import</span> time, os<br><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image<br><span class="hljs-keyword">from</span> selenium <span class="hljs-keyword">import</span> webdriver<br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Html2Image</span>(<span class="hljs-params">url,fname</span>):</span><br>    v_url = url<br>    chrome_driver = <span class="hljs-string">&quot;&quot;&quot;/usr/bin/chromedriver&quot;&quot;&quot;</span> <span class="hljs-comment"># 设置 chromedriver 地址</span><br>    save_fn = fname + <span class="hljs-string">&#x27;.png&#x27;</span><br>    option = webdriver.ChromeOptions()<br>    option.add_argument(<span class="hljs-string">&#x27;--headless&#x27;</span>)						<span class="hljs-comment"># 开启无头模式</span><br>    option.add_argument(<span class="hljs-string">&#x27;--disable-gpu&#x27;</span>)<br>    option.add_argument(<span class="hljs-string">&quot;--window-size=900,1200&quot;</span>)<span class="hljs-comment">#image size</span><br>    option.add_argument(<span class="hljs-string">&quot;--hide-scrollbars&quot;</span>)<br>    driver = webdriver.Chrome(options=option,executable_path=chrome_driver)<br>    driver.get(v_url)<br>    time.sleep(<span class="hljs-number">5</span>)<br>    scroll_width = driver.execute_script(<span class="hljs-string">&#x27;return document.body.parentNode.scrollWidth&#x27;</span>)<br>    scroll_height = driver.execute_script(<span class="hljs-string">&#x27;return document.body.parentNode.scrollHeight&#x27;</span>)<br>    driver.set_window_size(scroll_width, scroll_height)<br>    <span class="hljs-comment">#打开html文件截图为图片</span><br>    driver.save_screenshot(save_fn)<br>    time.sleep(<span class="hljs-number">5</span>)<br>    driver.quit()<br>    <span class="hljs-comment">#生成html文件，嵌入上面生成的图片</span><br>    im = Image.<span class="hljs-built_in">open</span>(save_fn)<br>    w, h = im.size<br>    imgCount = h // <span class="hljs-number">2000</span> + <span class="hljs-number">1</span><br>    size = h / imgCount<br>    left = <span class="hljs-number">0</span><br>    shang = <span class="hljs-number">0</span><br>    index = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(imgCount):<br>        i = i + <span class="hljs-number">1</span><br>        shang += <span class="hljs-number">1</span><br>        a = size * left<br>        b = size * (i - <span class="hljs-number">1</span>)<br>        c = w<br>        d = size * i<br>        region = im.crop((a, b, c, d))<br>        region.save(<span class="hljs-string">&quot;report%s.png&quot;</span> % i)<br><br>    fp = <span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;report.html&quot;</span>, <span class="hljs-string">&quot;w+b&quot;</span>)  <span class="hljs-comment"># 打开一个文本文件</span><br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, imgCount + <span class="hljs-number">1</span>):<br>        fp.write(<span class="hljs-built_in">bytes</span>(<span class="hljs-string">&#x27;&lt;img src=&quot;report&#x27;</span> + <span class="hljs-built_in">str</span>(i) + <span class="hljs-string">&#x27;.png&quot;&gt;&lt;/img&gt;&#x27;</span>,<span class="hljs-string">&#x27;utf-8&#x27;</span>))  <span class="hljs-comment"># 写入数据</span><br>    fp.close()  <span class="hljs-comment"># 关闭文件</span><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    Html2Image(url=<span class="hljs-string">&quot;file:///tools/scripts/oradbinfo/storage_report_HtmlResult.html&quot;</span>,fname=<span class="hljs-string">&#x27;storage_report_HtmlResult&#x27;</span>)<br><br></code></pre></td></tr></table></figure>
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%A0%88/">前端技术栈</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">问题解决方案</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/09/16/%E7%AC%AC2%E7%AB%A0%E3%80%81%E9%80%9A%E8%BF%87-client-go-%E8%B0%83%E7%94%A8-k8s-api/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第2章、通过 client-go 调用 k8s api</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/13/%E7%AC%AC3%E7%AB%A0%E3%80%81Golang-module%E7%AE%A1%E7%90%86/">
+                        <span class="hidden-mobile">第3章、Golang module管理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
