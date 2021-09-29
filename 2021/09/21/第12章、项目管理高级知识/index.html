@@ -1,0 +1,465 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第12章、项目管理高级知识">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第12章、项目管理高级知识 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第12章、项目管理高级知识">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-09-21 19:59" pubdate>
+        2021年9月21日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      537 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      6
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第12章、项目管理高级知识</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第12章、项目管理高级知识"><a href="#第12章、项目管理高级知识" class="headerlink" title="第12章、项目管理高级知识"></a>第12章、项目管理高级知识</h1><span id="more"></span>
+
+
+
+
+
+<h2 id="一、知识管理"><a href="#一、知识管理" class="headerlink" title="一、知识管理"></a>一、知识管理</h2><h3 id="1、知识的概念"><a href="#1、知识的概念" class="headerlink" title="1、知识的概念"></a>1、知识的概念</h3><h4 id="1）知识的分类"><a href="#1）知识的分类" class="headerlink" title="1）知识的分类"></a>1）知识的分类</h4><h5 id="1-显性知识"><a href="#1-显性知识" class="headerlink" title="1. 显性知识"></a>1. 显性知识</h5><h5 id="2-隐性知识"><a href="#2-隐性知识" class="headerlink" title="2. 隐性知识"></a>2. 隐性知识</h5><h4 id="2）知识的特征"><a href="#2）知识的特征" class="headerlink" title="2）知识的特征"></a>2）知识的特征</h4><h4 id="3）知识的管理工具"><a href="#3）知识的管理工具" class="headerlink" title="3）知识的管理工具"></a>3）知识的管理工具</h4><h4 id="4）隐性知识的共享"><a href="#4）隐性知识的共享" class="headerlink" title="4）隐性知识的共享"></a>4）隐性知识的共享</h4><h5 id="1-共享的方法"><a href="#1-共享的方法" class="headerlink" title="1. 共享的方法"></a>1. 共享的方法</h5><ul>
+<li>编码化</li>
+<li>面对面交流</li>
+<li>人员轮换和网络</li>
+</ul>
+<h5 id="2-共享的途径"><a href="#2-共享的途径" class="headerlink" title="2. 共享的途径"></a>2. 共享的途径</h5><ul>
+<li>创建学习型组织</li>
+<li>构建内部的信任机制</li>
+<li>编码化</li>
+<li></li>
+</ul>
+<h2 id="二、战略管理"><a href="#二、战略管理" class="headerlink" title="二、战略管理"></a>二、战略管理</h2><h3 id="1、组织战略"><a href="#1、组织战略" class="headerlink" title="1、组织战略"></a>1、组织战略</h3><h4 id="1）战略目标"><a href="#1）战略目标" class="headerlink" title="1）战略目标"></a>1）战略目标</h4><h4 id="2）战略方针"><a href="#2）战略方针" class="headerlink" title="2）战略方针"></a>2）战略方针</h4><h4 id="3）战略实施能力"><a href="#3）战略实施能力" class="headerlink" title="3）战略实施能力"></a>3）战略实施能力</h4><h4 id="4）战略措施"><a href="#4）战略措施" class="headerlink" title="4）战略措施"></a>4）战略措施</h4><h3 id="2、战略实施过程分解"><a href="#2、战略实施过程分解" class="headerlink" title="2、战略实施过程分解"></a>2、战略实施过程分解</h3><h3 id="3、组织事业战略类型"><a href="#3、组织事业战略类型" class="headerlink" title="3、组织事业战略类型"></a>3、组织事业战略类型</h3><h4 id="1）防御者战略（Defender）"><a href="#1）防御者战略（Defender）" class="headerlink" title="1）防御者战略（Defender）"></a>1）防御者战略（Defender）</h4><h4 id="2）探索者战略（Prospector）"><a href="#2）探索者战略（Prospector）" class="headerlink" title="2）探索者战略（Prospector）"></a>2）探索者战略（Prospector）</h4><h4 id="3）分析者战略（Anaiyser）"><a href="#3）分析者战略（Anaiyser）" class="headerlink" title="3）分析者战略（Anaiyser）"></a>3）分析者战略（Anaiyser）</h4><h4 id="4）反应者战略（Reactor）"><a href="#4）反应者战略（Reactor）" class="headerlink" title="4）反应者战略（Reactor）"></a>4）反应者战略（Reactor）</h4><h3 id="4、战略组织类型"><a href="#4、战略组织类型" class="headerlink" title="4、战略组织类型"></a>4、战略组织类型</h3><h4 id="1）指挥型"><a href="#1）指挥型" class="headerlink" title="1）指挥型"></a>1）指挥型</h4><h4 id="2）变革型"><a href="#2）变革型" class="headerlink" title="2）变革型"></a>2）变革型</h4><h4 id="3）合作型"><a href="#3）合作型" class="headerlink" title="3）合作型"></a>3）合作型</h4><h4 id="4）文化型"><a href="#4）文化型" class="headerlink" title="4）文化型"></a>4）文化型</h4><h4 id="5）增长型"><a href="#5）增长型" class="headerlink" title="5）增长型"></a>5）增长型</h4><h3 id="5、组织战略层次"><a href="#5、组织战略层次" class="headerlink" title="5、组织战略层次"></a>5、组织战略层次</h3><h4 id="1）目标层"><a href="#1）目标层" class="headerlink" title="1）目标层"></a>1）目标层</h4><h4 id="2）方针层"><a href="#2）方针层" class="headerlink" title="2）方针层"></a>2）方针层</h4><h4 id="3）行为层"><a href="#3）行为层" class="headerlink" title="3）行为层"></a>3）行为层</h4><h2 id="三、组织级项目管理"><a href="#三、组织级项目管理" class="headerlink" title="三、组织级项目管理"></a>三、组织级项目管理</h2><h3 id="1、组织级项目管理成熟度模型（OPM3）"><a href="#1、组织级项目管理成熟度模型（OPM3）" class="headerlink" title="1、组织级项目管理成熟度模型（OPM3）"></a>1、组织级项目管理成熟度模型（OPM3）</h3><h2 id="四、流程管理"><a href="#四、流程管理" class="headerlink" title="四、流程管理"></a>四、流程管理</h2><h3 id="1、企业流程分类"><a href="#1、企业流程分类" class="headerlink" title="1、企业流程分类"></a>1、企业流程分类</h3><h4 id="1）生产流程层"><a href="#1）生产流程层" class="headerlink" title="1）生产流程层"></a>1）生产流程层</h4><h4 id="2）运作层"><a href="#2）运作层" class="headerlink" title="2）运作层"></a>2）运作层</h4><h4 id="3）计划层"><a href="#3）计划层" class="headerlink" title="3）计划层"></a>3）计划层</h4><h4 id="4）战略层"><a href="#4）战略层" class="headerlink" title="4）战略层"></a>4）战略层</h4><h3 id="2、流程分析工具"><a href="#2、流程分析工具" class="headerlink" title="2、流程分析工具"></a>2、流程分析工具</h3><h4 id="1）业务流程图"><a href="#1）业务流程图" class="headerlink" title="1）业务流程图"></a>1）业务流程图</h4><h4 id="2）业务活动图示"><a href="#2）业务活动图示" class="headerlink" title="2）业务活动图示"></a>2）业务活动图示</h4><h4 id="3）UML的活动图"><a href="#3）UML的活动图" class="headerlink" title="3）UML的活动图"></a>3）UML的活动图</h4><h4 id="4）标杆瞄准"><a href="#4）标杆瞄准" class="headerlink" title="4）标杆瞄准"></a>4）标杆瞄准</h4><h4 id="5）IDEF"><a href="#5）IDEF" class="headerlink" title="5）IDEF"></a>5）IDEF</h4><h4 id="6）DEMO"><a href="#6）DEMO" class="headerlink" title="6）DEMO"></a>6）DEMO</h4><h4 id="7）Petri-网"><a href="#7）Petri-网" class="headerlink" title="7）Petri 网"></a>7）Petri 网</h4><h4 id="8）业务流程建模语言"><a href="#8）业务流程建模语言" class="headerlink" title="8）业务流程建模语言"></a>8）业务流程建模语言</h4><h3 id="3、业务流程评估"><a href="#3、业务流程评估" class="headerlink" title="3、业务流程评估"></a>3、业务流程评估</h3><h4 id="1）增值性分析"><a href="#1）增值性分析" class="headerlink" title="1）增值性分析"></a>1）增值性分析</h4><p>1.定义</p>
+<p>2.评价活动的三个参数</p>
+<h4 id="2）流程设计的正确性检验"><a href="#2）流程设计的正确性检验" class="headerlink" title="2）流程设计的正确性检验"></a>2）流程设计的正确性检验</h4><h4 id="3）业务流程方案的评价"><a href="#3）业务流程方案的评价" class="headerlink" title="3）业务流程方案的评价"></a>3）业务流程方案的评价</h4><h3 id="4、敏捷项目管理模式的结构"><a href="#4、敏捷项目管理模式的结构" class="headerlink" title="4、敏捷项目管理模式的结构"></a>4、敏捷项目管理模式的结构</h3><h4 id="1）构想"><a href="#1）构想" class="headerlink" title="1）构想"></a>1）构想</h4><h4 id="2）推测"><a href="#2）推测" class="headerlink" title="2）推测"></a>2）推测</h4><h4 id="3）探索"><a href="#3）探索" class="headerlink" title="3）探索"></a>3）探索</h4><h4 id="4）适应"><a href="#4）适应" class="headerlink" title="4）适应"></a>4）适应</h4><h4 id="5）结束"><a href="#5）结束" class="headerlink" title="5）结束"></a>5）结束</h4><h2 id="五、项目、项目集、项目组合管理"><a href="#五、项目、项目集、项目组合管理" class="headerlink" title="五、项目、项目集、项目组合管理"></a>五、项目、项目集、项目组合管理</h2><h3 id="1、基本概念"><a href="#1、基本概念" class="headerlink" title="1、基本概念"></a>1、基本概念</h3><h4 id="1）项目"><a href="#1）项目" class="headerlink" title="1）项目"></a>1）项目</h4><h4 id="2）项目集"><a href="#2）项目集" class="headerlink" title="2）项目集"></a>2）项目集</h4><h4 id="3）项目组合"><a href="#3）项目组合" class="headerlink" title="3）项目组合"></a>3）项目组合</h4><h2 id="六、成熟度模型、量化管理"><a href="#六、成熟度模型、量化管理" class="headerlink" title="六、成熟度模型、量化管理"></a>六、成熟度模型、量化管理</h2><h3 id="1、组织项目管理成熟度模型（OPM3）"><a href="#1、组织项目管理成熟度模型（OPM3）" class="headerlink" title="1、组织项目管理成熟度模型（OPM3）"></a>1、组织项目管理成熟度模型（OPM3）</h3><h3 id="2、能力成熟度模型集成（CMMI）"><a href="#2、能力成熟度模型集成（CMMI）" class="headerlink" title="2、能力成熟度模型集成（CMMI）"></a>2、能力成熟度模型集成（CMMI）</h3><p>作业：</p>
+<p>1、区分显性知识与隐性知识</p>
+<p>2、知识管理工具</p>
+<p>3、组织事业战略类型</p>
+<p>4、战略组织类型</p>
+<p>5、组织战略层次</p>
+<p>6、组织级项目管理成熟度模型（OPM3）四个梯级</p>
+<p>7、敏捷项目管理模式的结构</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%BD%AF%E8%80%83%E9%AB%98%E9%A1%B9/">软考高项</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/">项目管理</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/09/22/Kubernetes-1-18%EF%BC%88calico-%E7%BD%91%E7%BB%9C%EF%BC%89-%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E9%83%A8%E7%BD%B2/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kubernetes 1.18（calico 网络）二进制包部署</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/18/Kubernetes-calico-%E7%BD%91%E7%BB%9C%E7%BB%84%E4%BB%B6%E5%8D%87%E7%BA%A7/">
+                        <span class="hidden-mobile">Kubernetes calico 网络组件升级</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

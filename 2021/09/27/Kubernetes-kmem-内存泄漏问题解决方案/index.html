@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Kubernetes kmem 内存泄漏问题解决方案">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>Kubernetes kmem 内存泄漏问题解决方案 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Kubernetes kmem 内存泄漏问题解决方案">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-09-27 13:56" pubdate>
+        2021年9月27日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      38
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kubernetes kmem 内存泄漏问题解决方案</h1>
+            
+            <div class="markdown-body">
+              <h1 id="Kubernetes-kmem-内存泄漏问题解决方案"><a href="#Kubernetes-kmem-内存泄漏问题解决方案" class="headerlink" title="Kubernetes kmem 内存泄漏问题解决方案"></a>Kubernetes kmem 内存泄漏问题解决方案</h1><span id="more"></span> 
+
+
+
+<h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>当我们的 Kubernetes 集群运行日久后，有的 node 会出现无法再新建 pod 的情况，重启服务器后才可以恢复正常使用，比较典型的有如下情况：</p>
+<p>在 查看 pod 的时候出现如下报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">applying cgroup … caused: mkdir ...no space left on device<br></code></pre></td></tr></table></figure>
+
+<p>或如下报错</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">unable to ensure pod container exists: ...cannot allocate memory<br></code></pre></td></tr></table></figure>
+
+<p>或 node 内核日志出现如下报错:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">SLUB: Unable to allocate memory on node -1<br></code></pre></td></tr></table></figure>
+
+<p>当出现如上这种情况的时候，K8S 集群可能就存在内存泄露问题了，当创建的 pod 越多的时候，内存泄露的越多、越快。我们可以通过以下方式来查看集群是否存在内存泄漏：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat /sys/fs/cgroup/memory/kubepods/memory.kmem.slabinfo<br></code></pre></td></tr></table></figure>
+
+<p>如果没有内存泄漏问题，返回如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat: /sys/fs/cgroup/memory/kubepods/memory.kmem.slabinfo: Input/output error<br></code></pre></td></tr></table></figure>
+
+<p>如果存在内存泄漏问题，返回则如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">slabinfo - version: 2.1<br><span class="hljs-meta">#</span><span class="bash"> name            &lt;active_objs&gt; &lt;num_objs&gt; &lt;objsize&gt; &lt;objperslab&gt; &lt;pagesperslab&gt; : tunables &lt;<span class="hljs-built_in">limit</span>&gt; &lt;batchcount&gt; &lt;sharedfactor&gt; : slabdata &lt;active_slabs&gt; &lt;num_slabs&gt; &lt;sharedavail&gt;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>🌈 事实上，绝大多数的 Kubernetes 都会存在该隐患，只不过在一般情况下内存泄漏发生的比较慢，所以难以察觉。一般性来说，即使 pod 百分百发生泄漏，也需要一个节点销毁过 3w + 的pod，才会导致 pod 无法继续创建，这种情况如果出现了，除了重启节点，就没有解决的方法了。虽说，这种情况发生的概率不大，但是当内存泄漏发生时，一个 pod 可能会泄漏 2个 memory cgroup 的数量配额，这是非常可怕的。并且由于某些服务本身的特性，高频率的 gc，往往也是有可能诱发内存泄漏产生的。</p>
+</blockquote>
+<h2 id="二、根因追溯"><a href="#二、根因追溯" class="headerlink" title="二、根因追溯"></a>二、根因追溯</h2><p>其实这个问题在 pingcap 的 <a target="_blank" rel="noopener" href="https://en.pingcap.com/blog/try-to-fix-two-linux-kernel-bugs-while-testing-tidb-operator-in-k8s">文章</a> 和腾讯云的 <a target="_blank" rel="noopener" href="https://tencentcloudcontainerteam.github.io/2018/12/29/cgroup-leaking/">官方修复</a> 都已经阐述过该问题。其主要产生的原因是，在 Linux 3.10.x 的内核版本中，其 cgroup 的 kmem account 特性（CONFIG_MEMCG_KMEM）存在内存泄露的 bug。如果开启了该特性，就会导致可分配的内存逐步减少，直到无法创建新的 pod 或节点出现异常。该问题在 4.x 的内核版本中已修复。</p>
+<p>官方给出了该内核问题的解释:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/torvalds/linux/commit/d6e0b7fa11862433773d986b5f995ffdf47ce672">https://github.com/torvalds/linux/commit/d6e0b7fa11862433773d986b5f995ffdf47ce672</a></li>
+<li><a target="_blank" rel="noopener" href="https://support.d2iq.com/s/article/Critical-Issue-KMEM-MSPH-2018-0006">https://support.d2iq.com/s/article/Critical-Issue-KMEM-MSPH-2018-0006</a></li>
+</ul>
+<p>事实上，3.10 内核已明确声明过 kmem 只是实验特性，但由于它是 cgroup 自带的扩展能力，所以 runc、docker、k8s 层面都进行了该功能的支持，也就默认打开了 kmem 属性，但是在兼容上面却并没有做好，所以当节点压力大，如频繁启动和停止容器时就会导致 cgroup memory leak。</p>
+<p>该问题也被记录在了 docker 和 kubernetes 的官方 issue 中:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/moby/moby/issues/29638">https://github.com/moby/moby/issues/29638</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/70324">https://github.com/kubernetes/kubernetes/issues/70324</a></li>
+</ul>
+<p>从 1.13 开始的版本，Docker 就默认启用了该功能，且无法关闭，只到 18.09.1 版本后才修复了该问题。</p>
+<p>kubelet 的 vender 中引用了 runc，所以 kubelet 也就开启了 kmem，要解决该问题就需要修改源码重新编译。</p>
+<h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2><h3 id="1、方案一-——-升级内核至-4-x"><a href="#1、方案一-——-升级内核至-4-x" class="headerlink" title="1、方案一 —— 升级内核至 4.x"></a>1、方案一 —— 升级内核至 4.x</h3><p>既然这个问题只会出现在 3.x，并且在 4.x 中解决了，那么直接将内核版本升级是最直接的方法，但是<strong>在产线环境中并不推荐</strong>。</p>
+<h4 id="1）该方式的缺点"><a href="#1）该方式的缺点" class="headerlink" title="1）该方式的缺点:"></a>1）该方式的缺点:</h4><ul>
+<li>需要升级所有的节点并重启，重启必然会导致 pod 漂移，所以一旦集群规模较大这个过程就会比较痛苦，且可能对业务产生直接的影响，需要事先争取业务部门同意</li>
+<li>使用公有云环境时，内核版本的升级可能会与公有云vm环境产生冲突，需要云商有足够的评测，证明其可行性，这个过程就会很长，并且不一定能保证问题被解决</li>
+<li>已有环境的代码在 3.x 运行正常，并不代表在 4.x 也能正常，在全量升级前要做较久的兼容性测试，周期很长。</li>
+</ul>
+<h4 id="2）实施方案"><a href="#2）实施方案" class="headerlink" title="2）实施方案"></a>2）实施方案</h4><blockquote>
+<p><strong>在此仅记录通用的升级内核版本的方案（yum 方式）以供参考：</strong></p>
+</blockquote>
+<h5 id="1-查看当前内核版本"><a href="#1-查看当前内核版本" class="headerlink" title="1. 查看当前内核版本"></a>1. 查看当前内核版本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# uname -r<br>3.10.0-862.el7.x86_64<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-安装-elrepo-的-yum-源"><a href="#2-安装-elrepo-的-yum-源" class="headerlink" title="2. 安装 elrepo 的 yum 源"></a>2. 安装 elrepo 的 yum 源</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>安装完成后检查 <code>/boot/grub2/grub</code>.cfg 中对应内核 menuentry 中是否包含 initrd16 配置，如果没有，再安装一次！</p>
+</blockquote>
+<h5 id="3-安装内核"><a href="#3-安装内核" class="headerlink" title="3. 安装内核"></a>3. 安装内核</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# yum --enablerepo=elrepo-kernel install -y kernel-lt<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在 yum 的 elrepo 源中，有最新版本的内核，直接 yum 安装即可</p>
+</blockquote>
+<h5 id="4-设置开机从新内核启动"><a href="#4-设置开机从新内核启动" class="headerlink" title="4. 设置开机从新内核启动"></a>4. 设置开机从新内核启动</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# grub2-set-default 0<br></code></pre></td></tr></table></figure>
+
+<h5 id="5-重启服务器"><a href="#5-重启服务器" class="headerlink" title="5. 重启服务器"></a>5. 重启服务器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# reboot<br></code></pre></td></tr></table></figure>
+
+<h5 id="6-安装内核源文件（在升级完内核并重启机器后执行，也可以不用执行这一步。可选）"><a href="#6-安装内核源文件（在升级完内核并重启机器后执行，也可以不用执行这一步。可选）" class="headerlink" title="6. 安装内核源文件（在升级完内核并重启机器后执行，也可以不用执行这一步。可选）"></a>6. 安装内核源文件（在升级完内核并重启机器后执行，也可以不用执行这一步。可选）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# yum --enablerepo=elrepo-kernel install kernel-lt-devel-$(uname -r) kernel-lt-headers-$(uname -r)<br></code></pre></td></tr></table></figure>
+
+<h5 id="7-再次查看内核版本"><a href="#7-再次查看内核版本" class="headerlink" title="7. 再次查看内核版本"></a>7. 再次查看内核版本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# uname -r<br>4.4.180-2.el7.elrepo.x86_64<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、方案二-——-关闭-grub-引导中的-kmem-配置"><a href="#2、方案二-——-关闭-grub-引导中的-kmem-配置" class="headerlink" title="2、方案二 —— 关闭 grub 引导中的 kmem 配置"></a>2、方案二 —— 关闭 grub 引导中的 kmem 配置</h3><p>官方早已申明该特性为实验特性，并不推荐使用，事实上，只要不开启 kmem accounting 就不会发出 cgroup 泄漏问题。所以另一种解决方案就是开机引导时就直接关闭该功能，禁用 cgroup 的 kmem 特性。</p>
+<h4 id="1）该方式的缺点-1"><a href="#1）该方式的缺点-1" class="headerlink" title="1）该方式的缺点:"></a>1）该方式的缺点:</h4><ul>
+<li>仍然需要重启服务器，所以其实和升级内核性质差不多</li>
+<li>这个方式并不能全局生效，有些服务器可能无法生效</li>
+</ul>
+<h4 id="2）实施方案-1"><a href="#2）实施方案-1" class="headerlink" title="2）实施方案"></a>2）实施方案</h4><blockquote>
+<p><strong>在此仅记录方案以供参考：</strong></p>
+</blockquote>
+<h5 id="1-修改-etc-default-grub-，修改内容如下"><a href="#1-修改-etc-default-grub-，修改内容如下" class="headerlink" title="1. 修改 /etc/default/grub ，修改内容如下:"></a>1. 修改 <code>/etc/default/grub</code> ，修改内容如下:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">GRUB_CMDLINE_LINUX=&quot;crashkernel=auto net.ifnames=0 biosdevname=0 intel_pstate=disable cgroup.memory=nokmem&quot;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>设置 <code>cgroup.memory=nokmem</code>，禁用 kmem。</p>
+</blockquote>
+<h5 id="2-生成配置"><a href="#2-生成配置" class="headerlink" title="2. 生成配置"></a>2. 生成配置</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-重启服务器"><a href="#3-重启服务器" class="headerlink" title="3. 重启服务器"></a>3. 重启服务器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# reboot<br></code></pre></td></tr></table></figure>
+
+<h5 id="4-验证"><a href="#4-验证" class="headerlink" title="4. 验证"></a>4. 验证</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@k8s-master01 ~]# cat /sys/fs/cgroup/memory/kubepods/burstable/pod*/*/memory.kmem.slabinfo<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>无输出即可。</p>
+</blockquote>
+<h3 id="3、方案三-——-从使用方维度关闭-kmem-配置（推荐）"><a href="#3、方案三-——-从使用方维度关闭-kmem-配置（推荐）" class="headerlink" title="3、方案三 —— 从使用方维度关闭 kmem 配置（推荐）"></a>3、方案三 —— 从使用方维度关闭 kmem 配置（推荐）</h3><p>之前的两种方案都是从OS层面解决问题，但是归根结底，问题其实是出在使用方的兼容性上，所以从使用方的维度去禁用该特性是更加有效的，这也是官方推荐的方法，并也给出了解决方式。</p>
+<h4 id="1）对于-Docker"><a href="#1）对于-Docker" class="headerlink" title="1）对于 Docker"></a>1）对于 Docker</h4><p>针对 Dokcer 既然官方已经解决了该兼容性问题，那么我们在安装 Docker 时安装高于 18.09.1 的版本即可（或升级）。</p>
+<h4 id="2）对于-runc-官方针对这个问题做了比较灵活的修复，通过-BUILDTAGS-的方式重新编译即可，方法如下"><a href="#2）对于-runc-官方针对这个问题做了比较灵活的修复，通过-BUILDTAGS-的方式重新编译即可，方法如下" class="headerlink" title="2）对于 runc 官方针对这个问题做了比较灵活的修复，通过 BUILDTAGS 的方式重新编译即可，方法如下"></a>2）对于 runc 官方针对这个问题做了比较灵活的修复，通过 BUILDTAGS 的方式重新编译即可，方法如下</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd $GO_PATH/src/github.com/opencontainers/runc/<br>make BUILDTAGS=&quot;seccomp nokmem&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）对于-kubelet"><a href="#3）对于-kubelet" class="headerlink" title="3）对于 kubelet"></a>3）对于 kubelet</h4><p>针对 kubelet  ，官方 issue 给出的解决方式是自行重新编译 kubelet 来解决。</p>
+<h5 id="1-v1-13-及以前版本的-kubelet"><a href="#1-v1-13-及以前版本的-kubelet" class="headerlink" title="1. v1.13 及以前版本的 kubelet"></a>1. v1.13 及以前版本的 kubelet</h5><p>修改源码，文件路径: <code>vendor/github.com/opencontainers/runc/libcontainer/cgroups/fs/memory.go</code>，替换以下两个函数:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">EnableKernelMemoryAccounting</span><span class="hljs-params">(path <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setKernelMemory</span><span class="hljs-params">(path <span class="hljs-keyword">string</span>, kernelMemoryLimit <span class="hljs-keyword">int64</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后重新编译 kubelet：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make WHAT=cmd/kubelet GOFLAGS=-v GOGCFLAGS=&quot;-N -l&quot;<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-v1-14-及以后版本的-kubelet"><a href="#2-v1-14-及以后版本的-kubelet" class="headerlink" title="2. v1.14 及以后版本的 kubelet"></a>2. v1.14 及以后版本的 kubelet</h5><p>k8s v1.14 起也已经如 runc 一样支持通过 BUILDTAGS 的方式来禁止 kmem accounting 了，使用如下命令重新编译 kubelet：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make BUILDTAGS=&quot;nokmem&quot; WHAT=cmd/kubelet GOFLAGS=-v GOGCFLAGS=&quot;-N -l&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="四、实施记录"><a href="#四、实施记录" class="headerlink" title="四、实施记录"></a>四、实施记录</h2><h3 id="1、配置-go-环境"><a href="#1、配置-go-环境" class="headerlink" title="1、配置 go 环境"></a>1、配置 go 环境</h3><p>由于不同版本的 k8s 编译使用 go 版本是不同的，所以可以采用多版本控制的方式来配置 go 环境。具体可参考之前的文章: <a href="https://tareya.github.io/2021/08/25/golang-%E5%A4%9A%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7-%E2%80%94-g/">golang 多版本管理工具 — g</a></p>
+<h3 id="2、重新编译-runc"><a href="#2、重新编译-runc" class="headerlink" title="2、重新编译 runc"></a>2、重新编译 runc</h3><h4 id="1）下载-runc-源码"><a href="#1）下载-runc-源码" class="headerlink" title="1）下载 runc 源码"></a>1）下载 runc 源码</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/opencontainers/runc &amp;&amp; \<br>cd runc/ &amp;&amp; \<br>git checkout v1.0.2<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>切换到最新tag</p>
+</blockquote>
+<h4 id="2）重新编译"><a href="#2）重新编译" class="headerlink" title="2）重新编译"></a>2）重新编译</h4><h5 id="1-安装编译组件"><a href="#1-安装编译组件" class="headerlink" title="1. 安装编译组件"></a>1. 安装编译组件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">sudo yum install libseccomp-devel -y <br></code></pre></td></tr></table></figure>
+
+<h5 id="2-编译源码"><a href="#2-编译源码" class="headerlink" title="2. 编译源码"></a>2. 编译源码</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make BUILDTAGS=&quot;seccomp nokmem&quot;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>会在当前目录下生成新的 runc 二进制文件</p>
+</blockquote>
+<h3 id="3、重新编译-kubelet"><a href="#3、重新编译-kubelet" class="headerlink" title="3、重新编译 kubelet"></a>3、重新编译 kubelet</h3><h4 id="1）下载-Kubernetes-源码"><a href="#1）下载-Kubernetes-源码" class="headerlink" title="1）下载 Kubernetes 源码"></a>1）下载 Kubernetes 源码</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/kubernetes/kubernetes.git &amp;&amp; \<br>cd kubernetes &amp;&amp; \<br>git checkout v1.18.18<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）重新编译-1"><a href="#2）重新编译-1" class="headerlink" title="2）重新编译"></a>2）重新编译</h4><blockquote>
+<p>修改源码函数过程忽略</p>
+</blockquote>
+<h5 id="1-v1-18-18-版本"><a href="#1-v1-18-18-版本" class="headerlink" title="1. v1.18.18 版本"></a>1. v1.18.18 版本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">KUBE_GIT_TREE_STATE=clean KUBE_GIT_VERSION=v1.18.18 make BUILDTAGS=&quot;nokmem&quot; WHAT=cmd/kubelet GOFLAGS=-v GOGCFLAGS=&quot;-N -l&quot;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>参数说明:</strong></p>
+<ul>
+<li><code>KUBE_GIT_TREE_STATE</code> 和 <code>KUBE_GIT_VERSION</code> 两个参数用于设置版本，保持版本号干净；</li>
+<li><code>BUILDTAGS</code> 设置 nokmem 用于关闭 kmem 的使用。</li>
+</ul>
+</blockquote>
+<p>编译结果会生产在 <code>kubernetes/_output/local/bin/linux/amd64</code> 下，查看版本以验证：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">_output/local/bin/linux/amd64/kubelet --version<br></code></pre></td></tr></table></figure>
+
+<p>正常返回值为:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">Kubernetes v1.18.18<br></code></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-v1-15-5-版本"><a href="#2-v1-15-5-版本" class="headerlink" title="2. v1.15.5 版本"></a>2. v1.15.5 版本</h5><blockquote>
+<p>⚠️ <strong>关于编译 k8s 源码的 go 版本</strong></p>
+<p>由于 v1.15.5 版本的 k8s 使用的 go 版本为 1.12.10，新版本的go 对于包管理的方式与老版本四不同的，而且 k8s 版本的vender 是不兼容的，需要根据 go.mod 里的需求来进行匹配，最直接的方式其实就是看官方给出的 kubectl 二进制包使用哪个版本的 go 编译的，再二次编译的时候使用相同版本即可，如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl version --client<br></code></pre></td></tr></table></figure>
+
+<p>其返回为:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">Client Version: version.Info&#123;Major:&quot;1&quot;, Minor:&quot;15&quot;, GitVersion:&quot;v1.15.5&quot;, GitCommit:&quot;20c265fef0741dd71a66480e35bd69f18351daea&quot;, GitTreeState:&quot;clean&quot;, BuildDate:&quot;2019-10-15T19:16:51Z&quot;, GoVersion:&quot;go1.12.10&quot;, Compiler:&quot;gc&quot;, Platform:&quot;linux/amd64&quot;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到使用的go 版本为 1.12.10 ，通过 g 来切换到对应的版本，具体如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">g install 1.12.10<br></code></pre></td></tr></table></figure>
+
+<p>正常返回如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">Downloading 100% |███████████████| (122/122 MB, 1.149 MB/s) [1m46s:0s]         <br><br>Computing checksum with SHA256<br><br>Checksums matched<br><br>Now using go1.12.10<br></code></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">KUBE_GIT_TREE_STATE=clean KUBE_GIT_VERSION=v1.15.5 make BUILDTAGS=&quot;nokmem&quot; WHAT=cmd/kubelet GOFLAGS=-v GOGCFLAGS=&quot;-N -l&quot;<br></code></pre></td></tr></table></figure>
+
+<p>编译结果仍然会生产在 <code>kubernetes/_output/local/bin/linux/amd64</code> 下，查看版本以验证：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">_output/local/bin/linux/amd64/kubelet --version<br></code></pre></td></tr></table></figure>
+
+<p>正常返回值为:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">Kubernetes v1.15.5<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="4、替换原有的-kubelet-和-docker-runc"><a href="#4、替换原有的-kubelet-和-docker-runc" class="headerlink" title="4、替换原有的 kubelet 和 docker-runc"></a>4、替换原有的 kubelet 和 docker-runc</h3><h4 id="1）批量备份原版本"><a href="#1）批量备份原版本" class="headerlink" title="1）批量备份原版本"></a>1）批量备份原版本</h4><blockquote>
+<p>该过程可以批量进行</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible all -S -R root -m file -a &quot;path=/tmp/bak state=directory owner=root group=root&quot;<br>ansible all -S -R root -m shell -a &quot;cp -a /usr/bin/runc /tmp/bak/&quot;<br>ansible all -S -R root -m shell -a &quot;cp -a /usr/bin/docker-runc /tmp/bak/&quot;<br>ansible all -S -R root -m shell -a &quot;cp -a /data/application/kubernetes/bin/kubelet /tmp/bak/&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）分发重新编译后的-runc-和-kubelet"><a href="#2）分发重新编译后的-runc-和-kubelet" class="headerlink" title="2）分发重新编译后的 runc 和 kubelet"></a>2）分发重新编译后的 runc 和 kubelet</h4><blockquote>
+<p>该过程可以批量进行</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible all -S -R root -m copy -a &quot;src=runc dest=/tmp/runc owner=root group=root mode=0755&quot; <br>ansible all -S -R root -m copy -a &quot;src=runc dest=/tmp/docker-runc owner=root group=root mode=0755&quot; <br>ansible all -S -R root -m copy -a &quot;src=kubelet dest=/tmp/kubelet owner=root group=root mode=0755&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）停止-docker-和-kubelet"><a href="#3）停止-docker-和-kubelet" class="headerlink" title="3）停止 docker 和 kubelet"></a>3）停止 docker 和 kubelet</h4><blockquote>
+<p>该过程建议逐个节点进行</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">systemctl stop kubelet<br>systemctl stop docker<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）替换重新编译的-runc-和-kubelet"><a href="#3）替换重新编译的-runc-和-kubelet" class="headerlink" title="3）替换重新编译的 runc 和 kubelet"></a>3）替换重新编译的 runc 和 kubelet</h4><blockquote>
+<p>该过程建议逐个节点进行</p>
+</blockquote>
+<h5 id="1-替换-runc"><a href="#1-替换-runc" class="headerlink" title="1. 替换 runc"></a>1. 替换 runc</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">/bin/rm -f /usr/bin/runc /usr/bin/docker-runc &amp;&amp; \<br>/bin/mv /tmp/*runc /usr/bin/<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-替换-kubelet"><a href="#2-替换-kubelet" class="headerlink" title="2. 替换 kubelet"></a>2. 替换 kubelet</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">/bin/rm -f /data/applications/kubernetes/bin/kubelet &amp;&amp; \<br>/bin/mv -a /tmp/kubelet /data/applications/kubernetes/bin/<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）重启服务器验证"><a href="#4）重启服务器验证" class="headerlink" title="4）重启服务器验证"></a>4）重启服务器验证</h4><blockquote>
+<p>检查 kmem 是否关闭需要将节点的 pod 杀掉重启或重启服务器，但是这一工作可以再新增节点的准备环境就完成</p>
+</blockquote>
+<h5 id="1-查看k8s-pod-kmem-内存-使用"><a href="#1-查看k8s-pod-kmem-内存-使用" class="headerlink" title="1. 查看k8s pod kmem 内存 使用"></a>1. 查看k8s pod kmem 内存 使用</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat /sys/fs/cgroup/memory/kubepods/burstable/memory.kmem.usage_in_bytes<br></code></pre></td></tr></table></figure>
+
+<p>如果返回值为0，则表明 kmem 已关闭</p>
+<h5 id="2-查看是否存在内存泄漏"><a href="#2-查看是否存在内存泄漏" class="headerlink" title="2. 查看是否存在内存泄漏"></a>2. 查看是否存在内存泄漏</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat /sys/fs/cgroup/memory/kubepods/memory.kmem.slabinfo<br></code></pre></td></tr></table></figure>
+
+<p>如果返回值为 <code>Input/output error</code>，则也表明 kmem 已关闭</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">问题解决方案</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/09/28/%E7%AC%AC13%E7%AB%A0%E3%80%81%E4%BF%A1%E6%81%AF%E7%B3%BB%E7%BB%9F%E6%B5%8B%E8%AF%95%E7%9F%A5%E8%AF%86/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第13章、信息系统测试知识</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/22/Kubernetes-1-18%EF%BC%88calico-%E7%BD%91%E7%BB%9C%EF%BC%89-%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E9%83%A8%E7%BD%B2/">
+                        <span class="hidden-mobile">Kubernetes 1.18（calico 网络）二进制包部署</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Kubernetes calico 网络组件升级">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>Kubernetes calico 网络组件升级 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Kubernetes calico 网络组件升级">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-09-18 09:53" pubdate>
+        2021年9月18日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kubernetes calico 网络组件升级</h1>
+            
+            <div class="markdown-body">
+              <h1 id="Kubernetes-calico-网络组件升级"><a href="#Kubernetes-calico-网络组件升级" class="headerlink" title="Kubernetes calico 网络组件升级"></a>Kubernetes calico 网络组件升级</h1><span id="more"></span>
+
+
+
+<h2 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h2><p>由于原本业务架构设计的不合理性，只是非常片面的将服务在代码层面进行了拆分，这就导致了服务数量的急剧扩张，而从根本上来说大多数拆分出的服务实际上却是起不到微服务的作用的，出于业绩需求将上游服务人为的再拆分上下游，而这类上下游服务却又都依赖于中台应用，并且服务聚合、治理、API网关、服务发现等方面都尚不完善，原子服务之间直接通过 http 进行互相通信，带来的除了调用链混乱外，还有更多的无谓的网络消耗（毕竟原本2个服务之间的沟通渠道为2，n个服务之间就会变成 n*(n-1)/2，交互成本就是网络消耗的不断累加）。</p>
+<p>因此，由于 K8S 整体迁移工作进展较快，加以服务数量不断的增多（副本数近千）、服务间通信的复杂，不必要的网络通信过多、迭代的频率过高、本身出于公有云资源的成本考虑，所使用的服务器资源也只是最大化平衡后的最低门槛资源，这诸多的因素，都直接对基础的 flannel 网络组件造成了巨大的压力，如果考虑以目前的趋势而毫无改制和节制的话，在副本数超过千数后，整体网络的性能就会急剧下降，到1500左右时，网络组件就会出现较为频繁的崩溃。</p>
+<p>原本采用 flannel 的主要因素在于维护相对简单，对于维护人员的人数以及技术条件不会太高，比较适合单人维护多集群的情况，但是以目前的情况来说，flannel 已经不足以支撑之后1年半载内可能的发展需要了，那么，是时候进行升级换代了。</p>
+<h2 id="二、知识讲解"><a href="#二、知识讲解" class="headerlink" title="二、知识讲解"></a>二、知识讲解</h2><h3 id="1、Kubernetes-内的网络通信"><a href="#1、Kubernetes-内的网络通信" class="headerlink" title="1、Kubernetes 内的网络通信"></a>1、Kubernetes 内的网络通信</h3><h4 id="1）Container-间的通信"><a href="#1）Container-间的通信" class="headerlink" title="1）Container 间的通信"></a>1）Container 间的通信</h4><p>我们知道，一个 K8S 的 Pod 中是可以存在多个容器（Container）的，也就是我们常说的 docker、Podman 之类的。在同一个 Pod 内，容器之间共享网络命名空间，故其之间通过 loopback 口即可实现通信（127.0.0.1:Port），其整体的网络模式仍是继承自 docker 网桥通信的思路，Pod 即相当于一个独立的宿主对象，一个虚拟化沙盒，其通信原理如下图：</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/K8S%20Container%E9%97%B4%E9%80%9A%E4%BF%A1.jpg" srcset="/img/loading.gif" lazyload alt="K8S Container间通信"></p>
+<h4 id="2）同节点-Pod-间的通信"><a href="#2）同节点-Pod-间的通信" class="headerlink" title="2）同节点 Pod 间的通信"></a>2）同节点 Pod 间的通信</h4><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/K8S%20%E5%90%8C%E8%8A%82%E7%82%B9Pod%E9%97%B4%E9%80%9A%E4%BF%A1.jpg" srcset="/img/loading.gif" lazyload alt="K8S 同节点Pod间通信"></p>
+<h4 id="3）Pod-和-Service-间的通信"><a href="#3）Pod-和-Service-间的通信" class="headerlink" title="3）Pod 和 Service 间的通信"></a>3）Pod 和 Service 间的通信</h4><h4 id="4）Service-和集群外部的通信"><a href="#4）Service-和集群外部的通信" class="headerlink" title="4）Service 和集群外部的通信"></a>4）Service 和集群外部的通信</h4><h4 id="5）不同节点-Pod-间通信"><a href="#5）不同节点-Pod-间通信" class="headerlink" title="5）不同节点 Pod 间通信"></a>5）不同节点 Pod 间通信</h4><h5 id="1-关于-CNI"><a href="#1-关于-CNI" class="headerlink" title="1. 关于 CNI"></a>1. 关于 CNI</h5><p>CNI，即 Container Network Interface（容器网络接口）。顾名思义，它是一种为容器平台的网络所建立的标准协议规范，使用这种标准可以让不同的容器平台（如，Kubernetes、Swarm、Mesos 等），可以通过相同的接口调用不同的网络插件。集群内的跨节点通信涉及到了不同子网内的通信，仅靠 docker0 是无法实现的，这时候就需要借助 CNI 网络插件来实现。</p>
+<p>目前 K8S 所能够支持的 CNI 组件种类很多，如 host-local、bridge、dhcp、flannel、calico、ipvlan、tuning vlan 等等，其虽然现在 K8S 在尝试推动使用 Podman 来取代 Docker，但是目前市面上 Docker 仍然是 K8S 集群最主要的 Container 方案，因此从某种程度上来说，在说 K8S 网络方案的同时其实就是在说 Docker 的网络方案。</p>
+<h5 id="2-关于-Docker-的跨节点通信模式"><a href="#2-关于-Docker-的跨节点通信模式" class="headerlink" title="2. 关于 Docker 的跨节点通信模式"></a>2. 关于 Docker 的跨节点通信模式</h5><p>在 Docker 中，主流的跨节点通信方案主要有以下几种：</p>
+<h6 id="1⃣️-基于隧道的-overlay-网络"><a href="#1⃣️-基于隧道的-overlay-网络" class="headerlink" title="1⃣️ 基于隧道的 overlay 网络"></a>1⃣️ 基于隧道的 overlay 网络</h6><p>Docker 原生的 overlay 网络是基于 vxlan 隧道的方式实现的，新版本的 flannel 版本也是以这种方式实现 overlay 网络的。</p>
+<h6 id="2⃣️-基于包封装的-overlay-网络"><a href="#2⃣️-基于包封装的-overlay-网络" class="headerlink" title="2⃣️ 基于包封装的 overlay 网络"></a>2⃣️ 基于包封装的 overlay 网络</h6><p>基于 UDP 封装等数据包包装方式，实现跨主机网络，比如 weave和早期的 flannel。</p>
+<h6 id="3⃣️-基于三层实现的-SDN-网络"><a href="#3⃣️-基于三层实现的-SDN-网络" class="headerlink" title="3⃣️ 基于三层实现的 SDN 网络"></a>3⃣️ 基于三层实现的 SDN 网络</h6><p>基于三层协议和路由，直接在三层实现跨主机网络，并且通过 iptables 实现网络的安全隔离，最典型的就是 Project Calico。</p>
+<h5 id="3-通信方式"><a href="#3-通信方式" class="headerlink" title="3. 通信方式"></a>3. 通信方式</h5><h3 id="2、Kubernetes-网络组件简介"><a href="#2、Kubernetes-网络组件简介" class="headerlink" title="2、Kubernetes 网络组件简介"></a>2、Kubernetes 网络组件简介</h3><h4 id="1）关于-Flannel"><a href="#1）关于-Flannel" class="headerlink" title="1）关于 Flannel"></a>1）关于 Flannel</h4><h4 id="2）关于-Calico"><a href="#2）关于-Calico" class="headerlink" title="2）关于 Calico"></a>2）关于 Calico</h4><h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">问题解决方案</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/09/21/%E7%AC%AC12%E7%AB%A0%E3%80%81%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E9%AB%98%E7%BA%A7%E7%9F%A5%E8%AF%86/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第12章、项目管理高级知识</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/16/%E7%AC%AC5%E7%AB%A0%E3%80%81Ansible-API/">
+                        <span class="hidden-mobile">第5章、Ansible API</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
