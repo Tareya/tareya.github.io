@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      21k 字
+      21.1k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      339
+      340
        分钟
     </span>
   
@@ -765,7 +765,8 @@
 
 
 
-<h3 id="3、部署-etcd-集群"><a href="#3、部署-etcd-集群" class="headerlink" title="3、部署 etcd 集群"></a>3、部署 etcd 集群</h3><blockquote>
+<h3 id="3、部署-etcd-集群"><a href="#3、部署-etcd-集群" class="headerlink" title="3、部署 etcd 集群"></a>3、部署 etcd 集群</h3><p><strong>基础组件介绍 —— etcd:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-etcd/#Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-etcd">传送门</a></p>
+<blockquote>
 <p>🌈 etcd 从 3.4 版本开始会自动通过配置文件加载环境变量参数，EnvironmentFile 文件中有的参数不需要在 systems unit 的 ExecStart 中添加了，可以更加的精简化配置，所以我们这里我们选用 3.4 版本的 etcd。方便后期统一的配置管理。</p>
 </blockquote>
 <h4 id="1）下载-etcd-二进制文件"><a href="#1）下载-etcd-二进制文件" class="headerlink" title="1）下载 etcd 二进制文件"></a>1）下载 etcd 二进制文件</h4><blockquote>
@@ -957,7 +958,8 @@
 <p>🌈 <strong>关于 master 节点</strong></p>
 <p>部署在 master 节点的必要组件有 <code>kube-apiserver</code>、<code>kube-scheduler</code> 和 <code>kube-controller-manager</code> ，均为多实例模式运行。</p>
 </blockquote>
-<h4 id="1）部署-kube-apiserver"><a href="#1）部署-kube-apiserver" class="headerlink" title="1）部署 kube-apiserver"></a>1）部署 kube-apiserver</h4><blockquote>
+<h4 id="1）部署-kube-apiserver"><a href="#1）部署-kube-apiserver" class="headerlink" title="1）部署 kube-apiserver"></a>1）部署 kube-apiserver</h4><p><strong>基础组件介绍 —— kube-apiserver:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-apiserver/">传送门</a></p>
+<blockquote>
 <p>🚩 这里部署的是一个三实例的 kube-apiserver 集群环境，kube-apiserver 是无状态的，通过 nginx 四层代理进行访问，并对外提供统一的 vip 地址，以此来保证服务的可用性。</p>
 <p><strong>以下的操作都是在 k8s-master01 上进行，然后再通过批管理工具分发至其他节点进行统一管理。</strong></p>
 </blockquote>
@@ -1107,7 +1109,8 @@
 
 
 
-<h4 id="2）部署-kube-controller-manager"><a href="#2）部署-kube-controller-manager" class="headerlink" title="2）部署 kube-controller-manager"></a>2）部署 kube-controller-manager</h4><blockquote>
+<h4 id="2）部署-kube-controller-manager"><a href="#2）部署-kube-controller-manager" class="headerlink" title="2）部署 kube-controller-manager"></a>2）部署 kube-controller-manager</h4><p><strong>基础组件介绍 —— kube-controller-manager:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-controller-manager/">传送门</a></p>
+<blockquote>
 <p>🚩 这里部署的是一个三实例的 kube-controller-manager 集群，启动后会通过选举机制产生一个 leader（类似 consul 或 etcd的机制），其他节点处于堵塞状态，当 leader 节点不可用时，剩余的堵塞节点会再次选举产生新的 leader，从热保证服务的高可用。</p>
 <p><strong>以下的操作都是在 k8s-master01 上进行，然后再通过批管理工具分发至其他节点进行统一管理。</strong></p>
 </blockquote>
@@ -1238,7 +1241,8 @@
 
 
 
-<h4 id="3）部署-kube-scheduler"><a href="#3）部署-kube-scheduler" class="headerlink" title="3）部署 kube-scheduler"></a>3）部署 kube-scheduler</h4><blockquote>
+<h4 id="3）部署-kube-scheduler"><a href="#3）部署-kube-scheduler" class="headerlink" title="3）部署 kube-scheduler"></a>3）部署 kube-scheduler</h4><p><strong>基础组件介绍 —— kube-scheduler:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-scheduler/">传送门</a></p>
+<blockquote>
 <p>🚩  这里部署的是一个三实例的 kube-scheduler 集群，启动后会通过选举机制产生一个 leader，其他节点处于堵塞状态，当 leader 节点不可用时，剩余的堵塞节点会再次选举产生新的 leader，从热保证服务的高可用。</p>
 <p><strong>以下的操作都是在 k8s-master01 上进行，然后再通过批管理工具分发至其他节点进行统一管理。</strong></p>
 </blockquote>
@@ -1319,7 +1323,8 @@
 <p>🌈 <strong>关于 node 节点</strong></p>
 <p>部署在 master 节点的必要组件有 <code>docker</code>、<code>kubelet</code> 、 <code>kube-proxy</code> 、<code>网络组件</code>，由于考虑到后续 mertics-server、istio 等服务的使用，这里我们将 master 节点也作为 node 加入集群，但是通过污点的方式禁止直接调度。</p>
 </blockquote>
-<h4 id="1）部署-kubelet"><a href="#1）部署-kubelet" class="headerlink" title="1）部署 kubelet"></a>1）部署 kubelet</h4><blockquote>
+<h4 id="1）部署-kubelet"><a href="#1）部署-kubelet" class="headerlink" title="1）部署 kubelet"></a>1）部署 kubelet</h4><p><strong>基础组件介绍 —— kubelet:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kubelet/">传送门</a></p>
+<blockquote>
 <p>🚩 kubelet 运行在每个node节点上，接收 kube-apiserver 发送的请求，管理 Pod 容器，执行交互式命令，如 exec、run、logs 等。kubelet 启动时自动向 kube-apiserver 注册节点信息，内置的 cadvisor 统计和监控节点的资源使用情况，这里我们在部署时直接开启 TLS bootstrap，以此来自动签发 kubelet 的证书。</p>
 <p><strong>以下的操作都是在 k8s-master01 上进行，然后再通过批管理工具分发至其他节点进行统一管理。</strong></p>
 </blockquote>
@@ -1499,7 +1504,8 @@
 <p><code>10248</code>：healthz http服务端口，即健康检查服务的端口，接收 http 请求，不需要认证授权；<br><code>10250</code>：kubelet 服务监听的端口, api 会检测他是否存活。接收 https 请求，访问该端口时需要认证和授权（即使访问<code>/healthz</code>也需要）；</p>
 <p><code>10255</code>: 只读端口，可以不用验证和授权机制，直接访问。配置 <code>&quot;readOnlyPort: 0&quot;</code> 则表示关闭只读端口；</p>
 </blockquote>
-<h4 id="2）部署-kube-proxy"><a href="#2）部署-kube-proxy" class="headerlink" title="2）部署 kube-proxy"></a>2）部署 kube-proxy</h4><blockquote>
+<h4 id="2）部署-kube-proxy"><a href="#2）部署-kube-proxy" class="headerlink" title="2）部署 kube-proxy"></a>2）部署 kube-proxy</h4><p><strong>基础组件介绍 —— kube-proxy:</strong> <a href="https://tareya.github.io/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-proxy/">传送门</a></p>
+<blockquote>
 <p>🚩 kube-proxy运行在所有的node节点上，它监听apiserver中service和endpoint的变化情况，创建路由规则以提供服务IP和负载均衡功能。</p>
 <p><strong>以下的操作都是在 k8s-master01 上进行，然后再通过批管理工具分发至其他节点进行统一管理。</strong></p>
 </blockquote>
