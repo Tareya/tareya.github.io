@@ -4,6 +4,206 @@
   
   
   <entry>
+    <title>Kubernetes 基础组件介绍 —— kube-proxy</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-proxy/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-proxy/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-kube-proxy"><a href="#Kubernetes-基础组件介绍-——-kube-proxy" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-proxy"></a>Kubernetes 基础组件介绍 —— kube-proxy</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 基础组件介绍 —— kubelet</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kubelet/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kubelet/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-kubelet"><a href="#Kubernetes-基础组件介绍-——-kubelet" class="headerlink" title="Kubernetes 基础组件介绍 —— kubelet"></a>Kubernetes 基础组件介绍 —— kubelet</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 基础组件介绍 —— kube-scheduler</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-scheduler/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-scheduler/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-kube-scheduler"><a href="#Kubernetes-基础组件介绍-——-kube-scheduler" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-scheduler"></a>Kubernetes 基础组件介绍 —— kube-scheduler</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 基础组件介绍 —— kube-controller-manager</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-controller-manager/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-controller-manager/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-kube-controller-manager"><a href="#Kubernetes-基础组件介绍-——-kube-controller-manager" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-controller-manager"></a>Kubernetes 基础组件介绍 —— kube-controller-manager</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 基础组件介绍 —— kube-apiserver</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-apiserver/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-apiserver/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-kube-apiserver"><a href="#Kubernetes-基础组件介绍-——-kube-apiserver" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-apiserver"></a>Kubernetes 基础组件介绍 —— kube-apiserver</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 基础组件介绍 —— etcd</title>
+    <link href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-etcd/"/>
+    <url>/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-etcd/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-基础组件介绍-——-etcd"><a href="#Kubernetes-基础组件介绍-——-etcd" class="headerlink" title="Kubernetes 基础组件介绍 —— etcd"></a>Kubernetes 基础组件介绍 —— etcd</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Kubernetes 快速入门手册</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes pods evicted 解决方案</title>
+    <link href="/2021/10/20/Kubernetes-pods-evicted-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
+    <url>/2021/10/20/Kubernetes-pods-evicted-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-pods-evicted-解决方案"><a href="#Kubernetes-pods-evicted-解决方案" class="headerlink" title="Kubernetes pods evicted 解决方案"></a>Kubernetes pods evicted 解决方案</h1><span id="more"></span>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决方案</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Kubernetes 二次调度解决方案</title>
+    <link href="/2021/10/20/Kubernetes-%E4%BA%8C%E6%AC%A1%E8%B0%83%E5%BA%A6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
+    <url>/2021/10/20/Kubernetes-%E4%BA%8C%E6%AC%A1%E8%B0%83%E5%BA%A6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Kubernetes-二次调度解决方案"><a href="#Kubernetes-二次调度解决方案" class="headerlink" title="Kubernetes 二次调度解决方案"></a>Kubernetes 二次调度解决方案</h1><span id="more"></span><h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>在 K8S 运行过程中，pod 的调度经常会出现倾斜的情况，大量副本积压在个别 node 节点上，将节点资源占用完（这里主要体现在内存方面），如下图的情况：</p><p>Node15、Node16 内存资源使用率以100%了，但是空闲的节点内存使用率可能未超过 50%，这种分布的倾斜事实上是不健康的。</p><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161447795.png" alt="image-20211020161447795"></p><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161535235.png" alt="image-20211020161535235"></p><p>由于我们在 kubelet 中设置了 eviction，也就是驱逐机制，在节点资源紧张时，驱逐机制就会开启，以此来尝试回收节点资源。回收的资源主要是内存和磁盘两种，回收的基本方式如下:</p><ul><li>磁盘回收: 主要通过删除已终止的容器和未使用的镜像</li><li>内存回收: 主要通过终止正在运行的pod</li></ul><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020162233920.png" alt="image-20211020162233920"></p><h2 id="二、根因追溯"><a href="#二、根因追溯" class="headerlink" title="二、根因追溯"></a>二、根因追溯</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2><h3 id="1、Descheduler-二次调度方案"><a href="#1、Descheduler-二次调度方案" class="headerlink" title="1、Descheduler 二次调度方案"></a>1、Descheduler 二次调度方案</h3>]]></content>
+    
+    
+    <categories>
+      
+      <category>Kubernetes</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决方案</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>第6章、Golang 网络编程（下）</title>
     <link href="/2021/10/14/%E7%AC%AC6%E7%AB%A0%E3%80%81Golang-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%8B%EF%BC%89/"/>
     <url>/2021/10/14/%E7%AC%AC6%E7%AB%A0%E3%80%81Golang-%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%EF%BC%88%E4%B8%8B%EF%BC%89/</url>
