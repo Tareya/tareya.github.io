@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1k 字
+      1.1k 字
     </span>
   
 
@@ -242,7 +242,8 @@
 <p>由于我们在 kubelet 中设置了 eviction，也就是驱逐机制，在节点资源紧张时，驱逐机制就会开启，以此来尝试回收节点资源。</p>
 <p>但是这种通过 kubelet 驱逐的方式是十分被动的，并不能及时的解决资源适应倾斜的问题。虽然 K8S 原始的调度提供了一些优先级调度和自定义调度的方法，但是这种方式并不灵活，有些也缺乏合理性，所以我们需要另一种方案去解决这类问题。</p>
 <p>事实上，我们并不需要再 Pod 初次调度时，就解决资源倾斜的问题，同样也可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。这也及时本方案所涉及的概念 —— 二次调度。</p>
-<h2 id="二、Kubernetes-的驱逐、调度原理"><a href="#二、Kubernetes-的驱逐、调度原理" class="headerlink" title="二、Kubernetes 的驱逐、调度原理"></a>二、Kubernetes 的驱逐、调度原理</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><h3 id="2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制"><a href="#2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制" class="headerlink" title="2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制"></a>2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制</h3><h4 id="1）什么是节点压力驱逐？"><a href="#1）什么是节点压力驱逐？" class="headerlink" title="1）什么是节点压力驱逐？"></a>1）什么是节点压力驱逐？</h4><p>节点压力驱逐事实上就是 kubelet 主动终止 Pod 以回收节点资源的过程。kubelet 会监控集群节点的 CPU、内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止枯竭。</p>
+<h2 id="二、Kubernetes-的驱逐、调度原理"><a href="#二、Kubernetes-的驱逐、调度原理" class="headerlink" title="二、Kubernetes 的驱逐、调度原理"></a>二、Kubernetes 的驱逐、调度原理</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><p>相关内容可以看之前的博文: <a href="https://tareya.github.io/2021/10/27/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-scheduler/#%E4%B8%80%E3%80%81kube-scheduler-%E8%B0%83%E5%BA%A6%E5%8E%9F%E7%90%86%E5%92%8C%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"></a></p>
+<h3 id="2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制"><a href="#2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制" class="headerlink" title="2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制"></a>2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制</h3><h4 id="1）什么是节点压力驱逐？"><a href="#1）什么是节点压力驱逐？" class="headerlink" title="1）什么是节点压力驱逐？"></a>1）什么是节点压力驱逐？</h4><p>节点压力驱逐事实上就是 kubelet 主动终止 Pod 以回收节点资源的过程。kubelet 会监控集群节点的 CPU、内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止枯竭。</p>
 <p>在节点压力驱逐期间，kubelet 会将所选的 Pod 的 <code>PodPhase</code> 设置为 <code>Failed</code>，这回终止 Pod。Pod 的信息残留反馈为 <code>Evicted</code> 状态，如下图:</p>
 <p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211027181000655.png" srcset="/img/loading.gif" lazyload alt="image-20211027181000655"></p>
 <p>K8S 中对于系统资源可以分为两种属性：</p>
