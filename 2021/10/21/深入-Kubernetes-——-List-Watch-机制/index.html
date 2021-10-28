@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      7 字
+      407 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      4
        分钟
     </span>
   
@@ -229,6 +229,21 @@
             
             <div class="markdown-body">
               <h1 id="深入-Kubernetes-——-List-Watch-机制"><a href="#深入-Kubernetes-——-List-Watch-机制" class="headerlink" title="深入 Kubernetes —— List-Watch 机制"></a>深入 Kubernetes —— List-Watch 机制</h1><span id="more"></span>
+
+
+
+<h2 id="一、概念介绍"><a href="#一、概念介绍" class="headerlink" title="一、概念介绍"></a>一、概念介绍</h2><h3 id="1、list-watch-简介"><a href="#1、list-watch-简介" class="headerlink" title="1、list-watch 简介"></a>1、list-watch 简介</h3><p>在 Kubernetes 中，对于异步消息的处理并没有使用消息队列的形式，而是使用了一种称为 <code>List-Watch</code> 的异步消息处理机制，它是 K8S 整体架构的精髓所在，保障了 K8S 中消息的实时性、可靠性、顺序性和性能等，为声明式风格的 API 奠定了良好的基础。、</p>
+<p><code>List-Watch</code> 顾名思义是由 <code>list</code> 和 <code>watch</code> 两个功能组成，在 K8S 中以 Restful API 的方式呈现。</p>
+<ul>
+<li><p><code>List</code>: 从表面理解是列出明细，事实上正如其实，它的作用就是调用资源的 <code>List API</code> 罗列出资源信息，这是一短期过程，所以是基于 HTTP 短链接实现；</p>
+</li>
+<li><p><code>Watch</code>: 从表面理解是观察，或者说是监视监控，它的作用就是调用资源的 <code>Watch API</code> 监听资源的变更（增删改）事件，这是一个持续性过程，所以需要通过 HTTP 长链接实现。</p>
+</li>
+</ul>
+<p>我们知道在 K8S 的整体架构中，<code>ETCD</code> 作为数据库存储集群的数据，<code>apiserver</code> 作为对 ETCD 操作的统一入口，为其他组件提供对数据的增删改查能力。客户端组件（kubelet、scheduler、controller-manager）会通过 <code>List-Watch</code> 监听 <code>apiserver</code> 中各资源（如，pod、rc、rs 等）的 create、update、delete 事件，并针对 <code>事件类型</code> 去触发对应的 <code>事件处理函数</code>。</p>
+<h3 id="2、示例说明"><a href="#2、示例说明" class="headerlink" title="2、示例说明"></a>2、示例说明</h3><p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#list-all-namespaces-pod-v1-core">https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#list-all-namespaces-pod-v1-core</a></p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#watch-pod-v1-core">https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#watch-pod-v1-core</a></p>
+<h2 id="二、设计理念"><a href="#二、设计理念" class="headerlink" title="二、设计理念"></a>二、设计理念</h2><h2 id="三、相关源码"><a href="#三、相关源码" class="headerlink" title="三、相关源码"></a>三、相关源码</h2>
             </div>
             <hr>
             <div>

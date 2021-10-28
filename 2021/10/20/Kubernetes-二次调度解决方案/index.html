@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      254 字
+      1k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      2
+      11
        分钟
     </span>
   
@@ -234,17 +234,69 @@
 
 
 
-<h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>在 K8S 运行过程中，pod 的调度经常会出现倾斜的情况，大量副本积压在个别 node 节点上，将节点资源占用完（这里主要体现在内存方面），如下图的情况：</p>
+<h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。但是默认的调度机制却并不那么友善，即使我们为 Node 配置了亲和或反亲和，仍然会出现某些节点负载高，某些节点则几乎空闲的情况。这是因为正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能是这些 Pod 再次调度v 。</p>
+<p>在这个案例中国，我们的 K8S 在运行过程中，就碰到了这种情况。pod 的调度经常会出现倾斜的情况，大量副本积压在个别 node 节点上，将节点资源占用完（这里主要体现在内存方面），如下图的情况：</p>
 <p>Node15、Node16 内存资源使用率以100%了，但是空闲的节点内存使用率可能未超过 50%，这种分布的倾斜事实上是不健康的。</p>
 <p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161447795.png" srcset="/img/loading.gif" lazyload alt="image-20211020161447795"></p>
 <p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161535235.png" srcset="/img/loading.gif" lazyload alt="image-20211020161535235"></p>
-<p>由于我们在 kubelet 中设置了 eviction，也就是驱逐机制，在节点资源紧张时，驱逐机制就会开启，以此来尝试回收节点资源。回收的资源主要是内存和磁盘两种，回收的基本方式如下:</p>
+<p>由于我们在 kubelet 中设置了 eviction，也就是驱逐机制，在节点资源紧张时，驱逐机制就会开启，以此来尝试回收节点资源。</p>
+<p>但是这种通过 kubelet 驱逐的方式是十分被动的，并不能及时的解决资源适应倾斜的问题。虽然 K8S 原始的调度提供了一些优先级调度和自定义调度的方法，但是这种方式并不灵活，有些也缺乏合理性，所以我们需要另一种方案去解决这类问题。</p>
+<p>事实上，我们并不需要再 Pod 初次调度时，就解决资源倾斜的问题，同样也可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。这也及时本方案所涉及的概念 —— 二次调度。</p>
+<h2 id="二、Kubernetes-的驱逐、调度原理"><a href="#二、Kubernetes-的驱逐、调度原理" class="headerlink" title="二、Kubernetes 的驱逐、调度原理"></a>二、Kubernetes 的驱逐、调度原理</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><h3 id="2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制"><a href="#2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制" class="headerlink" title="2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制"></a>2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制</h3><h4 id="1）什么是节点压力驱逐？"><a href="#1）什么是节点压力驱逐？" class="headerlink" title="1）什么是节点压力驱逐？"></a>1）什么是节点压力驱逐？</h4><p>节点压力驱逐事实上就是 kubelet 主动终止 Pod 以回收节点资源的过程。kubelet 会监控集群节点的 CPU、内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止枯竭。</p>
+<p>在节点压力驱逐期间，kubelet 会将所选的 Pod 的 <code>PodPhase</code> 设置为 <code>Failed</code>，这回终止 Pod。Pod 的信息残留反馈为 <code>Evicted</code> 状态，如下图:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211027181000655.png" srcset="/img/loading.gif" lazyload alt="image-20211027181000655"></p>
+<p>K8S 中对于系统资源可以分为两种属性：</p>
+<ul>
+<li><strong>可压缩资源</strong>: 例如 CPU 循环、Disk I/O、网络带宽，都是可以被限制和被回收的，对于一个 Pod 来说，可以降低这些资源的使用量而不需要去杀掉 Pod </li>
+<li><strong>不可压缩资源</strong>: 例如内存、磁盘空间，一般来说不杀掉 Pod 就没有办法回收。</li>
+</ul>
+<p>而 kubelet 回收的资源主要是内存和磁盘两种，回收的基本方式如下:</p>
 <ul>
 <li>磁盘回收: 主要通过删除已终止的容器和未使用的镜像</li>
-<li>内存回收: 主要通过终止正在运行的pod</li>
+<li>内存回收: 主要通过终止正在运行的 pod</li>
 </ul>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020162233920.png" srcset="/img/loading.gif" lazyload alt="image-20211020162233920"></p>
-<h2 id="二、根因追溯"><a href="#二、根因追溯" class="headerlink" title="二、根因追溯"></a>二、根因追溯</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><h2 id="三、解决方案"><a href="#三、解决方案" class="headerlink" title="三、解决方案"></a>三、解决方案</h2><h3 id="1、Descheduler-二次调度方案"><a href="#1、Descheduler-二次调度方案" class="headerlink" title="1、Descheduler 二次调度方案"></a>1、Descheduler 二次调度方案</h3>
+<h4 id="2）节点压力驱逐的机制"><a href="#2）节点压力驱逐的机制" class="headerlink" title="2）节点压力驱逐的机制"></a>2）节点压力驱逐的机制</h4><p>kubelet 会根据 <code>驱逐信号</code>，<code>驱逐条件</code>、<code>监控间隔</code> 来作出驱逐决定。</p>
+<h5 id="1-驱逐信号"><a href="#1-驱逐信号" class="headerlink" title="1. 驱逐信号"></a>1. 驱逐信号</h5><p>驱逐信号是特定资源在特定时间点的当前状态。kubelet 使用驱逐信号，通过将信号和驱逐条件进行比较，来做出驱逐决定，驱逐条件就是节点上应该可用资源的最小量。kubelet 可使用的驱逐信号如下:</p>
+<table>
+<thead>
+<tr>
+<th>驱逐信号</th>
+<th>取值方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>memory.available</td>
+<td>memory.available<code>:=</code>node.status.capacity[memory]<code>-</code>node.stats.memory.workingSet</td>
+<td></td>
+</tr>
+<tr>
+<td>nodefs.available</td>
+<td>nodefs.available<code>:=</code>node.stats.fs.available</td>
+<td></td>
+</tr>
+<tr>
+<td>nodefs.inodesFree</td>
+<td>nodefs.inodesFree<code>:=</code>node.stats.fs.inodesFree</td>
+<td></td>
+</tr>
+<tr>
+<td>imagefs.available</td>
+<td>imagefs.available<code>:=</code>node.stats.runtime.imagefs.available</td>
+<td></td>
+</tr>
+<tr>
+<td>imagefs.inodesFree</td>
+<td>imagefs.inodesFree<code>:=</code>node.stats.runtime.imagefs.inodesFree</td>
+<td></td>
+</tr>
+<tr>
+<td>pid.available</td>
+<td>pid.available<code>:=</code>node.stats.rlimit.maxpid<code>-</code>node.stats.rlimit.curproc</td>
+<td></td>
+</tr>
+</tbody></table>
+<h5 id="2-驱逐条件"><a href="#2-驱逐条件" class="headerlink" title="2. 驱逐条件"></a>2. 驱逐条件</h5><h5 id="3-驱逐监控间隔"><a href="#3-驱逐监控间隔" class="headerlink" title="3. 驱逐监控间隔"></a>3. 驱逐监控间隔</h5><h2 id="三、Descheduler-二次调度方案"><a href="#三、Descheduler-二次调度方案" class="headerlink" title="三、Descheduler 二次调度方案"></a>三、Descheduler 二次调度方案</h2><h3 id="1、Descheduler-简介"><a href="#1、Descheduler-简介" class="headerlink" title="1、Descheduler 简介"></a>1、Descheduler 简介</h3><h3 id="2、方案实施"><a href="#2、方案实施" class="headerlink" title="2、方案实施"></a>2、方案实施</h3>
             </div>
             <hr>
             <div>
@@ -278,9 +330,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/10/20/Kubernetes-pods-evicted-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
+                      <a href="/2021/10/21/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-etcd/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Kubernetes pods evicted 解决方案</span>
+                        <span class="hidden-mobile">Kubernetes 基础组件介绍 —— etcd</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
