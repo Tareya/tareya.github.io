@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.2k 字
+      6.9k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      64
+      83
        分钟
     </span>
   
@@ -380,7 +380,7 @@
 <td>实现了 <a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-topology-spread-constraints/">Pod 拓扑扩展约束</a>的优先级排序。</td>
 </tr>
 </tbody></table>
-<h3 id="3、调度器配置"><a href="#3、调度器配置" class="headerlink" title="3、调度器配置"></a>3、调度器配置</h3><blockquote>
+<h3 id="3、调度器配置（了解）"><a href="#3、调度器配置（了解）" class="headerlink" title="3、调度器配置（了解）"></a>3、调度器配置（了解）</h3><blockquote>
 <p>🚩 和 K8S 的其他组件一样，我们可以通过编写配置文件，并将其路径传给 <code>kube-scheduler</code> 的命令行参数，来指定其行为。这种配置文件称为调度的模版（profile），其中允许配置 kube-scheduler 中不同调度阶段。K8S 将每一个阶段都暴露在了某个扩展点中，并通过插件的形式来对这些扩展点进行管理。</p>
 </blockquote>
 <h4 id="1）基础配置"><a href="#1）基础配置" class="headerlink" title="1）基础配置"></a>1）基础配置</h4><p>通过运行 <code>kube-scheduler --config &lt;filename&gt;</code> 来设置调度模版，该模版使用的为 <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/config-api/kube-scheduler-config.v1beta1/">KubeSchedulerConfiguration (v1beta1)</a> 结构体。基础配置如下:</p>
@@ -388,8 +388,244 @@
 
 
 
-<h4 id="2）调度器扩展点"><a href="#2）调度器扩展点" class="headerlink" title="2）调度器扩展点"></a>2）调度器扩展点</h4><p><code>kube-scheduler</code> 支持根据不同的调度配置文件来指定断言（Predicates）和优先级（Priorities），以此来分别对 Node 节点进行过滤和打分。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">```<br><span class="hljs-meta"></span><br><span class="hljs-meta"></span><br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"><span class="hljs-comment">## 4、自定义调度器</span></span><br><br>自定义调度器主要的功能即查询为调度的 Pod，按照自定义的调度策略选择新的 Node，并将其更新到 Pod 的 NodeBinding 上。我们可以用 shell 来编写一个最简单的调度器。<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"><span class="hljs-comment">### 1）自定义调度器示例</span></span><br><br>```shell<br><span class="hljs-meta">#</span><span class="bash">!/bin/bash</span><br>SERVER=&#x27;localhost:8080&#x27;<br>while true;<br>do<br>    for PODNAME in $(kubectl --server $SERVER get pods -o json | jq &#x27;.items[] | select(.spec.schedulerName ==&quot;my-scheduler&quot;) | select(.spec.nodeName == null) | .metadata.name&#x27; | tr -d &#x27;&quot;&#x27;)<br>;<br>    do<br>        NODES=($(kubectl --server $SERVER get nodes -o json | jq &#x27;.items[].metadata.name&#x27; | tr -d &#x27;&quot;&#x27;))<br>        NUMNODES=$&#123;#NODES[@]&#125;<br>        CHOSEN=$&#123;NODES[$[ $RANDOM % $NUMNODES]]&#125;<br>        curl --header &quot;Content-Type:application/json&quot; --request POST --data &#x27;&#123;&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;:&quot;Binding&quot;,&quot;metadata&quot;: &#123;&quot;name&quot;:&quot;&#x27;$PODNAME&#x27;&quot;&#125;,&quot;target&quot;: &#123;&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;<br>: &quot;Node&quot;, &quot;name&quot;: &quot;&#x27;$CHOSEN&#x27;&quot;&#125;&#125;&#x27; http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/<br>        echo &quot;Assigned $PODNAME to $CHOSEN&quot;<br>    done<br>    sleep 1<br>done<br></code></pre></td></tr></table></figure>
+<h4 id="2）调度器扩展"><a href="#2）调度器扩展" class="headerlink" title="2）调度器扩展"></a>2）调度器扩展</h4><p><code>kube-scheduler</code> 支持根据不同的调度配置文件来指定断言（Predicates）和优先级（Priorities），以此来分别对 Node 节点进行过滤和打分。我们在上面说过，调度阶段的扩展点是通过调度插件来管理的，因此通过在调度配置文件中开启禁用调度插件，我们就可以在一定程度上决定 <code>kube-scheduler</code> 在不同阶段的调度行为。</p>
+<h5 id="1-扩展点"><a href="#1-扩展点" class="headerlink" title="1. 扩展点"></a>1. 扩展点</h5><p><code>kube-scheduler</code> 提供的扩展点如下:</p>
+<table>
+<thead>
+<tr>
+<th>扩展点</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>QueueSort</td>
+<td>这些插件用于将调度队列中处于 pending 状态的 Pods 进行排序。每次只能使用一个队列排序插件</td>
+</tr>
+<tr>
+<td>PreFilter</td>
+<td>这些插件用于在进行过滤前对 Pod 或集群的信息进程检查。它们可能会将一个 pod 标记为不可调度</td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>这些插件相当于调度策略中的断言（Predicates），用于过滤不能运行 Pod 的节点。过滤器的调用顺序是可配置的，如果没有一个节点通过所有的过滤筛选，Pod 就会被标记为不可调度</td>
+</tr>
+<tr>
+<td>PostFilter</td>
+<td>当没有为 pod 找到可行的节点时，这些插件就会按照它们的配置顺序调用。如果有任何一个 postFilter 插件将 Pod 标记为可调度，就不会再继续调用其余插件了</td>
+</tr>
+<tr>
+<td>PreScore</td>
+<td>这是一个消息扩展点，可用于预打分工作</td>
+</tr>
+<tr>
+<td>Score</td>
+<td>这些插件用于给通过过滤筛选的节点进行打分，调度器会选择得分最高的节点</td>
+</tr>
+<tr>
+<td>Reserve</td>
+<td>这是一个消息扩展点，当资源已经预留给 Pod 是，就会将消息通知插件。这些插件还实现了 <code>UnReserve</code> 接口，当在 <code>Reserve</code> 期间或之后出现故障时会被调用。</td>
+</tr>
+<tr>
+<td>UnReserve</td>
+<td>这是一个消息扩展点，如果一个 Pod 在 <code>Reserve</code> 后被拒绝，并被 <code>Permit</code> 搁置，就会被调用</td>
+</tr>
+<tr>
+<td>Permit</td>
+<td>这些插件可以阻止或延迟 Pod 的绑定</td>
+</tr>
+<tr>
+<td>PreBind</td>
+<td>这些插件会被在 Pod 绑定节点前被运行</td>
+</tr>
+<tr>
+<td>Bind</td>
+<td>这个插件将一个 Pod 绑定到节点。绑定插件会按照顺序调用，一旦有一个插件完成了绑定工作，其余的插件的就会呗跳过。<strong>至少需要有一个绑定插件</strong>。</td>
+</tr>
+<tr>
+<td>PostBind</td>
+<td>这是一个消息扩展点，在 Pod 绑定节点后会被调用</td>
+</tr>
+</tbody></table>
+<p>对于每个扩展点来说，你可以禁用默认插件或启用你自己的插件，语法如下:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kubescheduler.config.k8s.io/v1beta1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">KubeSchedulerConfiguration</span><br><span class="hljs-attr">profiles:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">plugins:</span><br>      <span class="hljs-attr">score:</span><br>        <span class="hljs-attr">disabled:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">NodeResourcesLeastAllocated</span><br>        <span class="hljs-attr">enabled:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">MyCustomPluginA</span><br>          <span class="hljs-attr">weight:</span> <span class="hljs-number">2</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">MyCustomPluginB</span><br>          <span class="hljs-attr">weight:</span> <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>可以在 <code>disabled</code> 数组中使用 <code>*</code> 禁用该扩展点的所有默认插件。 如果需要，这个字段也可以用来对插件重新顺序。</p>
+<h5 id="2-调度插件"><a href="#2-调度插件" class="headerlink" title="2. 调度插件"></a>2. 调度插件</h5><p><code>kube-scheduler</code> 默认启用的扩展点如下，它们实现了一个或多个扩展点。</p>
+<table>
+<thead>
+<tr>
+<th>插件</th>
+<th>作用</th>
+<th>实现的扩展点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ImageLocality</td>
+<td>选择已经存在运行 Pod 所需容器镜像的节点</td>
+<td>Score</td>
+</tr>
+<tr>
+<td>TaintToleration</td>
+<td>实现了污点（taint）和容忍（toleration）</td>
+<td>Filter、Prescore、Score</td>
+</tr>
+<tr>
+<td>NodeName</td>
+<td>检查 Pod 指定的节点名称与当前节点是否匹配</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>NodePorts</td>
+<td>检查 Pod 指定的端口在节点上是否可用</td>
+<td>preFilter、Filter</td>
+</tr>
+<tr>
+<td>NodeAffinity</td>
+<td>实现了节点选择器（ <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector">node selectors</a>） 和节点亲和性（ <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity">node affinity</a>）</td>
+<td>Filter、Score</td>
+</tr>
+<tr>
+<td>PodTopologySpread</td>
+<td>实现了 Pod 拓扑分布</td>
+<td>preFilter、Filter、preScore、Score</td>
+</tr>
+<tr>
+<td>NodeUnschedulable</td>
+<td>过滤出存在 <code>.spec.unschedulable</code> ，并且值为 true 的节点</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>NodeResourcesFit</td>
+<td>检查节点是否拥有所有 Pod 请求的资源。打分时根据三种策略中的一种:  <code>LeastAllocated</code> (默认), <code>MostAllocated</code> and <code>RequestedToCapacityRatio</code></td>
+<td>preFilter、Filter、Score</td>
+</tr>
+<tr>
+<td>NodeResourcesBalancedAllocation</td>
+<td>调度 Pod 时，选择资源更更加平衡的节点</td>
+<td>Score</td>
+</tr>
+<tr>
+<td>VolumeBinding</td>
+<td>检查节点是否存在或是否可以绑定请求的卷</td>
+<td>preFilter、Filter、Reserve、preBind、Score</td>
+</tr>
+<tr>
+<td>VolumeRestrictions</td>
+<td>检查挂载到节点上的是卷是否满足卷提供程序的限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>VolumeZone</td>
+<td>检查请求的卷是否在任何区域 都满足</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>NodeVolumeLimits</td>
+<td>检查该节点是否满足 CSI 卷限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>EBSLimits</td>
+<td>检查该节点是否满足 AWS EBS 卷限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>GCEPDLimits</td>
+<td>检查该节点是否满足 GCP-PD 卷限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>AzureDiskLimits</td>
+<td>检查该节点是否满足 Azure 磁盘卷限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>InterPodAffinity</td>
+<td>实现了 <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity">Pod 的亲和和反亲和特性</a></td>
+<td>preFilter、Filter、preScore、Score</td>
+</tr>
+<tr>
+<td>PrioritySort</td>
+<td>提供基于默认优先级策略的排序0</td>
+<td>queueSort</td>
+</tr>
+<tr>
+<td>DefaultBinder</td>
+<td>提供了默认的绑定机制</td>
+<td>bind</td>
+</tr>
+<tr>
+<td>DefaultPreemption</td>
+<td>提供了默认的抢占机制</td>
+<td>postFilter</td>
+</tr>
+</tbody></table>
+<p>以下策略默认不不启用，但是可以通过 API 的方式配置开启:</p>
+<table>
+<thead>
+<tr>
+<th>插件</th>
+<th>作用</th>
+<th>实现的扩展点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SelectorSpread</td>
+<td>对于属于 <a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/services-networking/service/">Services</a>、 <a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/workloads/controllers/replicaset/">ReplicaSets</a> 和 <a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/workloads/controllers/statefulset/">StatefulSets</a> 的 Pod 进行跨多个节点部署</td>
+<td>PreScore、Score</td>
+</tr>
+<tr>
+<td>CinderLimits</td>
+<td>检查该节点是否满足 openstack Cinder 卷限制</td>
+<td>Filter</td>
+</tr>
+<tr>
+<td>NodeResourcesLeastAllocated</td>
+<td>选择已分配资源少的节点</td>
+<td>Score</td>
+</tr>
+<tr>
+<td>NodeResourcesMostAllocated</td>
+<td>选择已分配资源多的节点</td>
+<td>Score</td>
+</tr>
+<tr>
+<td>RequestedToCapacityRatio</td>
+<td>根据配置的某个函数设置来进行节点选择</td>
+<td>Score</td>
+</tr>
+<tr>
+<td>NodeLabel</td>
+<td>根据配置的标签来过滤节点或给节点进行打分</td>
+<td>Filter、Score</td>
+</tr>
+<tr>
+<td>ServiceAffinity</td>
+<td>检查属于某个 Service 的 Pods 与配置的标签所定义的节点集合是否符合。这个插件还支持将属于某个 Service 的 Pods 分散到各节点</td>
+<td>preFilter、Filter、Score</td>
+</tr>
+<tr>
+<td>NodePreferAvoidPods</td>
+<td>基于节点注释 <code>scheduler.alpha.kubernetes.io/preferAvoidPods</code> 进行打分</td>
+<td>Score</td>
+</tr>
+</tbody></table>
+<h4 id="3）多配置文件使用"><a href="#3）多配置文件使用" class="headerlink" title="3）多配置文件使用"></a>3）多配置文件使用</h4><p>我们可以配置 <code>kube-scheduler</code> 运行多个配置文件，每个配置文件关联一个调度器名称，并可以在其扩展点中配置不同的插件集合。</p>
+<h5 id="1-使用示例"><a href="#1-使用示例" class="headerlink" title="1. 使用示例"></a>1. 使用示例</h5><p>使用下面的方法，可以同时使用2个配置，一个使用默认的插件，另一个禁用所有打分相关的插件。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kubescheduler.config.k8s.io/v1beta1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">KubeSchedulerConfiguration</span><br><span class="hljs-attr">profiles:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">schedulerName:</span> <span class="hljs-string">default-scheduler</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">schedulerName:</span> <span class="hljs-literal">no</span><span class="hljs-string">-scoring-scheduler</span><br>    <span class="hljs-attr">plugins:</span><br>      <span class="hljs-attr">preScore:</span><br>        <span class="hljs-attr">disabled:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;*&#x27;</span><br>      <span class="hljs-attr">score:</span><br>        <span class="hljs-attr">disabled:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">&#x27;*&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>默认情况下，会创建一个调度器名称为 <code>default-scheduler</code> 的配置文件，这个配置文件中会包括上述所有描述默认启用的插件。如果 P</p>
+<p>对于那些希望根据特定配置文件来进行调度的 Pod，我们可以在 <code>.spec.schedulerName</code> 字段指定对应的调度器名称。对于没有制定调度器名称的 Pod，<code>kube-apiserver</code> 会将其调度器名称设置为 <code>default-scheduler</code>。</p>
+<p>如果 Pod 将 <code>.spec.schedulerName</code> 字段值指定为 <code>ReportingController</code>. leader 选举时会使用配置文件列表中第一个调度器名称。</p>
+<blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<ul>
+<li>声明多个配置文件时，配置文件对应的调度器名称必须唯一。</li>
+<li>由于调度器只有一个保存 pending 状态 Pod 的队列，所以所有配置文件必须在 <code>QueueSort</code> 扩展点中使用相同的插件，配置相同的参数已避免冲突。 </li>
+</ul>
+</blockquote>
+<h3 id="4、自定义调度器"><a href="#4、自定义调度器" class="headerlink" title="4、自定义调度器"></a>4、自定义调度器</h3><p>自定义调度器主要的功能即查询为调度的 Pod，按照自定义的调度策略选择新的 Node，并将其更新到 Pod 的 NodeBinding 上。我们可以用 shell 来编写一个最简单的调度器。</p>
+<h4 id="1）自定义调度器示例"><a href="#1）自定义调度器示例" class="headerlink" title="1）自定义调度器示例"></a>1）自定义调度器示例</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash">!/bin/bash</span><br>SERVER=&#x27;localhost:8080&#x27;<br>while true;<br>do<br>    for PODNAME in $(kubectl --server $SERVER get pods -o json | jq &#x27;.items[] | select(.spec.schedulerName ==&quot;my-scheduler&quot;) | select(.spec.nodeName == null) | .metadata.name&#x27; | tr -d &#x27;&quot;&#x27;)<br>;<br>    do<br>        NODES=($(kubectl --server $SERVER get nodes -o json | jq &#x27;.items[].metadata.name&#x27; | tr -d &#x27;&quot;&#x27;))<br>        NUMNODES=$&#123;#NODES[@]&#125;<br>        CHOSEN=$&#123;NODES[$[ $RANDOM % $NUMNODES]]&#125;<br>        curl --header &quot;Content-Type:application/json&quot; --request POST --data &#x27;&#123;&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;:&quot;Binding&quot;,&quot;metadata&quot;: &#123;&quot;name&quot;:&quot;&#x27;$PODNAME&#x27;&quot;&#125;,&quot;target&quot;: &#123;&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;<br>: &quot;Node&quot;, &quot;name&quot;: &quot;&#x27;$CHOSEN&#x27;&quot;&#125;&#125;&#x27; http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/<br>        echo &quot;Assigned $PODNAME to $CHOSEN&quot;<br>    done<br>    sleep 1<br>done<br></code></pre></td></tr></table></figure>
 
 <h4 id="2）使用自定义调度器示例"><a href="#2）使用自定义调度器示例" class="headerlink" title="2）使用自定义调度器示例"></a>2）使用自定义调度器示例</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Pod</span><br><span class="hljs-attr">metadata:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span><br>  <span class="hljs-attr">labels:</span><br>    <span class="hljs-attr">app:</span> <span class="hljs-string">nginx</span><br><span class="hljs-attr">spec:</span><br>  <span class="hljs-attr">schedulerName:</span> <span class="hljs-string">my-scheduler</span>		 <span class="hljs-comment"># 选择使用自定义调度器 my-scheduler</span><br>  <span class="hljs-attr">containers:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">nginx</span><br>    <span class="hljs-attr">image:</span> <span class="hljs-string">nginx:1.10</span><br><br></code></pre></td></tr></table></figure>
 
