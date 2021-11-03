@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.5k 字
+      3.8k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      54
+      45
        分钟
     </span>
   
@@ -244,59 +244,8 @@
 <p>事实上，我们并不需要再 Pod 初次调度时，就解决资源倾斜的问题，同样也可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。这也及时本方案所涉及的概念 —— 二次调度。</p>
 <h2 id="二、Kubernetes-的驱逐、调度原理"><a href="#二、Kubernetes-的驱逐、调度原理" class="headerlink" title="二、Kubernetes 的驱逐、调度原理"></a>二、Kubernetes 的驱逐、调度原理</h2><h3 id="1、Kubernetes-默认调度机制-——-kube-scheduler"><a href="#1、Kubernetes-默认调度机制-——-kube-scheduler" class="headerlink" title="1、Kubernetes 默认调度机制 —— kube-scheduler"></a>1、Kubernetes 默认调度机制 —— kube-scheduler</h3><p>调度器是一个控制面的进程，它负责将 Pod 指派到 Node 节点上。调度基于约束和可用资源为调度队列中每个 Pod 确定其合适的运行位置。之后，调度器会对所有合适的节点进行优先级排序，并将 Pod 绑定到得分最高的节点去。</p>
 <p>通过对于其原理的学习，可以进一步了解 K8S 中的调度到底是在做什么。相关具体内容可以看之前的博文: <a href="https://tareya.github.io/2021/10/27/Kubernetes-%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E4%BB%8B%E7%BB%8D-%E2%80%94%E2%80%94-kube-scheduler/#%E4%B8%80%E3%80%81K8S-%E8%B0%83%E5%BA%A6%E5%8E%9F%E7%90%86%E5%92%8C%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5">K8S 调度原理和调度策略</a></p>
-<h3 id="2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制"><a href="#2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制" class="headerlink" title="2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制"></a>2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制</h3><h4 id="1）什么是节点压力驱逐？"><a href="#1）什么是节点压力驱逐？" class="headerlink" title="1）什么是节点压力驱逐？"></a>1）什么是节点压力驱逐？</h4><p>节点压力驱逐事实上就是 kubelet 主动终止 Pod 以回收节点资源的过程。kubelet 会监控集群节点的 CPU、内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止枯竭。</p>
-<p>在节点压力驱逐期间，kubelet 会将所选的 Pod 的 <code>PodPhase</code> 设置为 <code>Failed</code>，这回终止 Pod。Pod 的信息残留反馈为 <code>Evicted</code> 状态，如下图:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211027181000655.png" srcset="/img/loading.gif" lazyload alt="image-20211027181000655"></p>
-<p>K8S 中对于系统资源可以分为两种属性：</p>
-<ul>
-<li><strong>可压缩资源</strong>: 例如 CPU 循环、Disk I/O、网络带宽，都是可以被限制和被回收的，对于一个 Pod 来说，可以降低这些资源的使用量而不需要去杀掉 Pod </li>
-<li><strong>不可压缩资源</strong>: 例如内存、磁盘空间，一般来说不杀掉 Pod 就没有办法回收。</li>
-</ul>
-<p>而 kubelet 回收的资源主要是内存和磁盘两种，回收的基本方式如下:</p>
-<ul>
-<li>磁盘回收: 主要通过删除已终止的容器和未使用的镜像</li>
-<li>内存回收: 主要通过终止正在运行的 pod</li>
-</ul>
-<h4 id="2）节点压力驱逐的机制"><a href="#2）节点压力驱逐的机制" class="headerlink" title="2）节点压力驱逐的机制"></a>2）节点压力驱逐的机制</h4><p>kubelet 会根据 <code>驱逐信号</code>，<code>驱逐条件</code>、<code>监控间隔</code> 来作出驱逐决定。</p>
-<h5 id="1-驱逐信号"><a href="#1-驱逐信号" class="headerlink" title="1. 驱逐信号"></a>1. 驱逐信号</h5><p>驱逐信号是特定资源在特定时间点的当前状态。kubelet 使用驱逐信号，通过将信号和驱逐条件进行比较，来做出驱逐决定，驱逐条件就是节点上应该可用资源的最小量。kubelet 可使用的驱逐信号如下:</p>
-<table>
-<thead>
-<tr>
-<th>驱逐信号</th>
-<th>取值方式</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>memory.available</td>
-<td>memory.available<code>:=</code>node.status.capacity[memory]<code>-</code>node.stats.memory.workingSet</td>
-</tr>
-<tr>
-<td>nodefs.available</td>
-<td>nodefs.available<code>:=</code>node.stats.fs.available</td>
-</tr>
-<tr>
-<td>nodefs.inodesFree</td>
-<td>nodefs.inodesFree<code>:=</code>node.stats.fs.inodesFree</td>
-</tr>
-<tr>
-<td>imagefs.available</td>
-<td>imagefs.available<code>:=</code>node.stats.runtime.imagefs.available</td>
-</tr>
-<tr>
-<td>imagefs.inodesFree</td>
-<td>imagefs.inodesFree<code>:=</code>node.stats.runtime.imagefs.inodesFree</td>
-</tr>
-<tr>
-<td>pid.available</td>
-<td>pid.available<code>:=</code>node.stats.rlimit.maxpid<code>-</code>node.stats.rlimit.curproc</td>
-</tr>
-</tbody></table>
-<p>每个驱逐信号都支持百分比或是字面值，kubelet 采用的是信号有关的总量的百分比的方式来进行判断。</p>
-<h6 id="1⃣️-memory-available"><a href="#1⃣️-memory-available" class="headerlink" title="1⃣️ memory.available"></a>1⃣️ memory.available</h6><p><code>memory.available</code> 的值来自 cgroupfs，而不是像 <code>free -m</code> 这样的系统工具，这里系统工具在容器内实际上是起不到效果的（因为容器根本上在底层是公用的系统资源）。而 CGroup 则是将容器进行了分层次区分，每个容器都会有其唯一的 CGroup 根节点，kubelet 会判断该根节点的可用资源来计算 <code>memory.available</code>。</p>
-<p>具体的计算方法如此脚本<a target="_blank" rel="noopener" href="https://kubernetes.io/zh/examples/admin/resource/memory-available.sh">memory-available.sh</a>。kubelet 在其计算会排除了 inactive_file（即非活动 LRU 列表上基于文件来虚拟的内存的字节数）， 因为它假定在压力下内存是可回收的。</p>
-<h6 id="2⃣️-nodefs"><a href="#2⃣️-nodefs" class="headerlink" title="2⃣️ nodefs"></a>2⃣️ nodefs</h6><p><code>nodefs</code> 表示节点的主文件系统，适用于本地磁盘、emptyDir、日志存储等，它关注的是本地文件系统的磁盘空间 <code>nodefs.available</code> 和 inode 数 <code>nodefs.inodesFree</code>。</p>
-<h6 id="3⃣️-imagefs"><a href="#3⃣️-imagefs" class="headerlink" title="3⃣️ imagefs"></a>3⃣️ imagefs</h6><p><code>imagefs</code> 表示的是容器运行时，存储容器镜像和容器可写层，是将本地文件系统根据 CGroup 分层后的文件系统，它关注的是该层文件系统的磁盘空间 <code>imagefs.available</code> 和 inode 数 <code>imagefs.inodesFree</code>。</p>
-<h5 id="2-驱逐条件"><a href="#2-驱逐条件" class="headerlink" title="2. 驱逐条件"></a>2. 驱逐条件</h5><h5 id="3-驱逐监控间隔"><a href="#3-驱逐监控间隔" class="headerlink" title="3. 驱逐监控间隔"></a>3. 驱逐监控间隔</h5><h2 id="三、Descheduler-二次调度方案"><a href="#三、Descheduler-二次调度方案" class="headerlink" title="三、Descheduler 二次调度方案"></a>三、Descheduler 二次调度方案</h2><h3 id="1、Descheduler-简介"><a href="#1、Descheduler-简介" class="headerlink" title="1、Descheduler 简介"></a>1、Descheduler 简介</h3><h4 id="1）什么是-Descheduler-？"><a href="#1）什么是-Descheduler-？" class="headerlink" title="1）什么是 Descheduler ？"></a>1）什么是 Descheduler ？</h4><p>上文中我们介绍了Kubernetes 中的调度机制，简单的说调度就是将 Pending 状态的 Pod 绑定到 Node 节点的过程，这个工作默认是由 kube-scheduler 这个组件来完成的，它完成了 Pod 的初次调度。并且 Kubernetes 也允许在同一个集群中使用多个调度器。</p>
+<h3 id="2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制"><a href="#2、Kubernetes-节点压力驱逐-——-kubelet-的驱逐机制" class="headerlink" title="2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制"></a>2、Kubernetes 节点压力驱逐 —— kubelet 的驱逐机制</h3><p>除了通过调度的方式驱逐 Pod 外，K8S 还存在一种兜底的驱逐机制，就是节点压力驱逐，这个机制用于在节点资源耗尽前紧急回收系统资源，以避免节点所在系统由于资源耗尽宕机。相关具体内容可以看之前的博文: </p>
+<h2 id="三、Descheduler-二次调度方案"><a href="#三、Descheduler-二次调度方案" class="headerlink" title="三、Descheduler 二次调度方案"></a>三、Descheduler 二次调度方案</h2><h3 id="1、Descheduler-简介"><a href="#1、Descheduler-简介" class="headerlink" title="1、Descheduler 简介"></a>1、Descheduler 简介</h3><h4 id="1）什么是-Descheduler-？"><a href="#1）什么是-Descheduler-？" class="headerlink" title="1）什么是 Descheduler ？"></a>1）什么是 Descheduler ？</h4><p>上文中我们介绍了Kubernetes 中的调度机制，简单的说调度就是将 Pending 状态的 Pod 绑定到 Node 节点的过程，这个工作默认是由 kube-scheduler 这个组件来完成的，它完成了 Pod 的初次调度。并且 Kubernetes 也允许在同一个集群中使用多个调度器。</p>
 <p>由于 Kubernetes 整体来说是非常动态的，集群的状态随着时间的推移会不断的变化。我们经常会因为各种原因，期望将已运行的 Pod 可以移动到其他节点上。我们将这个过程称为二次调度。</p>
 <p>而 Descheduler 就是一个用于处理二次调度过程的调度器。它会根据调度策略，找到可以移动 Pod 并进行驱逐。但是需要注意的是，Descheduler 并不是用来代替 kube-scheduler 的，而是依赖于 K8S 原始的调度机制来完成工作。</p>
 <h4 id="2）版本兼容性"><a href="#2）版本兼容性" class="headerlink" title="2）版本兼容性"></a>2）版本兼容性</h4><p>虽然 <code>Descheduler</code> 对于 K8S 的版本没有硬性以来，但是一般来说 K8S 提供的客户端包（client-go、apimachinery 等）会向下兼容三个版本，例如，调度程序 v0.18 应与 k8s v1.18、v1.17 和 v1.16 配合使用。</p>
