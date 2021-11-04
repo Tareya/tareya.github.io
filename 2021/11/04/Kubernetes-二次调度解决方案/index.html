@@ -14,7 +14,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Kubernetes 二次调度解决方案">
+  <meta name="description" content="Kubernetes 二次调度解决方案我们知道，kube-scheduler 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，scheduler 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。">
   <meta name="author" content="Tareya">
   <meta name="keywords" content="">
   
@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.9k 字
+      5k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      58
+      59
        分钟
     </span>
   
@@ -228,9 +228,8 @@
             <h1 style="display: none">Kubernetes 二次调度解决方案</h1>
             
             <div class="markdown-body">
-              <h1 id="Kubernetes-二次调度解决方案"><a href="#Kubernetes-二次调度解决方案" class="headerlink" title="Kubernetes 二次调度解决方案"></a>Kubernetes 二次调度解决方案</h1><span id="more"></span>
-
-
+              <h1 id="Kubernetes-二次调度解决方案"><a href="#Kubernetes-二次调度解决方案" class="headerlink" title="Kubernetes 二次调度解决方案"></a>Kubernetes 二次调度解决方案</h1><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。</p>
+<span id="more"></span>
 
 
 
