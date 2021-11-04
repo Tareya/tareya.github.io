@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4.7k 字
+      4.9k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      59
+      61
        分钟
     </span>
   
@@ -290,6 +290,31 @@
 <li>磁盘回收: 主要通过删除已终止的容器和未使用的镜像</li>
 <li>内存回收: 主要通过终止正在运行的 pod</li>
 </ul>
+<h3 id="4、预分配资源"><a href="#4、预分配资源" class="headerlink" title="4、预分配资源"></a>4、预分配资源</h3><p>和容器一样，在没有做任何限制的情况下，K8S 的 Pod 能够使用所在 Node 节点的所有可用资源。这事实上是一个问题，因为我们一般会在节点上运了许多系统守护进程（系统内核、驱动、kubelet 等），它们也是要消耗资源的，除非我们为这些守护进程预留出一定的资源，否则它们就会与 Pod 一起加入到资源争夺的行列，很可能会直面节点资源短缺的问题，最严重的情况将无法维持系统的稳定运行。</p>
+<h4 id="1）节点可用计算资源量"><a href="#1）节点可用计算资源量" class="headerlink" title="1）节点可用计算资源量"></a>1）节点可用计算资源量</h4><p>Kubernetes 节点上的 <code>Allocatable</code> 被定义为 Pod 的可用计算资源量。调度器在调度 Pod 时时不会超额申请 <code>Allocatable</code> 的，目前可支持的资源为 <code>cpu</code>、<code>memory</code>、<code>ephemeral-storage</code>。</p>
+<p>我们可以将一个节点的资源总和定义为如下形式:</p>
+<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211104144209729.png" srcset="/img/loading.gif" lazyload alt="image-20211104144209729"></p>
+<h4 id="2）预留资源"><a href="#2）预留资源" class="headerlink" title="2）预留资源"></a>2）预留资源</h4><p>在 <code>kubelet</code> 中，可以为两类系统守护进程预留资源，一个是操作系统预留资源 <code>system-reserved</code>，另一个为 K8S 系统预留资源 <code>kube-reserved</code>。</p>
+<h5 id="1-system-reserved"><a href="#1-system-reserved" class="headerlink" title="1. system-reserved"></a>1. system-reserved</h5><p><code>system-reserved</code> 用于为诸如 <code>sshd</code>、<code>udev</code> 等系统级守护进程预留资源（cpu、内存、磁盘）；并且为系统内核预留内存资源（kernel 所使用的内存并不包括在 Pod 中）；以及为用户登陆会话预留资源（systemd 体系中的 user.slice）</p>
+<p>除了 <code>Allocatable</code> 相关的 <code>cpu</code>、<code>memory</code> 、<code>ephemeral-storage</code> 参数外，<code>pid</code>  参数可用于为OS系统进程预留指定的 进程 ID。</p>
+<p><code>system-reserved</code> 的配置方式有两种，一种为 <code>kubelet</code> 命令行参数 <code>--system-reserved</code>，另一种为 <code>kubelet</code> 的 yaml 配置文件参数 <code>systemReserved</code>。</p>
+<h6 id="1⃣️-命令行参数配置示例"><a href="#1⃣️-命令行参数配置示例" class="headerlink" title="1⃣️ 命令行参数配置示例"></a>1⃣️ 命令行参数配置示例</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">--system-reserved=[cpu=100m][,][memory=100Mi][,][ephemeral-storage=1Gi][,][pid=1000]<br></code></pre></td></tr></table></figure>
+
+<h6 id="2⃣️-配置文件参数配置示例"><a href="#2⃣️-配置文件参数配置示例" class="headerlink" title="2⃣️ 配置文件参数配置示例"></a>2⃣️ 配置文件参数配置示例</h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">systemReserved:</span><br>  <span class="hljs-attr">cpu:</span> <span class="hljs-string">512m</span><br>  <span class="hljs-attr">memory:</span> <span class="hljs-string">2048Mi</span><br>  <span class="hljs-attr">ephemeral-storage:</span> <span class="hljs-string">10Gi</span><br>  <span class="hljs-attr">pid:</span> <span class="hljs-number">1000</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-kube-reserved"><a href="#2-kube-reserved" class="headerlink" title="2. kube-reserved"></a>2. kube-reserved</h5><p><code>kube-reserved</code> 用于为诸如 <code>kubelet</code>、容器运行时、节点问题监测器等 Kubernetes 系统守护进程预留资源（cpu、内存、磁盘），而并非为 Pod 保留资源。<code>kube-reserved</code> 在一定程度上可以影响一个节点上 Pod 的多少。</p>
+<p>除了 <code>Allocatable</code> 相关的 <code>cpu</code>、<code>memory</code> 、<code>ephemeral-storage</code> 参数外，<code>pid</code>  参数可用于为 K8S 系统进程预留指定的 进程 ID。</p>
+<p><code>kube-reserved</code> 的配置方式有两种，一种为 <code>kubelet</code> 命令行参数 <code>--kube-reserved</code>，另一种为 <code>kubelet</code> 的 yaml 配置文件参数 <code>kubeReserved</code>。</p>
+<h6 id="1⃣️-命令行参数配置示例-1"><a href="#1⃣️-命令行参数配置示例-1" class="headerlink" title="1⃣️ 命令行参数配置示例"></a>1⃣️ 命令行参数配置示例</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">--kube-reserved=[cpu=100m][,][memory=100Mi][,][ephemeral-storage=1Gi][,][pid=1000]<br></code></pre></td></tr></table></figure>
+
+<h6 id="2⃣️-配置文件参数配置示例-1"><a href="#2⃣️-配置文件参数配置示例-1" class="headerlink" title="2⃣️ 配置文件参数配置示例"></a>2⃣️ 配置文件参数配置示例</h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">kubeReserved:</span><br>  <span class="hljs-attr">cpu:</span> <span class="hljs-string">512m</span><br>  <span class="hljs-attr">memory:</span> <span class="hljs-string">2048Mi</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
 <h2 id="三、Kubernetes-节点压力驱逐"><a href="#三、Kubernetes-节点压力驱逐" class="headerlink" title="三、Kubernetes 节点压力驱逐"></a>三、Kubernetes 节点压力驱逐</h2><h3 id="1、什么是节点压力驱逐？"><a href="#1、什么是节点压力驱逐？" class="headerlink" title="1、什么是节点压力驱逐？"></a>1、什么是节点压力驱逐？</h3><p>节点压力驱逐事实上就是 kubelet 主动终止 Pod 以回收节点资源的过程。kubelet 会监控集群节点的 CPU、内存、磁盘空间和文件系统的 inode 等资源。 当这些资源中的一个或者多个达到特定的消耗水平， kubelet 可以主动地使节点上一个或者多个 Pod 失效，以回收资源防止枯竭。</p>
 <p>在节点压力驱逐期间，kubelet 会将所选的 Pod 的 <code>PodPhase</code> 设置为 <code>Failed</code>，这回终止 Pod。Pod 的信息残留反馈为 <code>Evicted</code> 状态，如下图:</p>
 <p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211027181000655.png" srcset="/img/loading.gif" lazyload alt="image-20211027181000655"></p>
@@ -675,27 +700,18 @@
 <p>在这个例子中，如果 <code>nodefs.available</code> 信号满足驱逐条件， kubelet 会回收资源，直到信号达到 <code>1Gi</code> 的条件， 然后继续回收至少 <code>500Mi</code> 直到信号达到 <code>1.5Gi</code>。</p>
 <p>类似地，kubelet 会回收 <code>imagefs</code> 资源，直到 <code>imagefs.available</code> 信号达到 <code>102Gi</code>。</p>
 <p>对于所有资源，默认的 <code>eviction-minimum-reclaim</code> 为 <code>0</code>。</p>
-<h3 id="8、预分配资源"><a href="#8、预分配资源" class="headerlink" title="8、预分配资源"></a>8、预分配资源</h3><p>和容器一样，在没有做任何限制的情况下，K8S 的 Pod 能够使用所在 Node 节点的所有可用资源。这事实上是一个问题，因为我们一般会在节点上运了许多系统守护进程（系统内核、驱动、kubelet 等），它们也是要消耗资源的，除非我们为这些守护进程预留出一定的资源，否则它们就会与 Pod 一起加入到资源争夺的行列，很可能会直面节点资源短缺的问题，最严重的情况将无法维持系统的稳定运行。</p>
-<h4 id="1）节点可用计算资源量"><a href="#1）节点可用计算资源量" class="headerlink" title="1）节点可用计算资源量"></a>1）节点可用计算资源量</h4><p>Kubernetes 节点上的 <code>Allocatable</code> 被定义为 Pod 的可用计算资源量。调度器在调度 Pod 时时不会超额申请 <code>Allocatable</code> 的，目前可支持的资源为 <code>cpu</code>、<code>memory</code>、<code>ephemeral-storage</code>。</p>
-<p>我们可以将一个节点的资源总和定义为如下形式:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211104144209729.png" srcset="/img/loading.gif" lazyload alt="image-20211104144209729"></p>
-<h4 id="2）预留资源"><a href="#2）预留资源" class="headerlink" title="2）预留资源"></a>2）预留资源</h4><p>在 <code>kubelet</code> 中，可以为两类系统守护进程预留资源，一个是操作系统预留资源 <code>system-reserved</code>，另一个为 K8S 系统预留资源 <code>kube-reserved</code>。</p>
-<h5 id="1-system-reserved"><a href="#1-system-reserved" class="headerlink" title="1. system-reserved"></a>1. system-reserved</h5><p><code>system-reserved</code> 用于为诸如 <code>sshd</code>、<code>udev</code> 等系统级守护进程预留资源（cpu、内存、磁盘）；并且为系统内核预留内存资源（kernel 所使用的内存并不包括在 Pod 中）；以及为用户登陆会话预留资源（systemd 体系中的 user.slice）</p>
-<p>除了 <code>Allocatable</code> 相关的 <code>cpu</code>、<code>memory</code> 、<code>ephemeral-storage</code> 参数外，<code>pid</code>  参数可用于为OS系统进程预留指定的 进程 ID。</p>
-<p><code>system-reserved</code> 的配置方式有两种，一种为 <code>kubelet</code> 命令行参数 <code>--system-reserved</code>，另一种为 <code>kubelet</code> 的 yaml 配置文件参数 <code>systemReserved</code>。</p>
-<h6 id="1⃣️-命令行参数配置示例"><a href="#1⃣️-命令行参数配置示例" class="headerlink" title="1⃣️ 命令行参数配置示例"></a>1⃣️ 命令行参数配置示例</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">--system-reserved=[cpu=100m][,][memory=100Mi][,][ephemeral-storage=1Gi][,][pid=1000]<br></code></pre></td></tr></table></figure>
+<h3 id="8、驱逐配置最佳实践"><a href="#8、驱逐配置最佳实践" class="headerlink" title="8、驱逐配置最佳实践"></a>8、驱逐配置最佳实践</h3><p><strong>示例场景:</strong></p>
+<ul>
+<li>节点内存容量: <code>10Gi</code></li>
+<li>期望为系统守护进程（内核、kubelet）等预留 10% 的内存容量</li>
+<li>期望在节点内存利用率为 95% 的时候驱逐 Pods，以减少系统 OOM 的概率</li>
+</ul>
+<p><strong>示例配置:</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">--eviction-hard=memory.available&lt;500Mi<br>--system-reserved=memory=1.5Gi<br></code></pre></td></tr></table></figure>
 
-<h6 id="2⃣️-配置文件参数配置示例"><a href="#2⃣️-配置文件参数配置示例" class="headerlink" title="2⃣️ 配置文件参数配置示例"></a>2⃣️ 配置文件参数配置示例</h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">systemReserved:</span><br>  <span class="hljs-attr">cpu:</span> <span class="hljs-string">512m</span><br>  <span class="hljs-attr">memory:</span> <span class="hljs-string">2048Mi</span><br>  <span class="hljs-attr">ephemeral-storage:</span> <span class="hljs-string">10Gi</span><br>  <span class="hljs-attr">pid:</span> <span class="hljs-number">1000</span><br></code></pre></td></tr></table></figure>
-
-
-
-<h5 id="2-kube-reserved"><a href="#2-kube-reserved" class="headerlink" title="2. kube-reserved"></a>2. kube-reserved</h5><p><code>kube-reserved</code> 用于为诸如 <code>kubelet</code>、容器运行时、节点问题监测器等 Kubernetes 系统守护进程预留资源（cpu、内存、磁盘），而并非为 Pod 保留资源。<code>kube-reserved</code> 在一定程度上可以影响一个节点上 Pod 的多少。</p>
-<p>除了 <code>Allocatable</code> 相关的 <code>cpu</code>、<code>memory</code> 、<code>ephemeral-storage</code> 参数外，<code>pid</code>  参数可用于为 K8S 系统进程预留指定的 进程 ID。</p>
-<p><code>kube-reserved</code> 的配置方式有两种，一种为 <code>kubelet</code> 命令行参数 <code>--kube-reserved</code>，另一种为 <code>kubelet</code> 的 yaml 配置文件参数 <code>kubeReserved</code>。</p>
-<h6 id="1⃣️-命令行参数配置示例-1"><a href="#1⃣️-命令行参数配置示例-1" class="headerlink" title="1⃣️ 命令行参数配置示例"></a>1⃣️ 命令行参数配置示例</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">--kube-reserved=[cpu=100m][,][memory=100Mi][,][ephemeral-storage=1Gi][,][pid=1000]<br></code></pre></td></tr></table></figure>
-
-<h6 id="2⃣️-配置文件参数配置示例-1"><a href="#2⃣️-配置文件参数配置示例-1" class="headerlink" title="2⃣️ 配置文件参数配置示例"></a>2⃣️ 配置文件参数配置示例</h6><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">kubeReserved:</span><br>  <span class="hljs-attr">cpu:</span> <span class="hljs-string">512m</span><br>  <span class="hljs-attr">memory:</span> <span class="hljs-string">2048Mi</span><br></code></pre></td></tr></table></figure>
-
+<blockquote>
+<p>🌈 在此配置中，为系统守护进程预留了 <code>1.5Gi</code> 的内存，即 <code>总内存的 10% + 驱逐条件量</code>。这样，如果 pod 实际使用量超过其request 的量，或者系统使用超过 <code>1Gi</code> 的内存，则节点可以达到驱逐阈值，这使得 <code>memory.available</code> 信号低于 <code>500Mi</code> 时会触发阈值。</p>
+</blockquote>
 
             </div>
             <hr>

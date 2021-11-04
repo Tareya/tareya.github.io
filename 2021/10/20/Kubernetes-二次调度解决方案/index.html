@@ -234,7 +234,7 @@
 
 
 
-<h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。但是默认的调度机制却并不那么友善，即使我们为 Node 配置了亲和或反亲和，仍然会出现某些节点负载高，某些节点则几乎空闲的情况。这是因为正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能是这些 Pod 再次调度v 。</p>
+<h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。但是默认的调度机制却并不那么友善，即使我们为 Node 配置了亲和或反亲和，仍然会出现某些节点负载高，某些节点则几乎空闲的情况。这是因为正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能是这些 Pod 再次调度 。</p>
 <p>在这个案例中国，我们的 K8S 在运行过程中，就碰到了这种情况。pod 的调度经常会出现倾斜的情况，大量副本积压在个别 node 节点上，将节点资源占用完（这里主要体现在内存方面），如下图的情况：</p>
 <p>Node15、Node16 内存资源使用率以100%了，但是空闲的节点内存使用率可能未超过 50%，这种分布的倾斜事实上是不健康的。</p>
 <p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161447795.png" srcset="/img/loading.gif" lazyload alt="image-20211020161447795"></p>
