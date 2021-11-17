@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="在 Kubernetes 的架构体系中，etcd 是作为存储角色的存在，也是实现list-watch 机制的关键。本文将针对 Etcd 集群做简单的介绍。">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>Kubernetes 基础组件介绍 —— Etcd集群 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Kubernetes 基础组件介绍 —— Etcd集群">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-17 09:39" pubdate>
+        2021年11月17日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      24
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kubernetes 基础组件介绍 —— Etcd集群</h1>
+            
+            <div class="markdown-body">
+              <p>在 Kubernetes 的架构体系中，etcd 是作为存储角色的存在，也是实现<code>list-watch</code> 机制的关键。本文将针对 Etcd 集群做简单的介绍。</p>
+<span id="more"></span>
+
+
+
+<h1 id="Kubernetes-基础组件介绍-——-Etcd集群"><a href="#Kubernetes-基础组件介绍-——-Etcd集群" class="headerlink" title="Kubernetes 基础组件介绍 —— Etcd集群"></a>Kubernetes 基础组件介绍 —— Etcd集群</h1><h2 id="一、Etcd-概述"><a href="#一、Etcd-概述" class="headerlink" title="一、Etcd 概述"></a>一、Etcd 概述</h2><h3 id="1、Etcd-简介"><a href="#1、Etcd-简介" class="headerlink" title="1、Etcd 简介"></a>1、Etcd 简介</h3><h3 id="2、Etcd-的特性"><a href="#2、Etcd-的特性" class="headerlink" title="2、Etcd 的特性"></a>2、Etcd 的特性</h3><h4 id="1）高可用实现"><a href="#1）高可用实现" class="headerlink" title="1）高可用实现"></a>1）高可用实现</h4><p>Etcd 是基于 raft 算法的分布式键值数据库，生来就为集群化而设计的，由于Raft算法在做决策时需要超半数节点的投票，所以etcd集群一般推荐奇数节点，如3、5或者7个节点构成一个集群。</p>
+<h4 id="2）选主过程"><a href="#2）选主过程" class="headerlink" title="2）选主过程"></a>2）选主过程</h4><h4 id="3）节点数必须是奇数吗？"><a href="#3）节点数必须是奇数吗？" class="headerlink" title="3）节点数必须是奇数吗？"></a>3）节点数必须是奇数吗？</h4><h4 id="4）机器越多越好吗？"><a href="#4）机器越多越好吗？" class="headerlink" title="4）机器越多越好吗？"></a>4）机器越多越好吗？</h4><h4 id="5）关于脑裂"><a href="#5）关于脑裂" class="headerlink" title="5）关于脑裂"></a>5）关于脑裂</h4><h4 id="6）关于数据一致性"><a href="#6）关于数据一致性" class="headerlink" title="6）关于数据一致性"></a>6）关于数据一致性</h4><h2 id="二、Etcd-集群部署"><a href="#二、Etcd-集群部署" class="headerlink" title="二、Etcd 集群部署"></a>二、Etcd 集群部署</h2><blockquote>
+<p>🌈 Etcd 从 3.4 版本开始会自动通过配置文件加载环境变量参数，EnvironmentFile 文件中有的参数不需要在 systems unit 的 ExecStart 中添加了，可以更加的精简化配置，所以我们这里我们选用 3.4 版本的 etcd。方便后期统一的配置管理。</p>
+</blockquote>
+<h3 id="1、下载-etcd-二进制文件"><a href="#1、下载-etcd-二进制文件" class="headerlink" title="1、下载 etcd 二进制文件"></a>1、下载 etcd 二进制文件</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd/releases">官方下载地址</a></p>
+</blockquote>
+<h4 id="1）下载解压-3-4-14-etcd-客户端和服务端二进制包"><a href="#1）下载解压-3-4-14-etcd-客户端和服务端二进制包" class="headerlink" title="1）下载解压 3.4.14 etcd 客户端和服务端二进制包"></a>1）下载解压 3.4.14 etcd 客户端和服务端二进制包</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ~ &amp;&amp; \<br>wget -c https://github.com/coreos/etcd/releases/download/v3.4.14/etcd-v3.4.14-linux-amd64.tar.gz &amp;&amp; \<br>tar xf etcd-v3.4.14-linux-amd64.tar.gz<br></code></pre></td></tr></table></figure>
+
+<h5 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd etcd-v3.4.14-linux-amd64 &amp;&amp; ./etcdctl version<br></code></pre></td></tr></table></figure>
+
+<p>正常返回如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl version: 3.4.14<br>API version: 3.4<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、分发-etcd-至各-master-节点"><a href="#2、分发-etcd-至各-master-节点" class="headerlink" title="2、分发 etcd 至各 master 节点"></a>2、分发 etcd 至各 master 节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 etcd server 端</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/etcd-v3.4.14-linux-amd64/etcd dest=/data/applications/etcd/bin/etcd owner=root group=root mode=0755&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd client 工具</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/etcd-v3.4.14-linux-amd64/etcdctl dest=/data/applications/etcd/bin/etcdctl owner=root group=root mode=0755&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、创建配置文件"><a href="#3、创建配置文件" class="headerlink" title="3、创建配置文件"></a>3、创建配置文件</h3><h4 id="1）新建-etcd-配置文件-etcd-conf"><a href="#1）新建-etcd-配置文件-etcd-conf" class="headerlink" title="1）新建 etcd 配置文件 etcd.conf"></a>1）新建 etcd 配置文件 <code>etcd.conf</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/kubernetes/etcd/cfg/etcd.conf &lt;&lt; EOF<br><span class="hljs-meta">#</span><span class="bash">[Member]</span><br>ETCD_NAME=&quot;etcd-1&quot;<br>ETCD_DATA_DIR=&quot;/data/applications/etcd/data&quot;<br>ETCD_WAL_DIR=&quot;/data/applications/etcd/wal&quot;<br>ETCD_LISTEN_PEER_URLS=&quot;https://192.168.3.231:2380&quot;<br>ETCD_LISTEN_CLIENT_URLS=&quot;https://192.168.3.231:2379,http://127.0.0.1:2379&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Clustering]</span><br>ETCD_INITIAL_ADVERTISE_PEER_URLS=&quot;https://192.168.3.231:2380&quot;<br>ETCD_ADVERTISE_CLIENT_URLS=&quot;https://192.168.3.231:2379&quot;<br>ETCD_INITIAL_CLUSTER=&quot;etcd-1=https://192.168.3.231:2380,etcd-2=https://192.168.3.232:2380,etcd-3=https://192.168.3.233:2380&quot;<br>ETCD_INITIAL_CLUSTER_TOKEN=&quot;etcd-cluster-0&quot;<br>ETCD_INITIAL_CLUSTER_STATE=&quot;new&quot;<br>ETCD_ENABLE_V2=&quot;true&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Security]</span><br>ETCD_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_CLIENT_CERT_AUTH=&quot;true&quot;<br>ETCD_PEER_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_PEER_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_PEER_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_PEER_CLIENT_CERT_AUTH=&quot;true&quot;<br><br>EOF<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>etcd 每个节点的配置不同，根据实际情况进行修改，可以通过 jinja 模版渲染。</p>
+<p>3.4 版本的 etcd 默认使用的是 v3 版本的API，并默认关闭了 v2 版本API的使用，如果要继续使用的话，可以在配置文件中设置 <code>ETCD_ENABLE_V2=&quot;true&quot;</code>，或者在使用命令行时设置 <code>ETCDCTL_API</code> 环境变量，如<code>ETCDCTL_API=2 etcdctl</code>。</p>
+<p>flannel 操作 etcd 使用的是 v2 的API， kubernetes 操作 etcd 使用的 v3 的API，calico 3.x 版本也使用 v3 的 API。</p>
+</blockquote>
+<h4 id="2）新建-systemd-unit-配置-etcd-service"><a href="#2）新建-systemd-unit-配置-etcd-service" class="headerlink" title="2）新建 systemd unit 配置 etcd.service"></a>2）新建 systemd unit 配置 <code>etcd.service</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/kubernetes/etcd/systemd/etcd.service &lt;&lt; EOF<br>[Unit]<br>Description=Etcd Server<br>After=network.target<br>After=network-online.target<br>Wants=network-online.target<br>Documentation=https://github.com/coreos<br>   <br>[Service]<br>Type=notify<br>EnvironmentFile=/data/applications/etcd/cfg/etcd.conf<br>ExecStart=/data/applications/etcd/bin/etcd \<br>--auto-compaction-mode=periodic \<br>--auto-compaction-retention=1 \<br>--max-request-bytes=33554432 \<br>--quota-backend-bytes=6442450944 \<br>--heartbeat-interval=250 \<br>--election-timeout=2000 \<br>--logger=zap<br>Restart=on-failure<br>RestartSec=5<br>LimitNOFILE=65536<br>   <br>[Install]<br>WantedBy=multi-user.target<br><br>EOF<br></code></pre></td></tr></table></figure>
+
+<h5 id="重要配置参数说明"><a href="#重要配置参数说明" class="headerlink" title="重要配置参数说明:"></a>重要配置参数说明:</h5><table>
+<thead>
+<tr>
+<th>重要参数</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EnvironmentFile</td>
+<td>环境变量配置文件，使用改方式可以以加载变量的形式制作统一的 unit 模版</td>
+</tr>
+<tr>
+<td>–cert-file / –key-file</td>
+<td>etcd server 与 client 通信时使用的证书和私钥</td>
+</tr>
+<tr>
+<td>–trusted-ca-file</td>
+<td>签发 client 证书的 ca 证书，用于验证 client 证书；</td>
+</tr>
+<tr>
+<td>–peer-cert-file / –peer-key-file</td>
+<td>etcd peer 之间通信使用的证书和私钥；</td>
+</tr>
+<tr>
+<td>–peer-trusted-ca-file</td>
+<td>签发 peer 证书的 ca 证书，用于验证 peer 证书，可以和 client 证书使用同一套，也可以使用不同的；</td>
+</tr>
+</tbody></table>
+<h3 id="4、分发配置文件"><a href="#4、分发配置文件" class="headerlink" title="4、分发配置文件"></a>4、分发配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 systemd unit 配置文件</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/kubernetes/etcd/systemd/etcd.service dest=/usr/lib/systemd/system/etcd.service owner=root group=root mode=0644&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd 配置文件</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/kubernetes/etcd/cfg/etcd.conf dest=/data/applications/etcd/cfg/etcd.conf owner=root group=root mode=0644&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="5、启动集群"><a href="#5、启动集群" class="headerlink" title="5、启动集群"></a>5、启动集群</h3><h4 id="1）批量启动-etcd"><a href="#1）批量启动-etcd" class="headerlink" title="1）批量启动 etcd"></a>1）批量启动 etcd</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible k8s-master -S -R root -m shell -a &quot;systemctl daemon-reload&quot;<br>ansible k8s-master -S -R root -m shell -a &quot;systemctl enable etcd.service&quot;<br>ansible k8s-master -S -R root -m shell -a &quot;systemctl start etcd.service&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）验证服务状态"><a href="#2）验证服务状态" class="headerlink" title="2）验证服务状态"></a>2）验证服务状态</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible k8s-master -S -R root -m shell -a &quot;ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl  --endpoints=http://127.0.0.1:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint health&quot;<br></code></pre></td></tr></table></figure>
+
+<h5 id="正常返回结果"><a href="#正常返回结果" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 均返回 healthy 时，集群状态未正常</span><br>192.168.3.233 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.802973ms<br><br>192.168.3.231 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.426585ms<br><br>192.168.3.232 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 3.491516ms<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）查看集群-leader"><a href="#3）查看集群-leader" class="headerlink" title="3）查看集群 leader"></a>3）查看集群 leader</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl -w table  --endpoints=https://192.168.3.231:2379,https://192.168.3.232:2379,https://192.168.3.233:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint status<br></code></pre></td></tr></table></figure>
+
+<h5 id="正常返回结果-1"><a href="#正常返回结果-1" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 当前 etcd raft leader 为 192.168.3.231</span><br><br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>| https://192.168.3.231:2379 | e7d52edc2101ab48 |  3.4.14 |   20 kB |      true |      false |         5 |         28 |                 28 |        |<br>| https://192.168.3.232:2379 | a191bc097f41b735 |  3.4.14 |   20 kB |     false |      false |         5 |         28 |                 28 |        |<br>| https://192.168.3.233:2379 | 307ec828b6239718 |  3.4.14 |   20 kB |     false |      false |         5 |         28 |                 28 |        |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="三、etcdctl-常用命令"><a href="#三、etcdctl-常用命令" class="headerlink" title="三、etcdctl 常用命令"></a>三、etcdctl 常用命令</h2><blockquote>
+<p>🌈 etcd 版本为 3.4，可以ETCDCTL_API=3，或ETCDCTL_API=2，默认情况下用的就是v3了，可以不用声明ETCDCTL_API</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 ./etcdctl --endpoints=https://$&#123;node1&#125;:2379,https://$&#123;node2&#125;:2379,https://$&#123;node3&#125;:2379 --cacert /data/applications/etcd/ssl/ca.pem --cert /data/applications/etcd/ssl/server.pem --key /data/applications/etcd/ssl/server-key.pem endpoint status --write-out=table<br></code></pre></td></tr></table></figure>
+
+
+
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/etcd/">etcd</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Kubernetes-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E6%89%8B%E5%86%8C/">Kubernetes 快速入门手册</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/16/%E3%80%8A%E5%87%A4%E5%87%B0%E9%A1%B9%E7%9B%AE%E2%80%94%E2%80%94%E4%B8%80%E4%B8%AAIT%E8%BF%90%E7%BB%B4%E7%9A%84%E4%BC%A0%E5%A5%87%E6%95%85%E4%BA%8B%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+                        <span class="hidden-mobile">《凤凰项目——一个IT运维的传奇故事》读书笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

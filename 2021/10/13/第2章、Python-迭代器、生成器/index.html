@@ -295,7 +295,7 @@
 <h5 id="2-缺点-1"><a href="#2-缺点-1" class="headerlink" title="2. 缺点"></a>2. 缺点</h5><ul>
 <li>不能直观的查看里面的数据</li>
 <li>取值的时候不能走回头路，只能一路向下（取1释放1）<ul>
-<li><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211013163304251.png" srcset="/img/loading.gif" lazyload alt="image-20211013163304251"></li>
+<li><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211013163304251.png" srcset="/img/loading.gif" lazyload alt="image-20211013163304251"></li>
 </ul>
 </li>
 </ul>
@@ -332,7 +332,7 @@
 </ul>
 <h3 id="2、生成器函数"><a href="#2、生成器函数" class="headerlink" title="2、生成器函数"></a>2、生成器函数</h3><h4 id="1）什么是生成器函数？"><a href="#1）什么是生成器函数？" class="headerlink" title="1）什么是生成器函数？"></a>1）什么是生成器函数？</h4><p><strong>通俗的说，含有 yield 语句的函数即生成器函数，此函数被调用时会返回一个生成器对象。</strong> </p>
 <h5 id="1-创建一个简单的生成器函数"><a href="#1-创建一个简单的生成器函数" class="headerlink" title="1. 创建一个简单的生成器函数"></a>1. 创建一个简单的生成器函数</h5><p>如下创建一个简单的生成器函数（实际上就是将一个普通函数的 return 改为 yield），调用该生成器函数则会返回一个生成器对象，且该生成器对象也是一个迭代器，我们可以通过 next 对其循环取值，一个 yield 对应一个 next，如果 next 数量超过 yield 的数量，就会返回 StopIteration。 （如下例，由于 11 是函数 print 的输出，而非生成器器函数本身返回的值，所以循环执行2次 next 超过了 yield 的数量了，返回了 StopIteration）</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211013180116144.png" srcset="/img/loading.gif" lazyload alt="image-20211013180116144"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211013180116144.png" srcset="/img/loading.gif" lazyload alt="image-20211013180116144"></p>
 <h4 id="2）yield-和-return-的区别"><a href="#2）yield-和-return-的区别" class="headerlink" title="2）yield 和 return 的区别:"></a>2）yield 和 return 的区别:</h4><ul>
 <li><code>return</code>: 一般在函数中只会设置一个，它的作用是终止函数并返回函数执行结果，由于结果会一次性生成，所以会占用较多的内存。</li>
 <li><code>yield</code>: 可以在函数中设置多个，并不会终止函数。使用 next 取值时，会取对应的 yield 生成的结果。next 在调用生成器函数取值 yield 时会记录位置，再次调用时会返回 yield 的位置，继续向下执行，和迭代器一样，生成器函数也只需占用一个内存空间，并且取1释放 1，以此来节省内存资源。</li>
@@ -341,16 +341,16 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">eat</span>():</span><br>    <br>    <span class="hljs-built_in">list</span> = []<br>    <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>,<span class="hljs-number">31</span>):<br>    <br>        <span class="hljs-built_in">list</span>.append(<span class="hljs-string">&quot;羊肉串&quot;</span>+<span class="hljs-built_in">str</span>(i))<br>        <br>        <br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">list</span><br><br><br>e = eat()<br><span class="hljs-built_in">print</span>(e)<br></code></pre></td></tr></table></figure>
 
 <p>返回如下:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211014100235168.png" srcset="/img/loading.gif" lazyload alt="image-20211014100235168"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211014100235168.png" srcset="/img/loading.gif" lazyload alt="image-20211014100235168"></p>
 <p>而使用 yield，只有当 next 调用时才会生成结果，也就是说是吃一个包子（调 eat），做一个包子（yield），并且还会记录上次吃到第几个了（next），这样就比较节省内存空间了。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">eat</span>():</span><br>    <br>    <span class="hljs-built_in">list</span> = []<br>    <br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>,<span class="hljs-number">31</span>):<br>    <br>        <span class="hljs-keyword">yield</span> <span class="hljs-string">&quot;包子&quot;</span>+<span class="hljs-built_in">str</span>(i)<br>        <br><br>e = eat()<br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">next</span>(e))<br>    <br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;早上先吃10个，剩下的留着下次吃&#x27;</span>)<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">next</span>(e))<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;中午再吃10个，剩下的留着下次吃&#x27;</span>)<br><br><br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>):<br>    <span class="hljs-built_in">print</span>(<span class="hljs-built_in">next</span>(e))<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;晚上把剩下的都吃了&#x27;</span>)<br></code></pre></td></tr></table></figure>
 
 <p>返回如下:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211014101240667.png" srcset="/img/loading.gif" lazyload alt="image-20211014101240667"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211014101240667.png" srcset="/img/loading.gif" lazyload alt="image-20211014101240667"></p>
 <h4 id="3）send-方法"><a href="#3）send-方法" class="headerlink" title="3）send 方法"></a>3）send 方法</h4><p>我们之前说过，next 的使用方式比较单一，它只能用来获取 yield 生成的值，并不能传递值，如下所示:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211014102937726.png" srcset="/img/loading.gif" lazyload alt="image-20211014102937726"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211014102937726.png" srcset="/img/loading.gif" lazyload alt="image-20211014102937726"></p>
 <p>如果我们能要进行传参，就需要用到 send，它同样也可像 next 一样获取到 yield 的值，并且还可以将值传给 yield，如下所示:</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211014103739335.png" srcset="/img/loading.gif" lazyload alt="image-20211014103739335"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211014103739335.png" srcset="/img/loading.gif" lazyload alt="image-20211014103739335"></p>
 <blockquote>
 <p>⚠️ 注意先要 next()，让指针指向 yield，才能实现传参。</p>
 </blockquote>

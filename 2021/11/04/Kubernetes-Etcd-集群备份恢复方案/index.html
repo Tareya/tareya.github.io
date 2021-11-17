@@ -14,7 +14,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Kubernetes Etcd 集群备份恢复方案">
+  <meta name="description" content="Etcd 是 Kubernetes 集群中极为重要的一块服务，其中存储了 Kubernetes 集群所有的数据信息，如果 Etcd 集群发生灾难或数据丢失，集群数据的恢复将不可逆，所以做好这块的备份恢复是极为重要的。">
   <meta name="author" content="Tareya">
   <meta name="keywords" content="">
   
@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10 字
+      2.9k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      46
        分钟
     </span>
   
@@ -228,7 +228,152 @@
             <h1 style="display: none">Kubernetes Etcd 集群备份恢复方案</h1>
             
             <div class="markdown-body">
-              <h1 id="Kubernetes-Etcd-集群备份恢复方案"><a href="#Kubernetes-Etcd-集群备份恢复方案" class="headerlink" title="Kubernetes Etcd 集群备份恢复方案"></a>Kubernetes Etcd 集群备份恢复方案</h1><span id="more"></span>
+              <p>Etcd 是 Kubernetes 集群中极为重要的一块服务，其中存储了 Kubernetes 集群所有的数据信息，如果 Etcd 集群发生灾难或数据丢失，集群数据的恢复将不可逆，所以做好这块的备份恢复是极为重要的。</p>
+<span id="more"></span>
+
+<h1 id="Kubernetes-Etcd-集群备份恢复方案"><a href="#Kubernetes-Etcd-集群备份恢复方案" class="headerlink" title="Kubernetes Etcd 集群备份恢复方案"></a>Kubernetes Etcd 集群备份恢复方案</h1><blockquote>
+<p>🌈 Etcd 可以说是 Kubernetes 整个架构体系中最为重要的服务，其中存储了 Kubernetes 集群所有的数据信息，如 Namespace、Pod、Service、路由等状态信息，且 Kubernetes 体系中最重要的 list-watch 机制也是依赖 Etcd 实现的。</p>
+</blockquote>
+<h2 id="一、Etcd-集群备份"><a href="#一、Etcd-集群备份" class="headerlink" title="一、Etcd 集群备份"></a>一、Etcd 集群备份</h2><blockquote>
+<p>🚩 etcd 的版本不同，etcdctl 的命令可能会不一样，但是大致来说还是差不多的，我们这里使用 <code>napshot save</code> 快照的方式进行备份。需要注意以下几点:</p>
+<ul>
+<li>备份操作在 etcd 集群中的任何一个节点执行就可以了</li>
+<li>从 1.13 版本开始，K8S 就改用 v3 版本的 API 了，v2 和 v3 存储的路径是不同的，所以我们在备份时使用 v3 版本的 API 进行操作</li>
+<li>本案例使用的是二进制包部署的 v1.15.5 + flannel 网络的 K8S 集群</li>
+<li>下面命令中的 <code>ETCDCTL_API=3 etcdctl</code> 等效于 <code>etcdctl</code>，通过变量的方式同时 etcd 使用 v3 版本 API</li>
+</ul>
+</blockquote>
+<h3 id="1、检查-etcd-的数据"><a href="#1、检查-etcd-的数据" class="headerlink" title="1、检查 etcd 的数据"></a>1、检查 etcd 的数据</h3><h4 id="1）etcd-数据目录结构"><a href="#1）etcd-数据目录结构" class="headerlink" title="1）etcd 数据目录结构"></a>1）etcd 数据目录结构</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 etcd]# tree /data/application/etcd/default.etcd/<br>/data/application/etcd/default.etcd/<br>└── member<br>    ├── snap<br>    │   ├── 000000000000105a-00000000104d523c.snap<br>    │   ├── 000000000000105a-00000000104ed8dd.snap<br>    │   ├── 000000000000105a-0000000010505f7e.snap<br>    │   ├── 000000000000105a-000000001051e61f.snap<br>    │   ├── 000000000000105a-0000000010536cc0.snap<br>    │   └── db<br>    └── wal<br>        ├── 00000000000014b8-000000001050108f.wal<br>        ├── 00000000000014b9-000000001050e282.wal<br>        ├── 00000000000014ba-000000001051ab65.wal<br>        ├── 00000000000014bb-0000000010528504.wal<br>        ├── 00000000000014bc-0000000010534f82.wal<br>        └── 0.tmp<br><br>3 directories, 12 files<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/data/application/etcd/</td>
+<td>etcd 集群程序目录（企业目录标准）</td>
+</tr>
+<tr>
+<td>default.etcd/</td>
+<td>etcd 默认数据目录</td>
+</tr>
+<tr>
+<td>default.etcd/member/snap</td>
+<td>etcd 默认状态快照存储目录，目的是为了避免 wal 文件过多</td>
+</tr>
+<tr>
+<td>default.etcd/member/wal</td>
+<td>etcd 默认 wal（write ahead log）日志存储目录，wal 相当于 etcd 的 redo log，是集群保持一致的关键</td>
+</tr>
+</tbody></table>
+<h3 id="2、进行-etcd-数据备份"><a href="#2、进行-etcd-数据备份" class="headerlink" title="2、进行 etcd 数据备份"></a>2、进行 etcd 数据备份</h3><h4 id="1）批量创建备份目录"><a href="#1）批量创建备份目录" class="headerlink" title="1）批量创建备份目录"></a>1）批量创建备份目录</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m file -a &quot;path=/data/backup/etcd state=directory owner=root group=root&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）执行备份操作"><a href="#2）执行备份操作" class="headerlink" title="2）执行备份操作"></a>2）执行备份操作</h4><blockquote>
+<p>🚩 在 Etcd 集群的其中一个节点上执行备份即可（这里在 t-master-01 上执行），然后再将备份文件拷贝到其他节点上。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl --cacert=/data/application/etcd/ssl/ca.pem --cert=/data/application/etcd/ssl/server.pem --key=/data/application/etcd/ssl/server-key.pem --endpoints=https://192.168.3.151:2379 snapshot save /data/backup/etcd/snapshot-`date +%Y%m%d`.db<br></code></pre></td></tr></table></figure>
+
+<p>正常备份返回如下:</p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211107210929929.png" srcset="/img/loading.gif" lazyload alt="image-20211107210929929"></p>
+<h4 id="3）将备份文件拷贝到其他-etcd-节点"><a href="#3）将备份文件拷贝到其他-etcd-节点" class="headerlink" title="3）将备份文件拷贝到其他 etcd 节点"></a>3）将备份文件拷贝到其他 etcd 节点</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m copy -a &quot;src=/data/backup/etcd/snapshot-20211030.db dest=/data/backup/etcd/ owner=root group=root&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、备份定时任务"><a href="#3、备份定时任务" class="headerlink" title="3、备份定时任务"></a>3、备份定时任务</h3><h4 id="1）定时脚本"><a href="#1）定时脚本" class="headerlink" title="1）定时脚本"></a>1）定时脚本</h4><p>编辑脚本 <code>/data/scripts/etcd_backup.sh</code>，脚本内容如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash">!/usr/bin/bash</span><br> <br>date;<br>CACERT=&quot;/data/application/etcd/ssl/ca.pem&quot;<br>CERT=&quot;/data/application/etcd/ssl/server.pem&quot;<br>EKY=&quot;/data/application/etcd/ssl/server-key.pem&quot;<br>ENDPOINTS=&quot;192.168.3.151:2379&quot;<br> <br>ETCDCTL_API=3 /data/application/etcd/bin/etcdctl \<br>--cacert=&quot;$&#123;CACERT&#125;&quot; --cert=&quot;$&#123;CERT&#125;&quot; --key=&quot;$&#123;EKY&#125;&quot; \<br>--endpoints=$&#123;ENDPOINTS&#125; \<br>snapshot save /data/backup/etcd/snapshot-`date +%Y%m%d`.db<br><span class="hljs-meta"> </span><br><span class="hljs-meta">#</span><span class="bash"> 备份保留30天</span><br>find /data/backup/etcd/ -name &quot;*.db&quot; -mtime +30 -exec rm -f &#123;&#125; \;<br><span class="hljs-meta"> </span><br><span class="hljs-meta">#</span><span class="bash"> 同步到其他两个etcd节点</span><br>/bin/rsync -e &quot;ssh -p36022&quot; -avpgolr --delete /data/backup/etcd/ root@t-master-02:/data/backup/etcd/ <br>/bin/rsync -e &quot;ssh -p36022&quot; -avpgolr --delete /data/backup/etcd/ root@t-master-03:/data/backup/etcd/ <br></code></pre></td></tr></table></figure>
+
+<p>赋予执行权限:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# chmod +x /data/scripts/etcd_backup.sh<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）设置-crontab"><a href="#2）设置-crontab" class="headerlink" title="2）设置 crontab"></a>2）设置 crontab</h4><p><code>crontab -e</code> 创建定时任务，内容如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash">etcd集群数据备份</span><br>0 5 * * * /bin/bash -x /data/scripts/etcd_backup.sh &gt; /dev/null 2&gt;&amp;1<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、Etcd-集群恢复"><a href="#二、Etcd-集群恢复" class="headerlink" title="二、Etcd 集群恢复"></a>二、Etcd 集群恢复</h2><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>虽然备份操作只需要在一个节点进行，然后将快照同步到另外2个节点上，但是<strong>恢复操作需要在所有节点执行！！！</strong></p>
+</blockquote>
+<h3 id="1、模拟-etcd-集群数据丢失"><a href="#1、模拟-etcd-集群数据丢失" class="headerlink" title="1、模拟 etcd 集群数据丢失"></a>1、模拟 etcd 集群数据丢失</h3><h4 id="1）模拟数据丢失"><a href="#1）模拟数据丢失" class="headerlink" title="1）模拟数据丢失"></a>1）模拟数据丢失</h4><p>删除三个etcd集群节点的data数据 (或者直接删除data目录)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# rm -rf /data/application/etcd/default.etcd/*<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）查看集群状态"><a href="#2）查看集群状态" class="headerlink" title="2）查看集群状态"></a>2）查看集群状态</h4><p>此时查看节点状态会发现 etcd 无法正常连接，返回如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get cs<br>NAME                 STATUS      MESSAGE                                                                                           ERROR<br>etcd-2               Unhealthy   Get https://192.168.3.153:2379/health: dial tcp 192.168.3.153:2379: connect: connection refused<br>etcd-1               Unhealthy   Get https://192.168.3.152:2379/health: dial tcp 192.168.3.152:2379: connect: connection refused<br>etcd-0               Unhealthy   Get https://192.168.3.151:2379/health: dial tcp 192.168.3.151:2379: connect: connection refused<br>scheduler            Healthy     ok<br>controller-manager   Healthy     ok<br></code></pre></td></tr></table></figure>
+
+<p>但是，由于此时 etcd 集群的三个节点服务还在，过一会儿查看集群状态有会恢复正常连接状态:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get cs<br>NAME                 STATUS    MESSAGE             ERROR<br>controller-manager   Healthy   ok<br>scheduler            Healthy   ok<br>etcd-0               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br>etcd-2               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br>etcd-1               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>查看集群健康状态:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl --cacert=/data/application/etcd/ssl/ca.pem --cert=/data/application/etcd/ssl/server.pem --key=/data/application/etcd/ssl/server-key.pem --endpoints=https://192.168.3.151:2379 endpoint health<br>https://192.168.3.151:2379 is healthy: successfully committed proposal: took = 9.918673ms<br>https://192.168.3.152:2379 is healthy: successfully committed proposal: took = 10.985279ms<br>https://192.168.3.153:2379 is healthy: successfully committed proposal: took = 13.422545ms<br></code></pre></td></tr></table></figure>
+
+<p>查看集群 raft 状态:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl --cacert=/data/application/etcd/ssl/ca.pem --cert=/data/application/etcd/ssl/server.pem --key=/data/application/etcd/ssl/server-key.pem --endpoints=https://192.168.3.151:2379 member list -w table<br>+------------------+---------+--------+----------------------------+----------------------------+------------+<br>|        ID        | STATUS  |  NAME  |         PEER ADDRS         |        CLIENT ADDRS        | IS LEARNER |<br>+------------------+---------+--------+----------------------------+----------------------------+------------+<br>| 1d1d7edbba38c293 | started | etcd-3 | https://192.168.3.153:2380 | https://192.168.3.153:2379 |      false |<br>| 4c0cfad24e92e45f | started | etcd-2 | https://192.168.3.152:2380 | https://192.168.3.152:2379 |      false |<br>| 79cf4f0a8c3da54b | started | etcd-1 | https://192.168.3.151:2380 | https://192.168.3.151:2379 |      false |<br>+------------------+---------+--------+----------------------------+----------------------------+------------+<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意:</strong> </p>
+<p>如上发现，etcd集群三个节点的 leader 都是 false，即没有选主。此时需要重启三个节点的 etcd 服务：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;sudo systemctl restart etcd.service&quot;<br></code></pre></td></tr></table></figure>
+
+<p>重启后，再次查看发现 etcd 集群已经选主成功，集群状态正常！</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl --cacert=/data/application/etcd/ssl/ca.pem --cert=/data/application/etcd/ssl/server.pem --key=/data/application/etcd/ssl/server-key.pem --endpoints=https://192.168.3.151:2379 member list -w table<br>+----------------------------+------------------+---------+---------+-----------+-----------+------------+<br>|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | RAFT TERM | RAFT INDEX |<br>+----------------------------+------------------+---------+---------+-----------+-----------+------------+<br>| https://192.168.3.151:2379 | 6e2f4afb3149d56b |  3.3.13 |  407 MB |     false |      4186 |  275059559 |<br>| https://192.168.3.152:2379 | 1702f36aa0f89329 |  3.3.13 |  407 MB |     false |      4186 |  275059559 |<br>| https://192.168.3.153:2379 | a70de29d7876ed2f |  3.3.13 |  407 MB |      true |      4186 |  275059560 |<br>+----------------------------+------------------+---------+---------+-----------+-----------+------------+<br></code></pre></td></tr></table></figure>
+</blockquote>
+<p>虽然我们通过上述常规 etcdctl 命令查看集群健康，但是，k8s集群数据其实已经丢失了。namespace 命名空间下的 pod 等资源都没有了。此时就需要通过 etcd 集群备份文件来恢复，即通过上面的 etcd 集群快照文件恢复。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get ns<br>NAME              STATUS   AGE<br>default           Active   9m47s<br>kube-node-lease   Active   9m39s<br>kube-public       Active   9m39s<br>kube-system       Active   9m47s<br><br>[root@T-KuberM-001 ~]# kubectl get pods -n kube-system<br>No resources found in kube-system namespace.<br><br>[root@T-KuberM-001 ~]# kubectl get pods --all-namespaces<br>No resources found<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、Etcd-集群数据恢复"><a href="#2、Etcd-集群数据恢复" class="headerlink" title="2、Etcd 集群数据恢复"></a>2、Etcd 集群数据恢复</h3><blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<p>在 etcd 数据恢复之前，先依次关闭所有 master 节点的 kube-aposerver 服务，所有 etcd 节点的 etcd 服务：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 批量关闭 apiserver 防止新数据产生</span><br>[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl stop kube-apiserver.service&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 批量关闭 etcd</span><br>[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl stop etcd.service&quot;<br></code></pre></td></tr></table></figure>
+
+<p><strong>特别注意：</strong>在进行etcd集群数据恢复之前，一定要先将所有etcd节点的 data 和 wal 旧工作目录删掉，否则可能会导致恢复失败（恢复命令执行时报错数据目录已存在）。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;rm -rf /data/application/etcd/default.etcd/*&quot;<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="1）在每个-etcd-节点执行恢复操作"><a href="#1）在每个-etcd-节点执行恢复操作" class="headerlink" title="1）在每个 etcd 节点执行恢复操作"></a>1）在每个 etcd 节点执行恢复操作</h4><h5 id="1-192-168-3-151-节点"><a href="#1-192-168-3-151-节点" class="headerlink" title="1. 192.168.3.151 节点"></a>1. 192.168.3.151 节点</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl \<br>--name=etcd-1 \<br>--endpoints=&quot;https://192.168.3.151:2379&quot; \<br>--cert=/data/application/etcd/ssl/server.pem \<br>--key=/data/application/etcd/ssl/server-key.pem \<br>--cacert=/data/application/etcd/ssl/ca.pem \<br>--initial-cluster-token=etcd-cluster-0 \<br>--initial-advertise-peer-urls=https://192.168.3.151:2380 \<br>--initial-cluster=etcd-1=https://192.168.3.151:2380,etcd-2=https://192.168.3.152:2380,etcd-3=https://192.168.3.153:2380 \<br>snapshot restore /data/backup/etcd/snapshot-20211030.db <br></code></pre></td></tr></table></figure>
+
+<h5 id="2-192-168-3-152-节点"><a href="#2-192-168-3-152-节点" class="headerlink" title="2. 192.168.3.152 节点"></a>2. 192.168.3.152 节点</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-002 ~]# ETCDCTL_API=3 etcdctl \<br>--name=etcd-2 \<br>--endpoints=&quot;https://192.168.3.152:2379&quot; \<br>--cert=/data/application/etcd/ssl/server.pem \<br>--key=/data/application/etcd/ssl/server-key.pem \<br>--cacert=/data/application/etcd/ssl/ca.pem \<br>--initial-cluster-token=etcd-cluster-0 \<br>--initial-advertise-peer-urls=https://192.168.3.152:2380 \<br>--initial-cluster=etcd-1=https://192.168.3.151:2380,etcd-2=https://192.168.3.152:2380,etcd-3=https://192.168.3.153:2380 \<br>snapshot restore /data/backup/etcd/snapshot-20211030.db <br></code></pre></td></tr></table></figure>
+
+<h5 id="3-192-168-3-153-节点"><a href="#3-192-168-3-153-节点" class="headerlink" title="3. 192.168.3.153 节点"></a>3. 192.168.3.153 节点</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-003 ~]# ETCDCTL_API=3 etcdctl \<br>--name=etcd-3 \<br>--endpoints=&quot;https://192.168.3.153:2379&quot; \<br>--cert=/data/application/etcd/ssl/server.pem \<br>--key=/data/application/etcd/ssl/server-key.pem \<br>--cacert=/data/application/etcd/ssl/ca.pem \<br>--initial-cluster-token=etcd-cluster-0 \<br>--initial-advertise-peer-urls=https://192.168.3.153:2380 \<br>--initial-cluster=etcd-1=https://192.168.3.151:2380,etcd-2=https://192.168.3.152:2380,etcd-3=https://192.168.3.153:2380 \<br>snapshot restore /data/backup/etcd/snapshot-20211030.db <br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）依次启动所有-etcd-节点"><a href="#2）依次启动所有-etcd-节点" class="headerlink" title="2）依次启动所有 etcd 节点"></a>2）依次启动所有 etcd 节点</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl restart etcd.service&quot;<br>[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl status etcd.service&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）查看集群状态"><a href="#3）查看集群状态" class="headerlink" title="3）查看集群状态"></a>3）查看集群状态</h4><p>刚刚启动，集群可能存在连接异常的状态，如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get cs<br>NAME                 STATUS      MESSAGE                                  ERROR<br>controller-manager   Healthy     ok<br>scheduler            Healthy     ok<br>etcd-2               Unhealthy   HTTP probe failed with statuscode: 503<br>etcd-1               Unhealthy   HTTP probe failed with statuscode: 503<br>etcd-0               Unhealthy   HTTP probe failed with statuscode: 503<br></code></pre></td></tr></table></figure>
+
+
+<p>由于 etcd 服务刚重启，需要多刷几次状态就会正常：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get cs<br>NAME                 STATUS    MESSAGE             ERROR<br>controller-manager   Healthy   ok<br>scheduler            Healthy   ok<br>etcd-2               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br>etcd-0               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br>etcd-1               Healthy   &#123;&quot;health&quot;:&quot;true&quot;&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）查看kubernetes的资源情况"><a href="#4）查看kubernetes的资源情况" class="headerlink" title="4）查看kubernetes的资源情况"></a>4）查看kubernetes的资源情况</h4><h5 id="1-查看-namespace-是否恢复"><a href="#1-查看-namespace-是否恢复" class="headerlink" title="1. 查看 namespace 是否恢复"></a>1. 查看 namespace 是否恢复</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get ns<br>NAME              STATUS   AGE<br>apisix            Active   65d<br>default           Active   676d<br>ingress-nginx     Active   384d<br>kube-node-lease   Active   83d<br>kube-public       Active   676d<br>kube-system       Active   676d<br>kuboard           Active   319d<br>testing-app       Active   626d<br>testing-golang    Active   90d<br>testing-java      Active   153d<br>testing-php       Active   39d<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-查看-Pods-是否恢复"><a href="#2-查看-Pods-是否恢复" class="headerlink" title="2. 查看 Pods 是否恢复"></a>2. 查看 Pods 是否恢复</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# kubectl get pods -n kube-system<br>NAME                                  READY   STATUS      RESTARTS   AGE<br>alertmanager-5d75d5688f-tqrkf         2/2     Running     0          4d13h<br>coredns-56b5c4c4c7-gvdmq              1/1     Running     0          5m2s<br>coredns-56b5c4c4c7-qcrfp              1/1     Running     0          5m7s<br>coredns-56b5c4c4c7-vrt6q              1/1     Running     0          5m1s<br>descheduler-1636295400-q5m69          0/1     Completed   0          65m<br>descheduler-1636297200-l8bn2          0/1     Completed   0          34m<br>descheduler-1636299000-h9rxh          0/1     Completed   0          5m11s<br>dingtalk-hook-6464865879-d55sr        1/1     Running     0          4d14h<br>grafana-0                             1/1     Running     0          40d<br>kube-flannel-ds-amd64-2d7zw           1/1     Running     4          40d<br>kube-flannel-ds-amd64-2px9j           1/1     Running     8          40d<br>kube-flannel-ds-amd64-6rhxp           1/1     Running     2          40d<br>kube-flannel-ds-amd64-7lnwh           1/1     Running     3          40d<br>kube-flannel-ds-amd64-88lwm           1/1     Running     2          44d<br>kube-flannel-ds-amd64-b995n           1/1     Running     0          38d<br>kube-flannel-ds-amd64-bqpr7           1/1     Running     3          40d<br>kube-flannel-ds-amd64-d2q9c           1/1     Running     2          40d<br>kube-flannel-ds-amd64-d9jtg           1/1     Running     3          40d<br>kube-flannel-ds-amd64-dsvhm           1/1     Running     4          40d<br>kube-flannel-ds-amd64-fmfsw           1/1     Running     2          40d<br>kube-flannel-ds-amd64-fr4zq           1/1     Running     3          40d<br>kube-flannel-ds-amd64-fzv6f           1/1     Running     2          39d<br>kube-flannel-ds-amd64-gl98z           1/1     Running     2          39d<br>kube-flannel-ds-amd64-hhbrg           1/1     Running     3          40d<br>kube-flannel-ds-amd64-ljzn5           1/1     Running     2          40d<br>kube-flannel-ds-amd64-mfwz9           1/1     Running     5          39d<br>kube-flannel-ds-amd64-pwm5j           1/1     Running     5          44d<br>kube-flannel-ds-amd64-qm92s           1/1     Running     6          40d<br>kube-flannel-ds-amd64-rnwpl           1/1     Running     2          40d<br>kube-flannel-ds-amd64-rxmfq           1/1     Running     4          40d<br>kube-state-metrics-849c85f76d-zspn9   1/1     Running     0          40d<br>kuboard-59dbdc9866-5w7mz              1/1     Running     0          4m55s<br>metrics-server-65dc7bf77-9zg6w        1/1     Running     0          4d14h<br>prometheus-0                          2/2     Running     0          3d13h<br>tiller-deploy-5bdd494589-76hgd        1/1     Running     0          5m3s<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>🚩 在 etcd 集群数据恢复后，pod 容器也会慢慢恢复到 running 状态。至此，kubernetes 整个集群已经通过 etcd 备份数据恢复了。</p>
+</blockquote>
+<h4 id="5）重启所有-master-节点的-apiserver"><a href="#5）重启所有-master-节点的-apiserver" class="headerlink" title="5）重启所有 master 节点的 apiserver"></a>5）重启所有 master 节点的 apiserver</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl restart kube-apiserver.service&quot;<br>[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m shell -a &quot;systemctl status kube-apiserver.service&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+
             </div>
             <hr>
             <div>
@@ -238,6 +383,8 @@
                     <i class="iconfont icon-category"></i>
                     
                       <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/etcd/">etcd</a>
                     
                   </div>
                 
@@ -261,6 +408,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/11/10/%E5%85%B3%E4%BA%8E-DevOps-%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于 DevOps 的一些思考</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

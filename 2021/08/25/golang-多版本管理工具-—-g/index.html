@@ -245,7 +245,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">unalias g<br></code></pre></td></tr></table></figure>
 </blockquote>
 <h3 id="2、手动安装-（可选）"><a href="#2、手动安装-（可选）" class="headerlink" title="2、手动安装 （可选）"></a>2、手动安装 （可选）</h3><h4 id="1）下载对应平台的二进制压缩包"><a href="#1）下载对应平台的二进制压缩包" class="headerlink" title="1）下载对应平台的二进制压缩包"></a>1）下载对应平台的二进制压缩包</h4><p><a target="_blank" rel="noopener" href="https://github.com/voidint/g/releases">下载地址</a></p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825160732431.png" srcset="/img/loading.gif" lazyload alt="image-20210825160732431"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825160732431.png" srcset="/img/loading.gif" lazyload alt="image-20210825160732431"></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 以当前最新版本为例</span><br>wget -c https://github.com/voidint/g/releases/download/v1.2.0/g1.2.0.linux-amd64.tar.gz<br></code></pre></td></tr></table></figure>
 
 
@@ -257,7 +257,7 @@
 
 <h4 id="3）验证"><a href="#3）验证" class="headerlink" title="3）验证"></a>3）验证</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">g -h<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825162431942.png" srcset="/img/loading.gif" lazyload alt="image-20210825162431942"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825162431942.png" srcset="/img/loading.gif" lazyload alt="image-20210825162431942"></p>
 <h3 id="3、配置环境变量"><a href="#3、配置环境变量" class="headerlink" title="3、配置环境变量"></a>3、配置环境变量</h3><h4 id="1）编辑环境变量配置文件"><a href="#1）编辑环境变量配置文件" class="headerlink" title="1）编辑环境变量配置文件"></a>1）编辑环境变量配置文件</h4><p>新建文件，文件路径: <code>/etc/profile.d/g.sh</code>，文件内容如下:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">export G_MIRROR=https://golang.google.cn/dl/<br>export G_HOME=~/.g<br>export GOROOT=$G_HOME/go<br>export PATH=$GOROOT/bin:$PATH<br></code></pre></td></tr></table></figure>
 
@@ -269,10 +269,10 @@
 </blockquote>
 <h2 id="三、使用"><a href="#三、使用" class="headerlink" title="三、使用"></a>三、使用</h2><h3 id="1、安装-go-版本"><a href="#1、安装-go-版本" class="headerlink" title="1、安装 go 版本"></a>1、安装 go 版本</h3><h4 id="1）查询当前稳定版本的-go"><a href="#1）查询当前稳定版本的-go" class="headerlink" title="1）查询当前稳定版本的 go"></a>1）查询当前稳定版本的 go</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">g ls-remote stable<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825162918755.png" srcset="/img/loading.gif" lazyload alt="image-20210825162918755"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825162918755.png" srcset="/img/loading.gif" lazyload alt="image-20210825162918755"></p>
 <h4 id="2）安装目标-go-版本-1-16-7"><a href="#2）安装目标-go-版本-1-16-7" class="headerlink" title="2）安装目标 go 版本 1.16.7"></a>2）安装目标 go 版本 <code>1.16.7</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">g install 1.16.7<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210825163148164.png" srcset="/img/loading.gif" lazyload alt="image-20210825163148164"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825163148164.png" srcset="/img/loading.gif" lazyload alt="image-20210825163148164"></p>
 <h4 id="3）验证-1"><a href="#3）验证-1" class="headerlink" title="3）验证"></a>3）验证</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">g ls<br></code></pre></td></tr></table></figure>
 
 <blockquote>

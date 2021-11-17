@@ -18,7 +18,7 @@
   <meta name="author" content="Tareya">
   <meta name="keywords" content="">
   
-  <title>乱序时空</title>
+  <title>第1章、通过 http 调用 k8s api - 乱序时空</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
 
@@ -163,7 +163,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="">
+            <span class="h2" id="subtitle" title="第1章、通过 http 调用 k8s api">
               
             </span>
 
@@ -225,7 +225,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">第1章、通过 http 调用 k8s api</h1>
             
             <div class="markdown-body">
               <h1 id="第1章、通过-http-调用-k8s-api"><a href="#第1章、通过-http-调用-k8s-api" class="headerlink" title="第1章、通过 http 调用 k8s api"></a>第1章、通过 http 调用 k8s api</h1><span id="more"></span>
@@ -286,16 +286,16 @@
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s  $APISERVER/version --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq -r &#x27;.gitVersion&#x27;<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830173521373.png" srcset="/img/loading.gif" lazyload alt="image-20210830173521373"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210830173521373.png" srcset="/img/loading.gif" lazyload alt="image-20210830173521373"></p>
 <h3 id="2、获取所有-pod-的名称-—-api-v1-namespaces-NAMESPACE-pods"><a href="#2、获取所有-pod-的名称-—-api-v1-namespaces-NAMESPACE-pods" class="headerlink" title="2、获取所有 pod 的名称 — /api/v1/namespaces/${NAMESPACE}/pods"></a>2、获取所有 pod 的名称 — <code>/api/v1/namespaces/$&#123;NAMESPACE&#125;/pods</code></h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s  $APISERVER/api/v1/namespaces/default/pods/ --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq &#x27;.items[].metadata.name&#x27;<br></code></pre></td></tr></table></figure>
 
 <p>正常的 json 返回，类似下图，但是由于当前集群的 default 命名空间下并没 pod 资源，所以实际返回值什么也没有。</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830181237353.png" srcset="/img/loading.gif" lazyload alt="image-20210830181237353"></p>
-<h3 id="3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错"><a href="#3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错" class="headerlink" title="3、问题记录: 调用 K8S API 返回 cannot list resource 报错"></a>3、问题记录: 调用 K8S API 返回 cannot list resource 报错</h3><h4 id="1）报错信息类似下图"><a href="#1）报错信息类似下图" class="headerlink" title="1）报错信息类似下图:"></a>1）报错信息类似下图:</h4><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830181304648.png" srcset="/img/loading.gif" lazyload alt="image-20210830181304648"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210830181237353.png" srcset="/img/loading.gif" lazyload alt="image-20210830181237353"></p>
+<h3 id="3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错"><a href="#3、问题记录-调用-K8S-API-返回-cannot-list-resource-报错" class="headerlink" title="3、问题记录: 调用 K8S API 返回 cannot list resource 报错"></a>3、问题记录: 调用 K8S API 返回 cannot list resource 报错</h3><h4 id="1）报错信息类似下图"><a href="#1）报错信息类似下图" class="headerlink" title="1）报错信息类似下图:"></a>1）报错信息类似下图:</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210830181304648.png" srcset="/img/loading.gif" lazyload alt="image-20210830181304648"></p>
 <h4 id="2）问题原因"><a href="#2）问题原因" class="headerlink" title="2）问题原因:"></a>2）问题原因:</h4><p>这是典型的RBAC权限控制后的结果，也就说我们的 <code>apiviewer</code> 并没有操作 kube-system 命名空间下资源的权限，因为 ServiceAccount 是根据 namespace 隔离的，虽然 <code>cluster-admin</code> 具有较高的权限，但是我们的 <code>apiviewer</code> 却只有 default 命名空间的操作权限。而不具备其他 namespace 的权限。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl describe rolebinding apiadmin<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210830175553457.png" srcset="/img/loading.gif" lazyload alt="image-20210830175553457"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210830175553457.png" srcset="/img/loading.gif" lazyload alt="image-20210830175553457"></p>
 <h4 id="3）解决方案"><a href="#3）解决方案" class="headerlink" title="3）解决方案:"></a>3）解决方案:</h4><p>既然我们知道了问题的原因，解决起来就比较简单了，如果我们要通过 API 操作 <code>kube-system</code> 命名空间下的资源，那么只要重新创建一个具有该命名空间操作权限的 ServiceAccount 就可以了。其他命名空间也是同理的，甚至在不同的命名空间下我们可以用同一个 ServiceAccount 的名称。</p>
 <p>我们在文章开头说过，在 K8S 中对 API 资源的权限划分主要可用通过 <code>Role</code> 或者 <code>ClusterRole</code> 来绑定 <code>ServiceAccount</code>。上面我们使用里系统默认的 ClusterRole 进行了 RBAC 授权，这里我们通过从新创建 Role-RoleBinding 的方式来解决这个问题。</p>
 <h5 id="1-创建-RBAC-授权规则"><a href="#1-创建-RBAC-授权规则" class="headerlink" title="1. 创建 RBAC 授权规则"></a>1. 创建 RBAC 授权规则</h5><p>具体的 yaml 声明文件如下</p>
@@ -310,28 +310,28 @@
 <h5 id="3-再次访问验证"><a href="#3-再次访问验证" class="headerlink" title="3. 再次访问验证"></a>3. 再次访问验证</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">curl -s $APISERVER/api/v1/namespaces/kube-system/pods/ --header &quot;Authorization: Bearer $TOKEN&quot; --cacert /tmp/ca.crt | jq -r &#x27;.items[].metadata.name&#x27;<br></code></pre></td></tr></table></figure>
 
 <p>可以发现正常返回了 kube-system 下的 pod 列表，如下图：</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831104138845.png" srcset="/img/loading.gif" lazyload alt="image-20210831104138845"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831104138845.png" srcset="/img/loading.gif" lazyload alt="image-20210831104138845"></p>
 <h2 id="四、拓展知识：RBAC-权限审计"><a href="#四、拓展知识：RBAC-权限审计" class="headerlink" title="四、拓展知识：RBAC 权限审计"></a>四、拓展知识：RBAC 权限审计</h2><blockquote>
 <p>🚩 </p>
 <p>我们在上文中反复强调了授权要按照最小化原则来做，因为权限越大，责任也越大，权限的泛滥，可能会对整个体统导致不可挽回的后果，比如说一个账号不小心泄露，如果该账号的权限较大，那么很可能该账号所能调配的资源都会受到威胁。因此，授权时安装最小化原则这很重要，当然同样重要的还有权限的审计。</p>
 <p>事实上，K8S 官方的 Kubectl 工具中已经为用户提供了这样的审计命令 —— <code>Kubectl Can-I</code>，可以通过帮助菜单大概了解其用法：</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831111150021.png" srcset="/img/loading.gif" lazyload alt="image-20210831111150021"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831111150021.png" srcset="/img/loading.gif" lazyload alt="image-20210831111150021"></p>
 </blockquote>
 <h3 id="1、基础使用"><a href="#1、基础使用" class="headerlink" title="1、基础使用"></a>1、基础使用</h3><h4 id="1）查看你是否拥有-get-pod-的权限"><a href="#1）查看你是否拥有-get-pod-的权限" class="headerlink" title="1）查看你是否拥有 get pod 的权限"></a>1）查看你是否拥有 get pod 的权限</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i get pods<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831113515080.png" srcset="/img/loading.gif" lazyload alt="image-20210831113515080"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831113515080.png" srcset="/img/loading.gif" lazyload alt="image-20210831113515080"></p>
 <h4 id="2）查看你是否拥有-cluster-admin-的权限"><a href="#2）查看你是否拥有-cluster-admin-的权限" class="headerlink" title="2）查看你是否拥有 cluster-admin 的权限"></a>2）查看你是否拥有 cluster-admin 的权限</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i &quot;*&quot; &quot;*&quot;<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831113615960.png" srcset="/img/loading.gif" lazyload alt="image-20210831113615960"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831113615960.png" srcset="/img/loading.gif" lazyload alt="image-20210831113615960"></p>
 <h4 id="3）列出你在某个-namesapce-中拥有的所有权限"><a href="#3）列出你在某个-namesapce-中拥有的所有权限" class="headerlink" title="3）列出你在某个 namesapce 中拥有的所有权限"></a>3）列出你在某个 namesapce 中拥有的所有权限</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i --list --namespace=kube-system<br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831113700788.png" srcset="/img/loading.gif" lazyload alt="image-20210831113700788"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831113700788.png" srcset="/img/loading.gif" lazyload alt="image-20210831113700788"></p>
 <h3 id="2、结合上面内容练习一下："><a href="#2、结合上面内容练习一下：" class="headerlink" title="2、结合上面内容练习一下："></a>2、结合上面内容练习一下：</h3><h4 id="1）default-下-的-apiviewer"><a href="#1）default-下-的-apiviewer" class="headerlink" title="1）default 下 的 apiviewer"></a>1）default 下 的 apiviewer</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i list pods --as=system:serviceaccount:default:apiviewer -n kube-system <br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831112734259.png" srcset="/img/loading.gif" lazyload alt="image-20210831112734259"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831112734259.png" srcset="/img/loading.gif" lazyload alt="image-20210831112734259"></p>
 <h4 id="2）kube-system-下的-apiadmin"><a href="#2）kube-system-下的-apiadmin" class="headerlink" title="2）kube-system 下的 apiadmin"></a>2）kube-system 下的 apiadmin</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl auth can-i list pods --as=system:serviceaccount:kube-system:apiadmin -n kube-system <br></code></pre></td></tr></table></figure>
 
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20210831112746463.png" srcset="/img/loading.gif" lazyload alt="image-20210831112746463"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831112746463.png" srcset="/img/loading.gif" lazyload alt="image-20210831112746463"></p>
 <h2 id="五、思考与练习"><a href="#五、思考与练习" class="headerlink" title="五、思考与练习"></a>五、思考与练习</h2><h3 id="如果我这边需要新建一个命名空间，并期望通过-HTTP-REST-API-对该命名空间的资源进行操作，你会了吗？"><a href="#如果我这边需要新建一个命名空间，并期望通过-HTTP-REST-API-对该命名空间的资源进行操作，你会了吗？" class="headerlink" title="如果我这边需要新建一个命名空间，并期望通过 HTTP REST API 对该命名空间的资源进行操作，你会了吗？"></a>如果我这边需要新建一个命名空间，并期望通过 HTTP REST API 对该命名空间的资源进行操作，你会了吗？</h3><h4 id="思路提示"><a href="#思路提示" class="headerlink" title="思路提示:"></a>思路提示:</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span><br><span class="hljs-attr">kind:</span> <span class="hljs-string">Namespace</span><br><span class="hljs-attr">metadata:</span><br>    <span class="hljs-attr">name:</span> <span class="hljs-string">xxx</span><br>    <span class="hljs-attr">labels:</span><br>        <span class="hljs-attr">name:</span> <span class="hljs-string">xxx</span><br><span class="hljs-meta">---</span><br><span class="hljs-comment"># ...</span><br></code></pre></td></tr></table></figure>
 
 

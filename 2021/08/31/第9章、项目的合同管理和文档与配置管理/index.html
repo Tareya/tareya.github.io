@@ -1,0 +1,1265 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="第9章、项目的合同管理和文档与配置管理">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>第9章、项目的合同管理和文档与配置管理 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第9章、项目的合同管理和文档与配置管理">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-08-31 09:46" pubdate>
+        2021年8月31日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      81
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第9章、项目的合同管理和文档与配置管理</h1>
+            
+            <div class="markdown-body">
+              <h1 id="第9章、项目的合同管理和文档与配置管理"><a href="#第9章、项目的合同管理和文档与配置管理" class="headerlink" title="第9章、项目的合同管理和文档与配置管理"></a>第9章、项目的合同管理和文档与配置管理</h1><span id="more"></span>
+
+<h2 id="一、合同管理"><a href="#一、合同管理" class="headerlink" title="一、合同管理"></a>一、合同管理</h2><h3 id="1、合同类型"><a href="#1、合同类型" class="headerlink" title="1、合同类型"></a>1、合同类型</h3><h4 id="1）按项目范围划分"><a href="#1）按项目范围划分" class="headerlink" title="1）按项目范围划分"></a>1）按项目范围划分</h4><h5 id="1-项目总承包合同"><a href="#1-项目总承包合同" class="headerlink" title="1. 项目总承包合同"></a>1. 项目总承包合同</h5><h6 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h6><p>买方（甲方）将项目的<strong>全过程作为整体</strong>发包给<strong>同一个卖方</strong>（乙方）的合同</p>
+<h6 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h6><p>重点在于只与一个卖方签订合同，可以签订一个总合同，也可以签订多个分合同</p>
+<h6 id="适用场景："><a href="#适用场景：" class="headerlink" title="适用场景："></a>适用场景：</h6><p>卖方经验丰富、技术实力雄厚且组织管理协调能力强</p>
+<h6 id="优势："><a href="#优势：" class="headerlink" title="优势："></a>优势：</h6><p>买方只需要与一个卖方沟通，容易管理和协调</p>
+<h5 id="2-项目单项承包合同"><a href="#2-项目单项承包合同" class="headerlink" title="2. 项目单项承包合同"></a>2. 项目单项承包合同</h5><h6 id="概念：-1"><a href="#概念：-1" class="headerlink" title="概念："></a>概念：</h6><p>买方（甲方）<strong>分别与不同的卖方</strong>（乙方）订立项目单项承包合同</p>
+<h6 id="特点：-1"><a href="#特点：-1" class="headerlink" title="特点："></a>特点：</h6><p>一个卖方只承包项目中的某一项或者几项内容</p>
+<h6 id="适用场景：-1"><a href="#适用场景：-1" class="headerlink" title="适用场景："></a>适用场景：</h6><p>买方的组织管理协调能力较强，有能力同时与多个卖方沟通</p>
+<h6 id="优势：-1"><a href="#优势：-1" class="headerlink" title="优势："></a>优势：</h6><ul>
+<li>有利于吸引更多的卖方参与投标，择优录用</li>
+<li>有利于卖方专注于自身经验丰富且技术实力雄厚的部分</li>
+</ul>
+<h5 id="3-项目分包合同"><a href="#3-项目分包合同" class="headerlink" title="3. 项目分包合同"></a>3. 项目分包合同</h5><h6 id="概念：-2"><a href="#概念：-2" class="headerlink" title="概念："></a>概念：</h6><p>经合同约定或买方认可，卖方将其承包项目的某一个或几个<strong>非项目主体结构</strong>的项目<strong>再发包</strong>给<strong>具有相应资质</strong>的分包方，以此与分包方订立的合同即项目分包合同</p>
+<h6 id="需同时满足的5个条件："><a href="#需同时满足的5个条件：" class="headerlink" title="需同时满足的5个条件："></a>需同时满足的5个条件：</h6><ul>
+<li>经过买方认可</li>
+<li>分包的部分不能是项目的主体</li>
+<li>只能分包部分项目，不能整体转包</li>
+<li>分包方必须具备相应的资质条件</li>
+<li>分包方不得再次分包</li>
+</ul>
+<h4 id="2）按项目付款方式划分"><a href="#2）按项目付款方式划分" class="headerlink" title="2）按项目付款方式划分"></a>2）按项目付款方式划分</h4><h5 id="1-总价合同（Fixed-Price-Contract）"><a href="#1-总价合同（Fixed-Price-Contract）" class="headerlink" title="1. 总价合同（Fixed-Price Contract）"></a>1. 总价合同（Fixed-Price Contract）</h5><h6 id="特点：-2"><a href="#特点：-2" class="headerlink" title="特点："></a>特点：</h6><ul>
+<li>为既定产品或服务的采购设定一个总价</li>
+<li>买方必须准确定义要采购的产品或服务</li>
+</ul>
+<h6 id="固定总价合同（FFP，Firm-Fixed-Price）："><a href="#固定总价合同（FFP，Firm-Fixed-Price）：" class="headerlink" title="固定总价合同（FFP，Firm Fixed Price）："></a>固定总价合同（FFP，Firm Fixed Price）：</h6><ul>
+<li>采购价格一开始就确定，且不允许改变（除非工作范围发生变更）</li>
+<li>因合同履行不好而增加的成本由卖方承担</li>
+</ul>
+<h6 id="总价加激励费用合同（FPIP，Fixed-Price-Incentive-Fee）："><a href="#总价加激励费用合同（FPIP，Fixed-Price-Incentive-Fee）：" class="headerlink" title="总价加激励费用合同（FPIP，Fixed Price Incentive Fee）："></a>总价加激励费用合同（FPIP，Fixed Price Incentive Fee）：</h6><ul>
+<li>为买方和卖方都提供了一定的灵活性，允许有一定的绩效偏差，并对实现既定目标给予财务奖励</li>
+<li>FPIF合同要设置一个价格上限，买方付款的总数不得超过合同价格上限</li>
+</ul>
+<h6 id="总价加经济价格调整合同（FP-EPA，Fixed-Price-with-Economic-Price-Adjustment）："><a href="#总价加经济价格调整合同（FP-EPA，Fixed-Price-with-Economic-Price-Adjustment）：" class="headerlink" title="总价加经济价格调整合同（FP-EPA，Fixed Price with Economic Price Adjustment）："></a>总价加经济价格调整合同（FP-EPA，Fixed Price with Economic Price Adjustment）：</h6><ul>
+<li>卖方履约的周期跨度很长</li>
+<li>允许根据实际环境条件发生变化，以事先确定的方式（财务指数）对合同价格进行最终调整</li>
+<li>可以保护买卖双方免受外界不可控情况的影响</li>
+</ul>
+<h6 id="订购单："><a href="#订购单：" class="headerlink" title="订购单："></a>订购单：</h6><ul>
+<li>适用于非大量采购的标准化产品</li>
+<li>通常不需要谈判</li>
+<li>又称之为单边合同</li>
+</ul>
+<h5 id="2-成本补偿合同（Cost-Reimbursable-Contract）"><a href="#2-成本补偿合同（Cost-Reimbursable-Contract）" class="headerlink" title="2. 成本补偿合同（Cost-Reimbursable Contract）"></a>2. 成本补偿合同（Cost-Reimbursable Contract）</h5><h6 id="特点：-3"><a href="#特点：-3" class="headerlink" title="特点："></a>特点：</h6><ul>
+<li><p>向卖方支付为完成工作而发生的全部合法的可报销成本，外加一笔费用作为卖方的利润</p>
+</li>
+<li><p>卖方将实际成本作为付款基础，成本实报实销，因此买方的成本风险很大</p>
+</li>
+</ul>
+<h6 id="成本加固定费用合同（CPFF，Cost-Plus-Fixed-Fee）："><a href="#成本加固定费用合同（CPFF，Cost-Plus-Fixed-Fee）：" class="headerlink" title="成本加固定费用合同（CPFF，Cost Plus Fixed Fee）："></a>成本加固定费用合同（CPFF，Cost Plus Fixed Fee）：</h6><ul>
+<li><p>对卖方履行合同而发生的成本实报实销，并支付一笔固定费用作为利润</p>
+</li>
+<li><p>该固定费用由项目初步估算成本的某一百分比计算</p>
+</li>
+<li><p>只能针对已完成的工作来支付</p>
+</li>
+</ul>
+<h6 id="成本加激励费用合同（CPIF，Cost-Plus-Incentive-Fee）："><a href="#成本加激励费用合同（CPIF，Cost-Plus-Incentive-Fee）：" class="headerlink" title="成本加激励费用合同（CPIF，Cost Plus Incentive Fee）："></a>成本加激励费用合同（CPIF，Cost Plus Incentive Fee）：</h6><ul>
+<li>对卖方履行合同而发生的成本实报实销，并在达到合同规定绩效目标时，向卖方支付预先确定的激励费用</li>
+<li>实际成本大于目标成本时，可得报酬为 “目标成本 + 目标费用 + 买方应负担的成本支出”</li>
+<li>实际成本小于目标成本时，可得报酬为 “目标成本 + 目标费用 - 买方应享受的成本节约”</li>
+</ul>
+<h6 id="成本加奖励费用合同（CPAF，Cost-Price-Award-Fee）："><a href="#成本加奖励费用合同（CPAF，Cost-Price-Award-Fee）：" class="headerlink" title="成本加奖励费用合同（CPAF，Cost Price Award Fee）："></a>成本加奖励费用合同（CPAF，Cost Price Award Fee）：</h6><ul>
+<li>对卖方履行合同而发生的成本实报实销，买方再凭对卖方绩效主观判断给卖方支付一笔利润，通常卖方无权申述</li>
+</ul>
+<h5 id="3-工料合同（T-amp-M，Time-and-Material）"><a href="#3-工料合同（T-amp-M，Time-and-Material）" class="headerlink" title="3. 工料合同（T&amp;M，Time and Material）"></a>3. 工料合同（T&amp;M，Time and Material）</h5><h6 id="特点：-4"><a href="#特点：-4" class="headerlink" title="特点："></a>特点：</h6><ul>
+<li>按事先确定的单位工时费用标准和单位材料费用标准进行付款</li>
+<li>适用于工作性质清楚，工作范围比较明确，但具体的工作量无法确定的项目</li>
+<li>买方承担中等程度的成本风险（工作量变动的风险）</li>
+<li>卖方承担单价风险</li>
+<li>适合金额小、工期短、不复杂的项目</li>
+<li>兼具成本补偿合同和总价合同的某些特点的混合型合同</li>
+</ul>
+<h4 id="3）合同类型的选择"><a href="#3）合同类型的选择" class="headerlink" title="3）合同类型的选择"></a>3）合同类型的选择</h4><table>
+<thead>
+<tr>
+<th>合同类型</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>总价合同</td>
+<td>工作范围明确，项目设计具备详细的细节；卖方承担风险</td>
+</tr>
+<tr>
+<td>工料合同</td>
+<td>工作性质清楚，范围不清楚，工作不复杂，需快速签订合同；双方都承担风险</td>
+</tr>
+<tr>
+<td>成本补偿合同</td>
+<td>工作范围不清楚；买方承担风险</td>
+</tr>
+<tr>
+<td>单边合同（订购单）</td>
+<td>购买标准产品，且数量不大</td>
+</tr>
+</tbody></table>
+<h3 id="2、合同形式"><a href="#2、合同形式" class="headerlink" title="2、合同形式"></a>2、合同形式</h3><h4 id="1）最新的法规"><a href="#1）最新的法规" class="headerlink" title="1）最新的法规"></a>1）最新的法规</h4><p>2021年1月起，颁布《中华人民共和国民法典》，原来的《合同法》合并其中，并规范了部分解释</p>
+<h5 id="《民法典》对合同形式的解释"><a href="#《民法典》对合同形式的解释" class="headerlink" title="《民法典》对合同形式的解释"></a>《民法典》对合同形式的解释</h5><blockquote>
+<p>**第四百六十九条: **</p>
+<p>当事人订立合同，可以采用书面形式、口头形式或者其他形式。</p>
+<p>书面形式是合同书、信件、电报、电传、传真等可以有形地表现所载内容的形式。</p>
+<p>以电子数据交换、电子邮件等方式能够有形地表现所载内容，并可以随时调取茶用的数据电文，视为书面形式。</p>
+</blockquote>
+<h4 id="2）书面形式"><a href="#2）书面形式" class="headerlink" title="2）书面形式"></a>2）书面形式</h4><h5 id="概念：-3"><a href="#概念：-3" class="headerlink" title="概念："></a>概念：</h5><p>指以文字写成书面文件的方式达成的协议</p>
+<h5 id="特点：-5"><a href="#特点：-5" class="headerlink" title="特点："></a>特点：</h5><ul>
+<li>形式明确肯定，有据可查</li>
+<li>对于防止纠纷和解决争议具有重要作用</li>
+</ul>
+<h4 id="3）口头形式"><a href="#3）口头形式" class="headerlink" title="3）口头形式"></a>3）口头形式</h4><h5 id="概念：-4"><a href="#概念：-4" class="headerlink" title="概念："></a>概念：</h5><p>指当事人面对面地谈话或者以电话交谈等方式达成的协议</p>
+<h5 id="特点：-6"><a href="#特点：-6" class="headerlink" title="特点："></a>特点：</h5><ul>
+<li>直接、简便、快速</li>
+<li>数额较小或者现款交易通常采用口头形式</li>
+<li>是老百姓日常生活中广泛采用的合同形式</li>
+</ul>
+<h5 id="缺陷："><a href="#缺陷：" class="headerlink" title="缺陷："></a>缺陷：</h5><ul>
+<li>发生纠纷举证困难</li>
+</ul>
+<h4 id="4）其他形式"><a href="#4）其他形式" class="headerlink" title="4）其他形式"></a>4）其他形式</h4><h5 id="概念：-5"><a href="#概念：-5" class="headerlink" title="概念："></a>概念：</h5><p>指根据当事人的行为或者特定情形<strong>推定成立</strong>的合同，也称为<strong>默示合同</strong></p>
+<h5 id="特点：-7"><a href="#特点：-7" class="headerlink" title="特点："></a>特点：</h5><p>当事人未用语言明确表示成立，而是根据当事人的行为推定成立</p>
+<h5 id="样例："><a href="#样例：" class="headerlink" title="样例："></a>样例：</h5><p>如房屋租赁合同，租赁期满后，出租人为提出让承租人退房，承租人也未表示退房而继续交租金，出租人仍接受租金，尽管当事人之间没有重新签订合同，但是依行为推定，合同仍有效，继续履行</p>
+<h3 id="2、合同签订之前的程序"><a href="#2、合同签订之前的程序" class="headerlink" title="2、合同签订之前的程序"></a>2、合同签订之前的程序</h3><h4 id="1）要约"><a href="#1）要约" class="headerlink" title="1）要约"></a>1）要约</h4><h5 id="概念：-6"><a href="#概念：-6" class="headerlink" title="概念："></a>概念：</h5><p>希望与他人订立合同（投标文件）</p>
+<h5 id="特点"><a href="#特点" class="headerlink" title="特点:"></a>特点:</h5><ul>
+<li>内容具体确定，如价格、规格、型号、数量</li>
+<li>经受要约人承诺，一旦接受就必须去做</li>
+</ul>
+<h4 id="2）要约邀请"><a href="#2）要约邀请" class="headerlink" title="2）要约邀请"></a>2）要约邀请</h4><h5 id="概念：-7"><a href="#概念：-7" class="headerlink" title="概念："></a>概念：</h5><p>希望他人向自己发出要约（招标文件）</p>
+<h5 id="特点：-8"><a href="#特点：-8" class="headerlink" title="特点："></a>特点：</h5><p>要约邀请不会确定具体的价格</p>
+<h5 id="样例：-1"><a href="#样例：-1" class="headerlink" title="样例："></a>样例：</h5><p>拍卖公告、招标公告、招股说明书、债券募集办法、基金招募说明书、商业广告和宣传、寄送的价目表等</p>
+<h5 id="例外："><a href="#例外：" class="headerlink" title="例外："></a>例外：</h5><p>商业广告和宣传内容符合要约条件，即视为要约</p>
+<h4 id="3）承诺"><a href="#3）承诺" class="headerlink" title="3）承诺"></a>3）承诺</h4><h5 id="概念：-8"><a href="#概念：-8" class="headerlink" title="概念："></a>概念：</h5><p>受要约人同意要约</p>
+<h5 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h5><p><strong>承诺当以通知的方式作出</strong>，但是根据交易习惯或要约表明可以通过行为作出承诺的情况除外</p>
+<h4 id="4）《民法典》解释："><a href="#4）《民法典》解释：" class="headerlink" title="4）《民法典》解释："></a>4）《民法典》解释：</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831130036062.png" srcset="/img/loading.gif" lazyload alt="image-20210831130036062"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831130217704.png" srcset="/img/loading.gif" lazyload alt="image-20210831130217704"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831130241412.png" srcset="/img/loading.gif" lazyload alt="image-20210831130241412"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831130419210.png" srcset="/img/loading.gif" lazyload alt="image-20210831130419210"></p>
+<h3 id="3、关于合同内容约定不明确的规定"><a href="#3、关于合同内容约定不明确的规定" class="headerlink" title="3、关于合同内容约定不明确的规定"></a>3、关于合同内容约定不明确的规定</h3><h4 id="1）《民法典》解释"><a href="#1）《民法典》解释" class="headerlink" title="1）《民法典》解释"></a>1）《民法典》解释</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831131953380.png" srcset="/img/loading.gif" lazyload alt="image-20210831131953380"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831132031790.png" srcset="/img/loading.gif" lazyload alt="image-20210831132031790"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831132139924.png" srcset="/img/loading.gif" lazyload alt="image-20210831132139924"></p>
+<h4 id="2）总结"><a href="#2）总结" class="headerlink" title="2）总结"></a>2）总结</h4><h5 id="1-质量不明确"><a href="#1-质量不明确" class="headerlink" title="1. 质量不明确"></a>1. 质量不明确</h5><ul>
+<li>依照国家标准</li>
+<li>依照行业标准（如没有国家标准）</li>
+<li>依照合同目的（如没有行业标准）</li>
+</ul>
+<h5 id="2-价款（报酬）不明确"><a href="#2-价款（报酬）不明确" class="headerlink" title="2. 价款（报酬）不明确"></a>2. 价款（报酬）不明确</h5><ul>
+<li>依照订立合同时履行地的市场价</li>
+</ul>
+<h5 id="3-地点不明确"><a href="#3-地点不明确" class="headerlink" title="3. 地点不明确"></a>3. 地点不明确</h5><ul>
+<li>钱：在接受方所载地履行</li>
+<li>不动产：在不动产所在地履行</li>
+<li>其他：在履行义务方所在地履行</li>
+</ul>
+<h5 id="4-期限不明确"><a href="#4-期限不明确" class="headerlink" title="4. 期限不明确"></a>4. 期限不明确</h5><ul>
+<li>债务人随时可履行，但需给准备时间</li>
+<li>债权人随时可请求履行</li>
+</ul>
+<h5 id="5-方式不明确"><a href="#5-方式不明确" class="headerlink" title="5. 方式不明确"></a>5. 方式不明确</h5><ul>
+<li>按有利于合同目的的方式</li>
+</ul>
+<h5 id="6-费用不明确"><a href="#6-费用不明确" class="headerlink" title="6. 费用不明确"></a>6. 费用不明确</h5><ul>
+<li>由履行义务方承担</li>
+<li>因债权人原因增加的费用由债权人承担</li>
+</ul>
+<h3 id="4、什么是政府指导价？"><a href="#4、什么是政府指导价？" class="headerlink" title="4、什么是政府指导价？"></a>4、什么是政府指导价？</h3><h4 id="1）《民法典》解释-1"><a href="#1）《民法典》解释-1" class="headerlink" title="1）《民法典》解释"></a>1）《民法典》解释</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831133930987.png" srcset="/img/loading.gif" lazyload alt="image-20210831133930987"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831163629953.png" srcset="/img/loading.gif" lazyload alt="image-20210831163629953"></p>
+<h4 id="2）逾期交付"><a href="#2）逾期交付" class="headerlink" title="2）逾期交付"></a>2）逾期交付</h4><ul>
+<li><p>乙方违约，乙方承担损失</p>
+</li>
+<li><p>价格上涨，按原价执行</p>
+</li>
+<li><p>价格下降，按新价执行</p>
+</li>
+</ul>
+<h4 id="3）逾期提取"><a href="#3）逾期提取" class="headerlink" title="3）逾期提取"></a>3）逾期提取</h4><ul>
+<li><p>甲方违约，甲方承担损失</p>
+</li>
+<li><p>价格上涨，按新价执行</p>
+</li>
+<li><p>价格下降，按原价执行</p>
+</li>
+</ul>
+<h4 id="4）总结"><a href="#4）总结" class="headerlink" title="4）总结"></a>4）总结</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831163544129.png" srcset="/img/loading.gif" lazyload alt="image-20210831163544129"></p>
+<h3 id="5、定金和订金的区别"><a href="#5、定金和订金的区别" class="headerlink" title="5、定金和订金的区别"></a>5、定金和订金的区别</h3><h4 id="1）《民法典》解释-2"><a href="#1）《民法典》解释-2" class="headerlink" title="1）《民法典》解释"></a>1）《民法典》解释</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831164123183.png" srcset="/img/loading.gif" lazyload alt="image-20210831164123183"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831164211942.png" srcset="/img/loading.gif" lazyload alt="image-20210831164211942"></p>
+<h4 id="2）订金"><a href="#2）订金" class="headerlink" title="2）订金"></a>2）订金</h4><h5 id="概念：-9"><a href="#概念：-9" class="headerlink" title="概念："></a>概念：</h5><p>订金是作为货款的一部分，没有法律效益，发生违约情况时，不受法律保护</p>
+<h4 id="3）定金"><a href="#3）定金" class="headerlink" title="3）定金"></a>3）定金</h4><h5 id="概念：-10"><a href="#概念：-10" class="headerlink" title="概念："></a>概念：</h5><ul>
+<li>定金是法律术语，受法律保护</li>
+<li>定金不得超过交易总额的20%，超过部分不受法律保护</li>
+</ul>
+<h5 id="定金的收回："><a href="#定金的收回：" class="headerlink" title="定金的收回："></a>定金的收回：</h5><ul>
+<li><p>付定金方违约，无权请求返还定金</p>
+</li>
+<li><p>收定金方违约，需双倍返还定金</p>
+</li>
+<li><p><strong>即有违约金又有定金条例时，只能选其一，故哪一项可以收回最大利益选哪一项</strong></p>
+</li>
+</ul>
+<h3 id="6、建设工程合同、委托合同"><a href="#6、建设工程合同、委托合同" class="headerlink" title="6、建设工程合同、委托合同"></a>6、建设工程合同、委托合同</h3><h4 id="1）-建设工程合同"><a href="#1）-建设工程合同" class="headerlink" title="1） 建设工程合同"></a>1） 建设工程合同</h4><h5 id="概念：-11"><a href="#概念：-11" class="headerlink" title="概念："></a>概念：</h5><p>建设工程合同包括勘查、设计、施工合同</p>
+<h5 id="赔偿："><a href="#赔偿：" class="headerlink" title="赔偿："></a>赔偿：</h5><ul>
+<li>谁的原因，谁赔偿</li>
+</ul>
+<h5 id="《民法典》解释："><a href="#《民法典》解释：" class="headerlink" title="《民法典》解释："></a>《民法典》解释：</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165208645.png" srcset="/img/loading.gif" lazyload alt="image-20210831165208645"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165256923.png" srcset="/img/loading.gif" lazyload alt="image-20210831165256923"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165433283.png" srcset="/img/loading.gif" lazyload alt="image-20210831165433283"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165851986.png" srcset="/img/loading.gif" lazyload alt="image-20210831165851986"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165928005.png" srcset="/img/loading.gif" lazyload alt="image-20210831165928005"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831165955890.png" srcset="/img/loading.gif" lazyload alt="image-20210831165955890"></p>
+<h4 id="2）委托合同"><a href="#2）委托合同" class="headerlink" title="2）委托合同"></a>2）委托合同</h4><h5 id="概念：-12"><a href="#概念：-12" class="headerlink" title="概念："></a>概念：</h5><p>委托合同包括监理、咨询合同，也需要以书面形式订立</p>
+<h5 id="特点：-9"><a href="#特点：-9" class="headerlink" title="特点："></a>特点：</h5><ul>
+<li><p>可以授权处理一件或者多件（全部）事务</p>
+</li>
+<li><p>委托费用需要预付</p>
+</li>
+<li><p>受托人需亲自处理 </p>
+</li>
+</ul>
+<h5 id="《民法典》解释：-1"><a href="#《民法典》解释：-1" class="headerlink" title="《民法典》解释："></a>《民法典》解释：</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831170049854.png" srcset="/img/loading.gif" lazyload alt="image-20210831170049854"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831170531648.png" srcset="/img/loading.gif" lazyload alt="image-20210831170531648"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831170619906.png" srcset="/img/loading.gif" lazyload alt="image-20210831170619906"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831170637696.png" srcset="/img/loading.gif" lazyload alt="image-20210831170637696"></p>
+<h4 id="3）总结"><a href="#3）总结" class="headerlink" title="3）总结"></a>3）总结</h4><ul>
+<li><p>直接负责任的，是建设工程合同</p>
+</li>
+<li><p>间接负责任的，是委托合同</p>
+</li>
+<li><p>出现问题赔付不得超过合同本身价值</p>
+</li>
+</ul>
+<h3 id="7、无因管理和不当得利"><a href="#7、无因管理和不当得利" class="headerlink" title="7、无因管理和不当得利"></a>7、无因管理和不当得利</h3><h4 id="1）无因管理"><a href="#1）无因管理" class="headerlink" title="1）无因管理"></a>1）无因管理</h4><h5 id="概念：-13"><a href="#概念：-13" class="headerlink" title="概念："></a>概念：</h5><ul>
+<li>管理人没有法定的或者约定的义务，为避免他人利益受损而管理他人事务的，可以请求受益人偿还因管理事务而支出的必要费用</li>
+<li>管理人因管理事务而受到的损失，可以请求受益人给予适当补偿</li>
+<li>做好事的，是好人</li>
+</ul>
+<h5 id="构成条件："><a href="#构成条件：" class="headerlink" title="构成条件："></a>构成条件：</h5><ul>
+<li>没有法定或约定的义务</li>
+<li>主观上：有为他人谋利的意思</li>
+<li>客观上：为他人管理事务</li>
+<li><strong>必须针对特定的人</strong></li>
+</ul>
+<h5 id="《民法典》解释：-2"><a href="#《民法典》解释：-2" class="headerlink" title="《民法典》解释："></a>《民法典》解释：</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831171612995.png" srcset="/img/loading.gif" lazyload alt="image-20210831171612995"></p>
+<h4 id="2）不当得利"><a href="#2）不当得利" class="headerlink" title="2）不当得利"></a>2）不当得利</h4><h5 id="概念：-14"><a href="#概念：-14" class="headerlink" title="概念："></a>概念：</h5><ul>
+<li>得利人没有法律根据，取得不当利益的，收损失的人可以请求得利者返还取得的利益</li>
+<li>如不归还，是坏人</li>
+</ul>
+<h5 id="特点：-10"><a href="#特点：-10" class="headerlink" title="特点："></a>特点：</h5><ul>
+<li>不知者，不承担责任</li>
+<li>知法犯法，必须偿还</li>
+<li>利益转嫁，可以要求转嫁方偿还</li>
+</ul>
+<h5 id="《民法典》解释：-3"><a href="#《民法典》解释：-3" class="headerlink" title="《民法典》解释："></a>《民法典》解释：</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831171902327.png" srcset="/img/loading.gif" lazyload alt="image-20210831171902327"></p>
+<h3 id="8、合同管理"><a href="#8、合同管理" class="headerlink" title="8、合同管理"></a>8、合同管理</h3><h4 id="1）合同签订管理"><a href="#1）合同签订管理" class="headerlink" title="1）合同签订管理"></a>1）合同签订管理</h4><ul>
+<li>应当做好市场调查</li>
+<li>应当进行潜在合作伙伴或竞争对手的资信调查</li>
+<li>了解相关环境，做出正确的风险分析判断</li>
+<li>必须重视签订合同之前的谈判工作</li>
+</ul>
+<h4 id="2）合同履行管理"><a href="#2）合同履行管理" class="headerlink" title="2）合同履行管理"></a>2）合同履行管理</h4><ul>
+<li><p>对合同的履行情况进行跟踪管理</p>
+</li>
+<li><p>按合同规定应尽义务和职责进行检查合同的履行情况</p>
+</li>
+<li><p>及时、合理解决包括合同争议、合同违约和合同索赔等问题</p>
+</li>
+</ul>
+<h4 id="3）合同变更管理"><a href="#3）合同变更管理" class="headerlink" title="3）合同变更管理"></a>3）合同变更管理</h4><h5 id="1-特征"><a href="#1-特征" class="headerlink" title="1. 特征"></a>1. 特征</h5><ul>
+<li>合同双方当事人必须协商一致</li>
+<li>改变合同内容将产生新的债权和债务关系</li>
+</ul>
+<h5 id="2-条件"><a href="#2-条件" class="headerlink" title="2. 条件"></a>2. 条件</h5><ul>
+<li>双方协商，且不能损害国家和社会的利益</li>
+<li>不可抗力导致合同义务不能执行</li>
+<li>约定期限内没有履行合同，并在被允许的推迟期限内仍未履行</li>
+</ul>
+<h4 id="4）合同档案管理"><a href="#4）合同档案管理" class="headerlink" title="4）合同档案管理"></a>4）合同档案管理</h4><ul>
+<li>又称文本管理，是整个合同管理的基础</li>
+<li>包括正本和副本管理、合同文件格式等内容</li>
+<li>一般要求采用打印文本，手写的旁注和修改不具有法律效力，以此限制合同被随意修改</li>
+</ul>
+<h4 id="5）合同索赔管理"><a href="#5）合同索赔管理" class="headerlink" title="5）合同索赔管理"></a>5）合同索赔管理</h4><h5 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h5><h6 id="概念：-15"><a href="#概念：-15" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>索赔是在工程承包合同履行中，当事人由于另一方未履行合同所规定的义务而遭受损失时，向另一方提出赔偿要求的行为</li>
+<li>合同索赔是工程建设项目中常见的内容，是规范合同行为的一种约束力和保障措施</li>
+<li>一般情况下，索赔可以通过协商方式解决，如果无法妥协，可以要求仲裁</li>
+<li>索赔必须以合同为依据，遵循公平公正的原则</li>
+</ul>
+<h6 id="性质："><a href="#性质：" class="headerlink" title="性质："></a>性质：</h6><p>索赔属于经济补偿行为，不是惩罚行为</p>
+<h6 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h6><ul>
+<li>索赔先由监理工程师调节，调解失败再由政府主管部门调解，调解失败再由仲裁委员会调解、仲裁</li>
+<li>解决的优先顺序：谈判（协商）、调解、仲裁、诉讼</li>
+</ul>
+<h5 id="2-分类"><a href="#2-分类" class="headerlink" title="2. 分类"></a>2. 分类</h5><h6 id="按索赔目的分类："><a href="#按索赔目的分类：" class="headerlink" title="按索赔目的分类："></a>按索赔目的分类：</h6><ul>
+<li>工期索赔<ul>
+<li>要求买方延长项目工期</li>
+</ul>
+</li>
+<li>费用索赔<ul>
+<li>要求买方（或卖方）补偿费用损失</li>
+</ul>
+</li>
+</ul>
+<h6 id="按索赔依据分类："><a href="#按索赔依据分类：" class="headerlink" title="按索赔依据分类："></a>按索赔依据分类：</h6><ul>
+<li>合同规定的索赔<ul>
+<li>在合同文件中能否找到依据（不容易发生争议）</li>
+</ul>
+</li>
+<li>非合同规定的索赔<ul>
+<li>在合同文件内没有专门的文字叙述，但可以推论出索赔权</li>
+</ul>
+</li>
+</ul>
+<h6 id="按索赔的业务性质分类："><a href="#按索赔的业务性质分类：" class="headerlink" title="按索赔的业务性质分类："></a>按索赔的业务性质分类：</h6><ul>
+<li>工程索赔<ul>
+<li>项目执行过程中，施工条件、技术、范围变化引发索赔（发生频率高，索赔费用大）</li>
+</ul>
+</li>
+<li>商务索赔<ul>
+<li>项目执行过程中，设备采购、运输、保管等方面引发索赔</li>
+</ul>
+</li>
+</ul>
+<h6 id="按索赔的处理方式分类："><a href="#按索赔的处理方式分类：" class="headerlink" title="按索赔的处理方式分类："></a>按索赔的处理方式分类：</h6><ul>
+<li>单项索赔（一事一索赔）</li>
+<li>总索赔（综合一起索赔）</li>
+</ul>
+<h6 id="按索赔方分类"><a href="#按索赔方分类" class="headerlink" title="按索赔方分类:"></a>按索赔方分类:</h6><ul>
+<li><p>合同索赔（卖方向买方）</p>
+</li>
+<li><p>合同反索赔（买方向卖方）</p>
+</li>
+</ul>
+<h5 id="3-原则"><a href="#3-原则" class="headerlink" title="3. 原则"></a>3. 原则</h5><ul>
+<li>必须以合同为依据</li>
+<li>必须注意资料的积累</li>
+<li>及时、合理的处理索赔</li>
+<li>加强索赔的前瞻性</li>
+</ul>
+<h5 id="4-起因"><a href="#4-起因" class="headerlink" title="4. 起因"></a>4. 起因</h5><ul>
+<li>造成了项目成本额外支出或直接工期损失</li>
+<li>按合同约定，部署于索赔方应承担的责任</li>
+</ul>
+<h5 id="5-特殊原则"><a href="#5-特殊原则" class="headerlink" title="5. 特殊原则"></a>5. 特殊原则</h5><ul>
+<li>特殊反常天气达到合同中约定的程度，卖方可以得到延长工期，但得不到费用补偿</li>
+<li>买方原因导致的拖延工期，卖方应得到延长工期，还应得到费用补偿</li>
+</ul>
+<h5 id="5-流程"><a href="#5-流程" class="headerlink" title="5. 流程"></a>5. 流程</h5><h6 id="原则："><a href="#原则：" class="headerlink" title="原则："></a>原则：</h6><ul>
+<li>先要由监理工程师调解</li>
+<li>整个索赔工程中，遵循索赔的有理性、索赔依据的有效性、索赔计算的正确性</li>
+</ul>
+<h6 id="具体流程："><a href="#具体流程：" class="headerlink" title="具体流程："></a>具体流程：</h6><ul>
+<li>提出索赔要求，以书面形式发出索赔通知书</li>
+<li>报送索赔材料，提出索赔要求28天内须向监理方正式提出索赔意向通知书</li>
+<li>监理工程师答复</li>
+<li>监理工程师逾期答复后果，提交材料后28天未予以答复，则视为认可索赔</li>
+<li>持续索赔</li>
+<li>仲裁与诉讼</li>
+</ul>
+<h5 id="6-合同解释的原则（了解）"><a href="#6-合同解释的原则（了解）" class="headerlink" title="6. 合同解释的原则（了解）"></a>6. 合同解释的原则（了解）</h5><p>在处理索赔的过程中，需要以合同为依据，但如果合同中规定的比较含糊不清时，在需要使用一般的合同解释原则进行解释</p>
+<ul>
+<li>主导语言原则</li>
+<li>适用法律原则</li>
+<li>整体解释原则</li>
+<li>公平诚信原则</li>
+</ul>
+<h2 id="二、信息系统文档与配置管理"><a href="#二、信息系统文档与配置管理" class="headerlink" title="二、信息系统文档与配置管理"></a>二、信息系统文档与配置管理</h2><h3 id="1、文档管理"><a href="#1、文档管理" class="headerlink" title="1、文档管理"></a>1、文档管理</h3><h4 id="1）文档及其管理的概念"><a href="#1）文档及其管理的概念" class="headerlink" title="1）文档及其管理的概念"></a>1）文档及其管理的概念</h4><h5 id="1-文档的概念："><a href="#1-文档的概念：" class="headerlink" title="1. 文档的概念："></a>1. 文档的概念：</h5><ul>
+<li>信息系统相关信息（文档）是指某种数据媒体和其中所记录的数据。</li>
+<li>具有<strong>永久性</strong>，并可以由人或机器阅读，通常仅用于描述人工可读的东西</li>
+</ul>
+<h5 id="2-文档和程序的区别："><a href="#2-文档和程序的区别：" class="headerlink" title="2. 文档和程序的区别："></a>2. 文档和程序的区别：</h5><ul>
+<li><p>在软件工程学科领域，文档和程序合称为软件。</p>
+</li>
+<li><p>文档和程序的区别在于前者是人可阅读的，后者则由机器执行。</p>
+</li>
+<li><p>如果将源程序加上注释，也可以视作文档的一部分</p>
+</li>
+</ul>
+<h5 id="3-软件文档的分类："><a href="#3-软件文档的分类：" class="headerlink" title="3. 软件文档的分类："></a>3. 软件文档的分类：</h5><ul>
+<li>开发文档<ul>
+<li>可研报告和项目任务书</li>
+<li>需求规格<strong>说明</strong></li>
+<li>功能规格<strong>说明</strong></li>
+<li>设计规格<strong>说明</strong>（包括程序和数据规格说明）</li>
+<li><strong>开发计划</strong></li>
+<li>软件集成和测试<strong>计划</strong></li>
+<li>质量保证<strong>计划</strong></li>
+<li>安全和测试信息</li>
+</ul>
+</li>
+<li>产品文档<ul>
+<li>培训<strong>手册</strong></li>
+<li>参考<strong>手册</strong>和用户指南</li>
+<li>软件支持<strong>手册</strong></li>
+<li>产品<strong>手册</strong>和信息广告</li>
+</ul>
+</li>
+<li>管理文档<ul>
+<li>开发过程中每个阶段的进度和进度变更<strong>记录</strong></li>
+<li>软件变更情况的<strong>记录</strong></li>
+<li>开发团队的<strong>职责定义</strong></li>
+<li><strong>项目计划</strong>、项目<strong>阶段报告</strong></li>
+<li><strong>配置管理计划</strong></li>
+</ul>
+</li>
+</ul>
+<h5 id="4-文档的四级质量"><a href="#4-文档的四级质量" class="headerlink" title="4. 文档的四级质量"></a>4. 文档的四级质量</h5><ul>
+<li>最低限度文档（1级）<ul>
+<li>开发者自用程序（工作量低）</li>
+</ul>
+</li>
+<li>内部文档（2级）<ul>
+<li>不共享资源的专用程序</li>
+</ul>
+</li>
+<li>工作文档（3级）<ul>
+<li>同一单位内若干人联合开发的程序</li>
+</ul>
+</li>
+<li>正式文档（4级）<ul>
+<li>正式发行的软件</li>
+</ul>
+</li>
+</ul>
+<h4 id="2）文档及其管理的规则和方法"><a href="#2）文档及其管理的规则和方法" class="headerlink" title="2）文档及其管理的规则和方法"></a>2）文档及其管理的规则和方法</h4><h5 id="1-文档书写规范"><a href="#1-文档书写规范" class="headerlink" title="1. 文档书写规范"></a>1. 文档书写规范</h5><ul>
+<li>管理信息系统的文档资料涉及文本、图形和表格等多种类型</li>
+<li>应该遵循统一的书写规范<ul>
+<li>符号的使用</li>
+<li>图标的含义</li>
+<li>程序的注释行的使用</li>
+<li>注明文档书写人以及书写日期等</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-图表编号规则"><a href="#2-图表编号规则" class="headerlink" title="2. 图表编号规则"></a>2. 图表编号规则</h5><ul>
+<li><p>在管理信息系统的开发过程中会用到很多图表，对于这些图表进行有规则的编号，可以方便图表的查询</p>
+</li>
+<li><p>根据生命周期法的5个阶段划分</p>
+</li>
+<li><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210831181324484.png" srcset="/img/loading.gif" lazyload alt="image-20210831181324484"></p>
+</li>
+</ul>
+<h5 id="3-文档目录编写标准"><a href="#3-文档目录编写标准" class="headerlink" title="3. 文档目录编写标准"></a>3. 文档目录编写标准</h5><ul>
+<li>包含内容<ul>
+<li>文档编号<ul>
+<li>一般为分类结构，可以采用同图表编号类似的编号规则</li>
+</ul>
+</li>
+<li>文档名称<ul>
+<li>需要书写完整的规范</li>
+</ul>
+</li>
+<li>格式或载体<ul>
+<li>指原始单据或报表、磁盘文件、磁盘文件打印件、重要文件原件等</li>
+</ul>
+</li>
+<li>份数</li>
+<li>每份页数或件数</li>
+<li>存储地点</li>
+<li>存档时间</li>
+<li>保管人等</li>
+</ul>
+</li>
+</ul>
+<h5 id="4-文档管理制度"><a href="#4-文档管理制度" class="headerlink" title="4. 文档管理制度"></a>4. 文档管理制度</h5><ul>
+<li><p>文档的管理制度需根据组织实体的具体情况而定</p>
+</li>
+<li><p>主要内容</p>
+<ul>
+<li><p>建立文档的相关规范</p>
+<ul>
+<li>文档书写规范、图表编号规则、文档目录规范</li>
+</ul>
+</li>
+<li><p>文档借阅记录的登记制度</p>
+</li>
+<li><p>文档使用权控制制度规则</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2、配置管理"><a href="#2、配置管理" class="headerlink" title="2、配置管理"></a>2、配置管理</h3><h4 id="1）配置管理概念"><a href="#1）配置管理概念" class="headerlink" title="1）配置管理概念"></a>1）配置管理概念</h4><h5 id="1-配置管理"><a href="#1-配置管理" class="headerlink" title="1. 配置管理"></a>1. 配置管理</h5><ul>
+<li>配置管理关注重点<ul>
+<li>可交付产品（包括中间产品）</li>
+<li>各阶段过程文档</li>
+</ul>
+</li>
+<li>变更管理关注重点<ul>
+<li>识别、记录、批准或否决对项目文件、可交付产品或基准的变更</li>
+</ul>
+</li>
+</ul>
+<h5 id="2-配置管理6个主要活动（计时制，状态审计不符）"><a href="#2-配置管理6个主要活动（计时制，状态审计不符）" class="headerlink" title="2. 配置管理6个主要活动（计时制，状态审计不符）"></a>2. 配置管理6个主要活动（计时制，状态审计不符）</h5><ul>
+<li>制定配置管理<strong>计</strong>划</li>
+<li>配置标<strong>识</strong></li>
+<li>配置控<strong>制</strong></li>
+<li>配置<strong>状态</strong>报告</li>
+<li>配置<strong>审计</strong></li>
+<li>发<strong>布</strong>管理和交<strong>付</strong></li>
+</ul>
+<h5 id="3-软件配置管理"><a href="#3-软件配置管理" class="headerlink" title="3. 软件配置管理"></a>3. 软件配置管理</h5><ul>
+<li>配置识别</li>
+<li>变更控制</li>
+<li>状态报告</li>
+<li>配置审计</li>
+</ul>
+<h4 id="2）配置管理有关概念表"><a href="#2）配置管理有关概念表" class="headerlink" title="2）配置管理有关概念表"></a>2）配置管理有关概念表</h4><table>
+<thead>
+<tr>
+<th>概念名称</th>
+<th>名称解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>配置项</td>
+<td>为配置管理设计的硬件、软件或二者的集合，在配置管理的过程中作为一个单位实体来对待</td>
+</tr>
+<tr>
+<td>配置项状态</td>
+<td>配置项的状态可分为<strong>草稿</strong>、<strong>正式</strong>、<strong>修改</strong>三种。刚建立时为草稿，配置通过评审后改为正式</td>
+</tr>
+<tr>
+<td>配置项版本号</td>
+<td>配置项的版本号规则与配置项的状态相关</td>
+</tr>
+<tr>
+<td>配置项版本管理</td>
+<td>作用于多个配置管理活动中，如配置标识、配置控制和配置审计、发布和交付</td>
+</tr>
+<tr>
+<td>配置基线</td>
+<td>由一组配置项组成，这些配置项构成一个相对稳定的逻辑实例</td>
+</tr>
+<tr>
+<td>配置库</td>
+<td>存放配置项并记录与配置项相关的所有信息，是配置管理的有力工具，利用库中的信息可以回答许多配置管理的问题</td>
+</tr>
+<tr>
+<td>配置库权限设置</td>
+<td>配置管理员负责为每个项目成员分配对配置库的操作权限</td>
+</tr>
+<tr>
+<td>配置控制委员会</td>
+<td>CCB，负责对配置变更做出评估、审批以及监督已批准变更的实施</td>
+</tr>
+<tr>
+<td>配置管理员</td>
+<td>CMO，负责对整个项目生命周期中进行配置管理活动</td>
+</tr>
+<tr>
+<td>配置管理系统</td>
+<td>是用来进行配置管理的软件系统，其目的是通过确定配置管理细则和规范，加强开发过程的质量控制，增强可控性，确保配置项（各种文档、数据和程序）的完整性和可追踪性</td>
+</tr>
+</tbody></table>
+<h3 id="3、配置项"><a href="#3、配置项" class="headerlink" title="3、配置项"></a>3、配置项</h3><h4 id="1）分类"><a href="#1）分类" class="headerlink" title="1）分类"></a>1）分类</h4><h5 id="1-基线配置项"><a href="#1-基线配置项" class="headerlink" title="1. 基线配置项"></a>1. 基线配置项</h5><ul>
+<li>所有的设计文档和源程序等</li>
+</ul>
+<h5 id="2-非基线配置项"><a href="#2-非基线配置项" class="headerlink" title="2. 非基线配置项"></a>2. 非基线配置项</h5><ul>
+<li>项目的各类计划和报告等</li>
+</ul>
+<h4 id="2）原则"><a href="#2）原则" class="headerlink" title="2）原则"></a>2）原则</h4><ul>
+<li>由 CMO（配置管理员）管理</li>
+<li>基线配置项向开发人员开放读取的权限</li>
+<li>非基线配置项向PM、CCB及相关人员开放</li>
+</ul>
+<h4 id="3）配置项状态"><a href="#3）配置项状态" class="headerlink" title="3）配置项状态"></a>3）配置项状态</h4><h5 id="1-草稿"><a href="#1-草稿" class="headerlink" title="1. 草稿"></a>1. 草稿</h5><ul>
+<li>配置项刚建立</li>
+</ul>
+<h5 id="2-正式"><a href="#2-正式" class="headerlink" title="2. 正式"></a>2. 正式</h5><ul>
+<li>配置项通过评审</li>
+<li>修改完毕重新通过评审</li>
+</ul>
+<h5 id="3-修改"><a href="#3-修改" class="headerlink" title="3. 修改"></a>3. 修改</h5><ul>
+<li>更改配置项</li>
+</ul>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210902222138530.png" srcset="/img/loading.gif" lazyload alt="image-20210902222138530"></p>
+<h4 id="4）配置项版本号"><a href="#4）配置项版本号" class="headerlink" title="4）配置项版本号"></a>4）配置项版本号</h4><h5 id="1-草稿状态"><a href="#1-草稿状态" class="headerlink" title="1. 草稿状态"></a>1. 草稿状态</h5><ul>
+<li>版本格式为 0.YZ，YZ范围为 01～99，YZ的值递增，初值和增幅由用户自己控制</li>
+</ul>
+<h5 id="2-正式状态"><a href="#2-正式状态" class="headerlink" title="2. 正式状态"></a>2. 正式状态</h5><ul>
+<li><p>版本格式为 X.Y，X为主版本，取值范围 1～9；Y为次版本，取值范围 0～9</p>
+</li>
+<li><p>第一次成为正式状态时，版本号为 1.0</p>
+</li>
+<li><p>升级幅度小，则增加 Y 的值；升级幅度较大，才增加 X 的值</p>
+</li>
+</ul>
+<h5 id="3-修改状态"><a href="#3-修改状态" class="headerlink" title="3. 修改状态"></a>3. 修改状态</h5><ul>
+<li>版本格式为 X.YZ，一般只增大Z的值，X.Y 值保持不变</li>
+<li>修改完毕，成为正式状态后，Z的值设为0，增加 X.Y 的值</li>
+</ul>
+<h4 id="5）配置项版本管理"><a href="#5）配置项版本管理" class="headerlink" title="5）配置项版本管理"></a>5）配置项版本管理</h4><h5 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h5><ul>
+<li><p>配置项的版本管理多用于多个配置项活动中，如配置标识、配置控制、配置审计和发布交付等</p>
+</li>
+<li><p>绝大部分配置项要多次修改才能最终确定，任何对配置项的修改都会生成新的版本</p>
+</li>
+</ul>
+<h5 id="2-目的"><a href="#2-目的" class="headerlink" title="2. 目的"></a>2. 目的</h5><ul>
+<li>按照一定的规则保存配置项的所有版本</li>
+</ul>
+<h5 id="3-不能抛弃旧版本"><a href="#3-不能抛弃旧版本" class="headerlink" title="3. 不能抛弃旧版本"></a>3. 不能抛弃旧版本</h5><ul>
+<li>因为不能保证新版本一定比旧版本好，为了方便版本回滚和精准查找，任何人不能删除旧版本</li>
+</ul>
+<h4 id="6）配置基线"><a href="#6）配置基线" class="headerlink" title="6）配置基线"></a>6）配置基线</h4><h5 id="1-概念-1"><a href="#1-概念-1" class="headerlink" title="1. 概念"></a>1. 概念</h5><ul>
+<li><p>由一组配置项组成的相对稳定的逻辑实体</p>
+</li>
+<li><p>基线中的配置项不能随意修改</p>
+</li>
+<li><p>一个产品可以有一个基线或者多个基线，对外的加发行基线（Release），对内的叫构造基线（build）</p>
+</li>
+<li><p><strong>对基线的变更必须遵循正式的变更控制流程（需CCB审批）</strong></p>
+</li>
+</ul>
+<h5 id="2-优点"><a href="#2-优点" class="headerlink" title="2. 优点"></a>2. 优点</h5><ul>
+<li>基线为开发工作提供了一个定点和快照</li>
+<li>新项目可以在基线提供的定点上建立，作为独立分支存在，并将随后版本与原始版本隔离</li>
+<li>当认为更新不稳定或不可信时，提供一种取消变更的方法</li>
+<li>可以利用基线重新建立基于某个特定发行版的配置，以复现错误</li>
+</ul>
+<h4 id="7）配置库"><a href="#7）配置库" class="headerlink" title="7）配置库"></a>7）配置库</h4><h5 id="1-分类"><a href="#1-分类" class="headerlink" title="1. 分类"></a>1. 分类</h5><h6 id="开发库（DL）："><a href="#开发库（DL）：" class="headerlink" title="开发库（DL）："></a>开发库（DL）：</h6><ul>
+<li>也称为动态库，保存开发人员当前正在开发的配置实体</li>
+<li>变更频繁，无需进行控制，由开发人员自行控制，可以任意更改</li>
+</ul>
+<h6 id="受控库（CL）："><a href="#受控库（CL）：" class="headerlink" title="受控库（CL）："></a>受控库（CL）：</h6><ul>
+<li>也称为主库，阶段性开发完成后，将当前配置存入受控库，被置于配置管理之下，可以修改，但要走变更流程</li>
+</ul>
+<h6 id="产品库（PL）："><a href="#产品库（PL）：" class="headerlink" title="产品库（PL）："></a>产品库（PL）：</h6><ul>
+<li>也称为静态库、发行库，是正式发行的配置版本，完全置于配置管理之下，一般不再进行修改，如要修改必须走变更流程</li>
+</ul>
+<h5 id="2-建库模式"><a href="#2-建库模式" class="headerlink" title="2. 建库模式"></a>2. 建库模式</h5><h6 id="按配置项类型建库："><a href="#按配置项类型建库：" class="headerlink" title="按配置项类型建库："></a>按配置项类型建库：</h6><ul>
+<li>适用于通用软件的开发组织</li>
+<li>产品继承性较强，工具统一，对并行开发有需求</li>
+<li>有利于对配置项的统一管理和控制</li>
+</ul>
+<h6 id="按任务建库："><a href="#按任务建库：" class="headerlink" title="按任务建库："></a>按任务建库：</h6><ul>
+<li>适用于专业软件的开发组织</li>
+<li>使用的开发工具种类繁多，开发模式以线性发展为主</li>
+</ul>
+<h5 id="3-配置库权限设置"><a href="#3-配置库权限设置" class="headerlink" title="3. 配置库权限设置"></a>3. 配置库权限设置</h5><p>由CMO负责为项目成员分配权限</p>
+<h6 id="权限类型："><a href="#权限类型：" class="headerlink" title="权限类型："></a>权限类型：</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210902225039379.png" srcset="/img/loading.gif" lazyload alt="image-20210902225039379"></p>
+<h6 id="文档和代码的权限分配："><a href="#文档和代码的权限分配：" class="headerlink" title="文档和代码的权限分配："></a>文档和代码的权限分配：</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210902225433106.png" srcset="/img/loading.gif" lazyload alt="image-20210902225433106"></p>
+<h6 id="产品库的权限配置："><a href="#产品库的权限配置：" class="headerlink" title="产品库的权限配置："></a>产品库的权限配置：</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210902225602798.png" srcset="/img/loading.gif" lazyload alt="image-20210902225602798"></p>
+<h4 id="8）配置管理委员会（CCB）"><a href="#8）配置管理委员会（CCB）" class="headerlink" title="8）配置管理委员会（CCB）"></a>8）配置管理委员会（CCB）</h4><h5 id="1-职责"><a href="#1-职责" class="headerlink" title="1. 职责"></a>1. 职责</h5><ul>
+<li><p>负责对配置变更做出评估、审批以及监督已批准的变更的实施</p>
+</li>
+<li><p>负责决策接受、拒绝变更</p>
+</li>
+</ul>
+<h5 id="2-成员"><a href="#2-成员" class="headerlink" title="2. 成员"></a>2. 成员</h5><p>项目经理、用户代表、产品经理、开发工程师、测试工程师、质量控制人员、配置管理员</p>
+<h5 id="3-特点"><a href="#3-特点" class="headerlink" title="3. 特点"></a>3. 特点</h5><ul>
+<li><p>不是常设机构，小项目的CCB可以只有一个人，甚至时兼职人员</p>
+</li>
+<li><p>是决策机构，不是作业机构，不是变更的提出方</p>
+</li>
+<li><p>由项目涉及的多方人员组成</p>
+</li>
+</ul>
+<h5 id="4-两个子系统"><a href="#4-两个子系统" class="headerlink" title="4. 两个子系统"></a>4. 两个子系统</h5><ul>
+<li>变更控制委员会</li>
+<li>配置控制委员会</li>
+</ul>
+<h4 id="9）配置管理员（CMO）"><a href="#9）配置管理员（CMO）" class="headerlink" title="9）配置管理员（CMO）"></a>9）配置管理员（CMO）</h4><h5 id="1-职责-1"><a href="#1-职责-1" class="headerlink" title="1. 职责"></a>1. 职责</h5><p>负责在整个项目生命周期中进行配置管理活动</p>
+<h5 id="2-具体工作"><a href="#2-具体工作" class="headerlink" title="2. 具体工作"></a>2. 具体工作</h5><ul>
+<li>制度配置管理计划</li>
+<li>建立和维护配置管理系统</li>
+<li>建立和维护配置库</li>
+<li>配置项识别</li>
+<li>版本管理和配置控制</li>
+<li>配置状态报告</li>
+<li>配置审计</li>
+<li>发布管理和交付</li>
+<li>对项目成员进行配置管理培训</li>
+</ul>
+<h4 id="10）制定配置管理计划"><a href="#10）制定配置管理计划" class="headerlink" title="10）制定配置管理计划"></a>10）制定配置管理计划</h4><h5 id="1-配置管理计划"><a href="#1-配置管理计划" class="headerlink" title="1. 配置管理计划"></a>1. 配置管理计划</h5><h6 id="概念：-16"><a href="#概念：-16" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>是对如何展开项目配置管理工作的规划，是配置管理过程的基础</li>
+</ul>
+<h6 id="主要内容："><a href="#主要内容：" class="headerlink" title="主要内容："></a>主要内容：</h6><ul>
+<li>配置管理活动，覆盖的活动包括配置标识、配置控制、配置状态报告、配置审计、发布管理与交付</li>
+<li>实施这些活动的规范和流程</li>
+<li>实施这些活动的进度安排</li>
+<li>负责实施这些活动的人员或组织，以及他们和其他组织的关系</li>
+</ul>
+<h5 id="2-配置标识"><a href="#2-配置标识" class="headerlink" title="2. 配置标识"></a>2. 配置标识</h5><h6 id="概念：-17"><a href="#概念：-17" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>也称为配置识别，包括为系统选择配置项并在技术文档中记录器功能和物理特征</li>
+<li>配置标识是CMO的职能之一</li>
+</ul>
+<h6 id="基本步骤："><a href="#基本步骤：" class="headerlink" title="基本步骤："></a>基本步骤：</h6><ul>
+<li>识别需要受控的配置项</li>
+<li>为每个配置项制定唯一性的标示号</li>
+<li>定义每个配置项的重要特征</li>
+<li>确定每个配置项的所有者及其责任</li>
+<li>确定配置项进入配置管理的时间和条件</li>
+<li>建立和控制基线</li>
+<li>维护文档和组件的修订与产品版本之间的关系</li>
+</ul>
+<h5 id="3-配置控制"><a href="#3-配置控制" class="headerlink" title="3. 配置控制"></a>3. 配置控制</h5><h6 id="概念：-18"><a href="#概念：-18" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>对配置项和基线的变更控制</li>
+</ul>
+<h6 id="流程："><a href="#流程：" class="headerlink" title="流程："></a>流程：</h6><ul>
+<li>变更申请</li>
+<li>变更评估</li>
+<li>通告评估结果</li>
+<li>变更实施</li>
+<li>变更验证与确认</li>
+<li>变更发布</li>
+</ul>
+<h6 id="基于配置库的变更控制："><a href="#基于配置库的变更控制：" class="headerlink" title="基于配置库的变更控制："></a>基于配置库的变更控制：</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210902231931733.png" srcset="/img/loading.gif" lazyload alt="image-20210902231931733"></p>
+<h5 id="4-配置状态报告（了解）"><a href="#4-配置状态报告（了解）" class="headerlink" title="4. 配置状态报告（了解）"></a>4. 配置状态报告（了解）</h5><h6 id="概念：-19"><a href="#概念：-19" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>也叫配置状态统计</li>
+</ul>
+<h6 id="任务："><a href="#任务：" class="headerlink" title="任务："></a>任务：</h6><ul>
+<li>记录和报告管理配置所需的信息</li>
+</ul>
+<h6 id="目的："><a href="#目的：" class="headerlink" title="目的："></a>目的：</h6><ul>
+<li>及时、准确地给出配置项的当前状态，供相关人员了解，以便加强管理</li>
+</ul>
+<h6 id="内容："><a href="#内容：" class="headerlink" title="内容："></a>内容：</h6><ul>
+<li>每个受控配置项的标识和状态</li>
+<li>每个变更申请的状态和已批准的修改实施状态</li>
+<li>每个基线的当前和过期版本的状态以及各版本的比较</li>
+<li>其他配置管理过程活动的记录</li>
+</ul>
+<h5 id="5-配置审计（-）"><a href="#5-配置审计（-）" class="headerlink" title="5. 配置审计（***）"></a>5. 配置审计（***）</h5><h6 id="概念：-20"><a href="#概念：-20" class="headerlink" title="概念："></a>概念：</h6><ul>
+<li>也叫配置审核或配置评价</li>
+</ul>
+<h6 id="分类："><a href="#分类：" class="headerlink" title="分类："></a>分类：</h6><ul>
+<li>功能配置审计<ul>
+<li>验证当前配置项的一致性（实际功效是否与需求一致）</li>
+</ul>
+</li>
+<li>物理配置审计<ul>
+<li>验证当前配置项的完整性（物理存在是否与预期一致）</li>
+</ul>
+</li>
+</ul>
+<h5 id="6-发布管理和交付（了解）"><a href="#6-发布管理和交付（了解）" class="headerlink" title="6. 发布管理和交付（了解）"></a>6. 发布管理和交付（了解）</h5><h6 id="流程：-1"><a href="#流程：-1" class="headerlink" title="流程："></a>流程：</h6><ul>
+<li>存储</li>
+<li>复制</li>
+<li>打包</li>
+<li>交付</li>
+<li>重建</li>
+</ul>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h2 id="三、课后作业"><a href="#三、课后作业" class="headerlink" title="三、课后作业"></a>三、课后作业</h2><h3 id="1、区分项目总承包合同、项目单项合同和项目分包合同三类。"><a href="#1、区分项目总承包合同、项目单项合同和项目分包合同三类。" class="headerlink" title="1、区分项目总承包合同、项目单项合同和项目分包合同三类。"></a>1、区分项目总承包合同、项目单项合同和项目分包合同三类。</h3><blockquote>
+<ul>
+<li>项目总承包合同<ul>
+<li>买方（甲方）将项目的<strong>全过程作为整体</strong>发包给<strong>同一个卖方</strong>（乙方）的合同</li>
+</ul>
+</li>
+<li>项目单项合同<ul>
+<li>买方（甲方）<strong>分别与不同的卖方</strong>（乙方）订立项目单项承包合同，一个卖方只承包项目中的部分内容</li>
+</ul>
+</li>
+<li>项目分包合同<ul>
+<li>经合同约定或买方认可，卖方将其承包项目的某一个或几个<strong>非项目主体结构</strong>的项目<strong>再发包</strong>给<strong>具有相应资质</strong>的分包方，以此与分包方订立的合同即项目分包合同</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="2、订立项目分包合同必须同时满足的5个条件是什么？"><a href="#2、订立项目分包合同必须同时满足的5个条件是什么？" class="headerlink" title="2、订立项目分包合同必须同时满足的5个条件是什么？"></a>2、订立项目分包合同必须同时满足的5个条件是什么？</h3><blockquote>
+<ul>
+<li>经买方（甲方）认可</li>
+<li>分包部分不是项目主体部分</li>
+<li>只能分包部分项目，不能整体转包</li>
+<li>分包方需具备相应资质条件</li>
+<li>分包方不得再次分包</li>
+</ul>
+</blockquote>
+<h3 id="3、区分固定总价合同、总价加激励费用合同、总价加经济价格调整合同和订购单。"><a href="#3、区分固定总价合同、总价加激励费用合同、总价加经济价格调整合同和订购单。" class="headerlink" title="3、区分固定总价合同、总价加激励费用合同、总价加经济价格调整合同和订购单。"></a>3、区分固定总价合同、总价加激励费用合同、总价加经济价格调整合同和订购单。</h3><blockquote>
+<ul>
+<li>固定总价合同（FFP）<ul>
+<li>采购价格已开始就确定，且不允许改变（除非工作范围发生变更）</li>
+<li>因合同履行不好而增加的城成本由卖方承担</li>
+</ul>
+</li>
+<li>总价加激励费用合同（FPIF）<ul>
+<li>为买方和卖方都提供了一定的灵活性，允许有一定的绩效偏差，并对实现既定目标给予财务奖励</li>
+<li>FPIF合同要设置一个价格上限，买方付款的总数不得超过该上限</li>
+</ul>
+</li>
+<li>总价加经济价格调整合同（FP-EPA）<ul>
+<li>卖方履约的周期跨度很长（一般为几年）</li>
+<li>允许根据实际环境条件发生变化，以事先确定的方式（财务指数）对合同价格进行最终调整</li>
+<li>可以保护买卖双方免受外界不可控情况的影响</li>
+</ul>
+</li>
+<li>订购单<ul>
+<li>适用于非大量采购的标准化产品，通常不需要谈判，又称单边合同</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="4、区分成本补偿合同中成本加固定费用合同、成本加激励费用合同、成本加奖励费用合同。"><a href="#4、区分成本补偿合同中成本加固定费用合同、成本加激励费用合同、成本加奖励费用合同。" class="headerlink" title="4、区分成本补偿合同中成本加固定费用合同、成本加激励费用合同、成本加奖励费用合同。"></a>4、区分成本补偿合同中成本加固定费用合同、成本加激励费用合同、成本加奖励费用合同。</h3><h3 id="5、工料合同概念"><a href="#5、工料合同概念" class="headerlink" title="5、工料合同概念"></a>5、工料合同概念</h3><h3 id="6、合同管理包括？"><a href="#6、合同管理包括？" class="headerlink" title="6、合同管理包括？"></a>6、合同管理包括？</h3><blockquote>
+<ul>
+<li>合同签订管理</li>
+<li>合同履行管理</li>
+<li>合同变更管理</li>
+<li>合同档案管理</li>
+<li>合同索赔管理</li>
+</ul>
+</blockquote>
+<h3 id="7、合同索赔流程？"><a href="#7、合同索赔流程？" class="headerlink" title="7、合同索赔流程？"></a>7、合同索赔流程？</h3><blockquote>
+<ul>
+<li>先由监理工程师调解</li>
+<li>提出索赔要求，以书面形式发出索赔通知书</li>
+<li>报送索赔材料，提出索赔要求28天内须向监理方正式提出索赔意向通知书</li>
+<li>监理工程师答复</li>
+<li>监理工程师逾期答复后果，提交材料后28天未予以答复，则视为认可索赔</li>
+<li>持续索赔</li>
+<li>仲裁与诉讼</li>
+</ul>
+</blockquote>
+<h3 id="8、软件文档一般分为哪三类？"><a href="#8、软件文档一般分为哪三类？" class="headerlink" title="8、软件文档一般分为哪三类？"></a>8、软件文档一般分为哪三类？</h3><blockquote>
+<ul>
+<li>开发文档</li>
+<li>产品文档</li>
+<li>管理文档</li>
+</ul>
+</blockquote>
+<h3 id="9、配置管理包括的6个主要活动"><a href="#9、配置管理包括的6个主要活动" class="headerlink" title="9、配置管理包括的6个主要活动"></a>9、配置管理包括的6个主要活动</h3><blockquote>
+<p><strong>计时制，状态审计不符</strong></p>
+<ul>
+<li>制定配置管理计划</li>
+<li>配置标识</li>
+<li>配置控制</li>
+<li>配置状态报告</li>
+<li>配置审计</li>
+<li>发布管理和交付</li>
+</ul>
+</blockquote>
+<h3 id="10、区分配置项版本号"><a href="#10、区分配置项版本号" class="headerlink" title="10、区分配置项版本号"></a>10、区分配置项版本号</h3><blockquote>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E8%BD%AF%E8%80%83%E9%AB%98%E9%A1%B9/">软考高项</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/">项目管理</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/31/%E7%AC%AC10%E7%AB%A0%E3%80%81%E9%A1%B9%E7%9B%AE%E7%9A%84%E5%8F%98%E6%9B%B4%E7%AE%A1%E7%90%86%E5%92%8C%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">第10章、项目的变更管理和安全管理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/31/%E7%AC%AC8%E7%AB%A0%E3%80%81%E9%A1%B9%E7%9B%AE%E7%9A%84%E7%AB%8B%E9%A1%B9%E5%92%8C%E6%94%B6%E5%B0%BE/">
+                        <span class="hidden-mobile">第8章、项目的立项和收尾</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

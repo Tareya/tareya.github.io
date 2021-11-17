@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="DevOps 是在保证质量的前提下，提供的一整套从开发，测试到生产运维的持续交付和管控方法论。在整个过程中需要实现自动化，可视化，流水线式作用，同时将质量管控无缝嵌入其中。———《DevOps软件架构师行动指南》-伦思·拜斯">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>《DevOps软件架构师行动指南》读书笔记 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="《DevOps软件架构师行动指南》读书笔记">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-16 11:04" pubdate>
+        2021年11月16日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      29
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">《DevOps软件架构师行动指南》读书笔记</h1>
+            
+            <div class="markdown-body">
+              <p>DevOps 是在保证质量的前提下，提供的一整套从开发，测试到生产运维的持续交付和管控方法论。在整个过程中需要实现自动化，可视化，流水线式作用，同时将质量管控无缝嵌入其中。<br>———《DevOps软件架构师行动指南》-伦思·拜斯</p>
+<span id="more"></span>
+
+
+
+<h1 id="《DevOps软件架构师行动指南》读书笔记"><a href="#《DevOps软件架构师行动指南》读书笔记" class="headerlink" title="《DevOps软件架构师行动指南》读书笔记"></a>《DevOps软件架构师行动指南》读书笔记</h1><h2 id="一、DevOps-概述"><a href="#一、DevOps-概述" class="headerlink" title="一、DevOps 概述"></a>一、DevOps 概述</h2><h3 id="1、DevOps-对部署的要求"><a href="#1、DevOps-对部署的要求" class="headerlink" title="1、DevOps 对部署的要求"></a>1、DevOps 对部署的要求</h3><ul>
+<li>部署对系统的变更时（通常是代码形式），质量很重要</li>
+<li>这个定义要求交付机制也是高质量的</li>
+<li>我们认为有两个周期很重要<ul>
+<li>一个是开发人员提交新开发的代码的时间，这标志着基本的开发过程结束，部署工作开始</li>
+<li>另一个是把代码部署到生产环境的时间</li>
+</ul>
+</li>
+<li>我们的定义是目标导向的</li>
+<li>最后，定义中说明的目标并不限于DevOps用于测试和部署的实践</li>
+</ul>
+<h3 id="2、最佳实践要求"><a href="#2、最佳实践要求" class="headerlink" title="2、最佳实践要求"></a>2、最佳实践要求</h3><ul>
+<li>从需求的角度把运维人员视为首要干系人，这些实践符合定义中高质量方面的要求。运维人员有一套与日志和监控相关的需求</li>
+<li>让开发人员更多地负责相关事件的处理。新部署的内容在开始一段时间由开发人员主要负责，之后由运维人员主要负责</li>
+<li>强制推行所有人使用的部署过程，包括开发人员和运维人员。确保更高的部署质量</li>
+<li>使用持续部署</li>
+<li>在开发诸如部署脚本这样的基础设置代码时，也应遵守一套与应用程序代码相同的实践</li>
+</ul>
+<h3 id="3、为什么使用-DevOps"><a href="#3、为什么使用-DevOps" class="headerlink" title="3、为什么使用 DevOps"></a>3、为什么使用 DevOps</h3><ul>
+<li>运维人员能力有限</li>
+<li>减少运维复杂度</li>
+<li>DevOps运维采用一种不同的方法。它们的方法把以前由运维完成的很多任务都自动化了，并让开发人员承担部分剩余的工作，通过这种方法可以减少对专业运维人员的需求</li>
+</ul>
+<h3 id="4、小团队优势"><a href="#4、小团队优势" class="headerlink" title="4、小团队优势"></a>4、小团队优势</h3><ul>
+<li>可以快速做出决定</li>
+<li>人少比人多更容易组成一个关系密切的群体</li>
+<li>人们在小团队面前比在大团队面前更容易表达意见</li>
+<li>一个小团队需要完成一小部分代码。围绕着一组微服务架构是一种好方法，它能够把这些小任务打包在一起并减少显式配合 — 所以我们将开发团队的输出成果称为”服务”</li>
+</ul>
+<h3 id="5、团队角色"><a href="#5、团队角色" class="headerlink" title="5、团队角色"></a>5、团队角色</h3><ul>
+<li><p>服务所有者</p>
+<ul>
+<li>即能与其他干系人交流，又能与团队的其他成员交流</li>
+</ul>
+</li>
+<li><p>可靠性工程师</p>
+<ul>
+<li>必须出色的排查故障、诊断问题</li>
+<li>必须深入理解服务的内部，这样才能修复故障或采用临时解决方案</li>
+<li>需要逐步成长为有能力的开发人员，因为他们需要编写高质量的程序并且以自动化的方式实现不断重复发生的诊断、迁移和修复工作</li>
+</ul>
+</li>
+<li><p>看门人角色</p>
+<ul>
+<li>在部署流水线中，决定将服务进入下一步的手动角色</li>
+<li>决定服务的某个版本或服务的某个部分是否能够通过”门”并进入下一步</li>
+</ul>
+</li>
+<li><p>DevOps 工程师</p>
+<ul>
+<li>负责 DevOps 工具链中使用的各种工具的维护和保养</li>
+<li>这个角色可以是个人、团队或组织层面</li>
+<li>选择开发团队使用的配置管理工具的哪个发型版是DevOps工程师职责的一部分</li>
+<li>为开发团队定制工具并监控开发人员是否正确使用也是 DevOps 工程师的职责</li>
+<li>以自动化的方式实现开发和部署流水线是DevOps 的固有职责</li>
+</ul>
+</li>
+<li><p>一个人可以承担多个角色，一个角色也可以由多人承担，角色的分配取决于个人能力、个人的工作负荷以及这个角色所需的能力和工作量</p>
+</li>
+</ul>
+<h3 id="6、团队协作"><a href="#6、团队协作" class="headerlink" title="6、团队协作"></a>6、团队协作</h3><ul>
+<li>为什么需要团地协作<ul>
+<li>不同团队开发的各部分能够在一起工作</li>
+<li>避免重复工作</li>
+</ul>
+</li>
+<li>协作的形式<ul>
+<li>直接的</li>
+<li>间接的</li>
+<li>持久的</li>
+<li>短暂的</li>
+<li>同步的</li>
+<li>异步的</li>
+</ul>
+</li>
+<li>人工协作<ul>
+<li>DevOps 人工过程取自敏捷过程，目的是用于持久性不高的高带宽协作</li>
+<li>站立会议和信息发射源是人工过程协作机制的两个例子</li>
+</ul>
+</li>
+<li>自动化协作<ul>
+<li>自动化团队协作机制，用自动化的方式完成重复单调的任务，加快发现并报告错误的速度</li>
+<li>目标之一是尽可能快地向开发人员提供反馈</li>
+</ul>
+</li>
+<li>跨团队的协作方式<ul>
+<li>与干系人和客户的上游协作</li>
+<li>与运维人员的下游协作</li>
+<li>与其他开发团队的交叉协作</li>
+</ul>
+</li>
+<li>DevOps目标的一部分是通过使用隐性和不经常的协作代替直接的协作来实现的</li>
+</ul>
+<h3 id="7、推行-DevOps-的障碍"><a href="#7、推行-DevOps-的障碍" class="headerlink" title="7、推行 DevOps 的障碍"></a>7、推行 DevOps 的障碍</h3><ul>
+<li>文化冲突<ul>
+<li>开发人员的工作职责和激励机制是做出变更（发布新代码），运维人员的工作职责和激励机制是保持稳定（不多变更），由于这种原因往往会导致”混沌之墙”的出现</li>
+</ul>
+</li>
+<li>组织风险<ul>
+<li>一个特定组织所担忧的风险取决于他们的活动领域，对一些组织来说，出现问题所带来的风险比尽快推向市场更重要</li>
+<li>在监管领域运作的组织（金融、医疗保健、公用事业服务）有他们必须遵守的规则，如果违反了运营规则，就会面临处罚，有可能还是很严重的处罚</li>
+<li>在成熟，行动缓慢的领域中运作的组织（汽车或建筑行业）有很长的前置时间</li>
+<li>某些组织的客户在切换到其他供应商（supplier）时成本很高，例如企业资源计划系统，客户因为担心运行的稳定性而不愿意冒险</li>
+</ul>
+</li>
+</ul>
+<h2 id="二、云即平台"><a href="#二、云即平台" class="headerlink" title="二、云即平台"></a>二、云即平台</h2><h3 id="1、核心"><a href="#1、核心" class="headerlink" title="1、核心"></a>1、核心</h3><ul>
+<li>按需自助</li>
+<li>可计量</li>
+</ul>
+<h3 id="2、虚拟化平台的弊端"><a href="#2、虚拟化平台的弊端" class="headerlink" title="2、虚拟化平台的弊端"></a>2、虚拟化平台的弊端</h3><ul>
+<li>由于一个虚拟化与一个物理机上的其他虚拟机共享资源，所以虚拟机之间可能会有性能干扰</li>
+<li>当家在虚拟机时，取决于底层物理基础设施和需要动态加载的其他软件，可能 有时间和可靠性方面的不确定性</li>
+</ul>
+<h3 id="3、PAAS-与-Ops-类比"><a href="#3、PAAS-与-Ops-类比" class="headerlink" title="3、PAAS 与 Ops 类比"></a>3、PAAS 与 Ops 类比</h3><ul>
+<li>某种程度上，PASS 与传统 Ops 部门提供的一些服务相类似，Ops 部门通常接管基础设施层的管理并向开发团队提供一组环境选项来托管他们的系统，开发团队可以在这些环境中进行选择</li>
+</ul>
+<h3 id="4、正态分布"><a href="#4、正态分布" class="headerlink" title="4、正态分布"></a>4、正态分布</h3><ul>
+<li>诸如计算、读文件或者接收本地消息这样的简单请求都有接近正态分布</li>
+</ul>
+<h3 id="5、长尾分布"><a href="#5、长尾分布" class="headerlink" title="5、长尾分布"></a>5、长尾分布</h3><ul>
+<li>复杂的请求，如大量的 Map-Reduce 任务，大型数据库的搜索或启动虚拟实例，将会有长尾这样的偏态分布</li>
+<li>耗时过长的请求应当被当作故障，防止长尾的一个机制是取消耗时过长的请求</li>
+</ul>
+<h3 id="6、数据一致性"><a href="#6、数据一致性" class="headerlink" title="6、数据一致性"></a>6、数据一致性</h3><ul>
+<li><p>在分布式系统中，通过引入锁来维护一致性，这些锁控制访问单个数据项的顺序。但锁定数据项会带来访问这些数据项的延迟，因此，铲射高了各种不同的方案来维护一致性并减少由锁引起的延迟</p>
+</li>
+<li><p>根据称为CAP（Consistency: 一致性、Availability: 可用性、Partition tolerance: 分区容错性）原理的理论结果，不可能同时拥有完全可用、一致并分区的数据。<strong>最终一致性</strong>意味着当改变数据项时，分布、分区和复制的数据即使没有立即一致，在一段时间后，副本最终将会变得一致</p>
+</li>
+</ul>
+<h3 id="7、多环境支持"><a href="#7、多环境支持" class="headerlink" title="7、多环境支持"></a>7、多环境支持</h3><ul>
+<li>在开发、测试和部署过程的各阶段有多个环境并不是云独有的特性，但简单地创建和迁移环境的能力时云独有的特性，就如克隆新实例一样容易</li>
+</ul>
+<h2 id="三、IT-服务和运维"><a href="#三、IT-服务和运维" class="headerlink" title="三、IT 服务和运维"></a>三、IT 服务和运维</h2><h3 id="1、IT-职能"><a href="#1、IT-职能" class="headerlink" title="1、IT 职能"></a>1、IT 职能</h3><ul>
+<li><p>服务台的运维</p>
+<ul>
+<li>服务台的员工负责处理所有的事件和服务请求，并作为所有问题的第一级处理者</li>
+</ul>
+</li>
+<li><p>技术专家</p>
+</li>
+<li><p>IT 服务的日常经验</p>
+<ul>
+<li>这些包括周期性和重复性的维护运维、监控、备份以及设施管理</li>
+</ul>
+</li>
+</ul>
+<h3 id="2、软硬件供给"><a href="#2、软硬件供给" class="headerlink" title="2、软硬件供给"></a>2、软硬件供给</h3><ul>
+<li>防止内部研发的软件延期时 DevOps 的一个驱动力</li>
+<li>硬件标准化</li>
+</ul>
+<h3 id="3、业务连续性"><a href="#3、业务连续性" class="headerlink" title="3、业务连续性"></a>3、业务连续性</h3><ul>
+<li><p>恢复点目标（RPO，Recovery Point Objective）</p>
+<ul>
+<li>当灾难发生时，对数据丢失的最长容忍时间是多少？如果每小时备份数据一次，则恢复点目标为1小时，因为丢失的数据可能是自上一次备份后的增量数据</li>
+</ul>
+</li>
+<li><p>恢复时间目标（RTO，Recovery Time Objective）</p>
+<ul>
+<li>当灾难发生时，不能提供服务的最长容忍时间是多少？例如，如果一种方案需要10分钟来获取在另一个数据中心的备份，再需要5分钟来实例化新的服务器以便使用这些备份的数据，则恢复时间目标为15分钟</li>
+</ul>
+</li>
+</ul>
+<h3 id="4、服务设计原则"><a href="#4、服务设计原则" class="headerlink" title="4、服务设计原则"></a>4、服务设计原则</h3><ul>
+<li>标准化合同</li>
+<li>松耦合</li>
+<li>抽象</li>
+<li>可复用性</li>
+<li>自治</li>
+<li>无状态</li>
+<li>可发现性</li>
+<li>可组装性</li>
+</ul>
+<h3 id="5、服务移交"><a href="#5、服务移交" class="headerlink" title="5、服务移交"></a>5、服务移交</h3><ul>
+<li>服务移交包含服务的实施和交付两个阶段。DevOps 和持续部署要求服务移交的交付部分高度自动化，这样它才能够处理高频率的移交，并提供更好的质量控制</li>
+<li>变更类型<ul>
+<li>标准变更（例如，经常发生和低风险的变更）</li>
+<li>常规变更</li>
+<li>紧急变更</li>
+</ul>
+</li>
+</ul>
+<h3 id="6、监控职责区分"><a href="#6、监控职责区分" class="headerlink" title="6、监控职责区分"></a>6、监控职责区分</h3><ul>
+<li>开发团队分析他们自己开发的单系统监控的结果</li>
+<li>包括基础设施的多系统监控则由运维团队负责</li>
+<li>运维团队还负责需要一个或多个开发团队合作处理的事故上报</li>
+</ul>
+<h3 id="7、持续服务改进"><a href="#7、持续服务改进" class="headerlink" title="7、持续服务改进"></a>7、持续服务改进</h3><ul>
+<li>主要焦点是要在 IT 服务和业务需求之间达成一致 —— 不管这些需求是否已发生变化还是维持不变</li>
+<li>如果这些需求已经发生变化，则对 IT 服务的期望变化可以关注范围、功能或服务级别协议</li>
+<li>如果业务需求相同，则可以扩展 IT 服务来更好的支持它们，但对它们的改进也可以专注在提升效率上</li>
+</ul>
+<h3 id="8、ITIL-与-DevOps"><a href="#8、ITIL-与-DevOps" class="headerlink" title="8、ITIL 与 DevOps"></a>8、ITIL 与 DevOps</h3><ul>
+<li>如果认为 ITIL 是过于”重量级”尔不适合 DevOps 过程，那么这个观点是短视的，并且这个观点将导致要再走过那些 ITIL 框架中所试图解决的”坑”</li>
+<li>ITIL 服务移交和 DevOps 方法之间的一个差别在于 ITIL 假设非常大的发布包（需要小心计划、变更管理等）是可行的，而典型的 DevOps 场景中较常遇到的是高频率的小的发布包</li>
+</ul>
+<h2 id="四、整体架构"><a href="#四、整体架构" class="headerlink" title="四、整体架构"></a>四、整体架构</h2><h2 id="五、构建和测试"><a href="#五、构建和测试" class="headerlink" title="五、构建和测试"></a>五、构建和测试</h2><h2 id="六、部署"><a href="#六、部署" class="headerlink" title="六、部署"></a>六、部署</h2><h2 id="七、监控"><a href="#七、监控" class="headerlink" title="七、监控"></a>七、监控</h2><h2 id="八、安全与安全审计"><a href="#八、安全与安全审计" class="headerlink" title="八、安全与安全审计"></a>八、安全与安全审计</h2><h2 id="九、其他非功能需求"><a href="#九、其他非功能需求" class="headerlink" title="九、其他非功能需求"></a>九、其他非功能需求</h2><h2 id="十、业务关注点"><a href="#十、业务关注点" class="headerlink" title="十、业务关注点"></a>十、业务关注点</h2><h2 id="十一、运维补充"><a href="#十一、运维补充" class="headerlink" title="十一、运维补充"></a>十一、运维补充</h2><h2 id="十二、DevOps-未来"><a href="#十二、DevOps-未来" class="headerlink" title="十二、DevOps 未来"></a>十二、DevOps 未来</h2>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Devops/">Devops</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">读书笔记</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/16/%E3%80%8A%E5%87%A4%E5%87%B0%E9%A1%B9%E7%9B%AE%E2%80%94%E2%80%94%E4%B8%80%E4%B8%AAIT%E8%BF%90%E7%BB%B4%E7%9A%84%E4%BC%A0%E5%A5%87%E6%95%85%E4%BA%8B%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">《凤凰项目——一个IT运维的传奇故事》读书笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/14/Kubernetes-Etcd-%E9%9B%86%E7%BE%A4%E8%B0%83%E4%BC%98%E6%96%B9%E6%A1%88/">
+                        <span class="hidden-mobile">Kubernetes Etcd 集群调优方案</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/icon.png">
+  <link rel="icon" href="/img/icon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="我们知道，Etcd 可以说是 Kubernetes 集群的核心。一般情况下，在集群规模达到一定规模之前，etcd 默认模式不会有什么问题，当然如果 K8S 的节点数量达到了以千为单位的时，那就是另外一回事了。本文主要介绍一些关于 Etcd 的通用调优思路以及问题解决经验。">
+  <meta name="author" content="Tareya">
+  <meta name="keywords" content="">
+  
+  <title>Kubernetes Etcd 集群调优方案 - 乱序时空</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.7.2/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"tareya.github.io","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>乱序时空</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/background/lomo5.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Kubernetes Etcd 集群调优方案">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-14 21:07" pubdate>
+        2021年11月14日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      45
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kubernetes Etcd 集群调优方案</h1>
+            
+            <div class="markdown-body">
+              <p>我们知道，Etcd 可以说是 Kubernetes 集群的核心。一般情况下，在集群规模达到一定规模之前，etcd 默认模式不会有什么问题，当然如果 K8S 的节点数量达到了以千为单位的时，那就是另外一回事了。本文主要介绍一些关于 Etcd 的通用调优思路以及问题解决经验。</p>
+<span id="more"></span>
+
+
+
+<h1 id="Kubernetes-Etcd-集群调优方案"><a href="#Kubernetes-Etcd-集群调优方案" class="headerlink" title="Kubernetes Etcd 集群调优方案"></a>Kubernetes Etcd 集群调优方案</h1><blockquote>
+<p>🌈 事实上，etcd 也是一种 KV 型数据库，所以影响 etcd 的因素也和其他数据库产品一样，一般是网络和存储延时，尤其是跨地域、跨机房的集群。</p>
+</blockquote>
+<h2 id="一、关于网络延迟"><a href="#一、关于网络延迟" class="headerlink" title="一、关于网络延迟"></a>一、关于网络延迟</h2><blockquote>
+<p>🚩 对于集群型数据库来说，第一大问题就是网络延迟的问题。</p>
+</blockquote>
+<h3 id="1、集群规划"><a href="#1、集群规划" class="headerlink" title="1、集群规划"></a>1、集群规划</h3><p>因为 <code>leader</code> 和 <code>member</code> 之间有频繁的心跳和数据复制，因此网络拥塞影响会很大，当然长时间失败会无响应会导致 etcd 集群不可用。一般是将 etcd 集群规划在一个地域或一个机房内，并且使用 tc 提高带宽和优先级。</p>
+<h3 id="2、心跳间隔"><a href="#2、心跳间隔" class="headerlink" title="2、心跳间隔"></a>2、心跳间隔</h3><p>etcd 的一致性协议依赖两个时间参数。</p>
+<ul>
+<li><code>–heartbeat-interval</code>：心跳间隔，即 <code>leader</code> 通知 <code>member</code> 并保证自己 <code>leader</code> 地位的心跳，默认是 <code>100ms</code>，这个应该设置为节点间的 RTT 时间。</li>
+<li><code>–election-timeout</code>：选举超时时间，即 <code>member</code> 多久没有收到 <code>leader</code> 的回应，就开始自己竞选 <code>leader</code>，默认超时时间为 <code>1s</code></li>
+</ul>
+<p>默认值有可能不满足你的需求，如你的网络延迟较高，RTT 大于 100，就应该按真实延迟来，比如这个 issue，官方文档也对心跳的设置给了详细的解释和配置建议：<a target="_blank" rel="noopener" href="https://etcd.io/docs/v3.4/tuning/">https://etcd.io/docs/v3.4/tuning/</a></p>
+<p>如果心跳间隔太短，则 etcd 将发送不必要的消息，从而增加 CPU 和网络资源的使用。另一方面，心跳间隔过长会导致选举超时。较高的选举超时时间需要更长的时间来检测领导者失败。测量往返时间（RTT）的最简单方法是使用 PING。</p>
+<h2 id="二、关于磁盘-I-O"><a href="#二、关于磁盘-I-O" class="headerlink" title="二、关于磁盘 I/O"></a>二、关于磁盘 I/O</h2><blockquote>
+<p>🚩 除了网络延迟，磁盘 IO 也严重影响 etcd 的稳定性。</p>
+</blockquote>
+<p>etcd 需要持久化数据，对磁盘速度很敏感，强烈建议对 ETCD 的数据挂 SSD。</p>
+<p>另外，要确认机器上没有其他高 IO 操作，否则会影响 etcd 的 fsync，导致 etcd 丢失心跳，leader 更换等。一般磁盘有问题时，报错的关键字类似于：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sql">took too long (<span class="hljs-number">1.483848046</span>s) <span class="hljs-keyword">to</span> <span class="hljs-keyword">execute</span><br><br><br>etcdserver: failed <span class="hljs-keyword">to</span> send <span class="hljs-keyword">out</span> heartbeat <span class="hljs-keyword">on</span> <span class="hljs-type">time</span> <br></code></pre></td></tr></table></figure>
+
+<p>磁盘 IO 可以通过监控手段提前发现，并预防这类问题的出现。</p>
+<h2 id="三、关于快照"><a href="#三、关于快照" class="headerlink" title="三、关于快照"></a>三、关于快照</h2><p>etcd 的存储分为内存存储和持久化（硬盘）存储两部分，内存中的存储除了顺序化的记录下所有用户对节点数据变更的记录外，还会对用户数据进行索引、建堆等方便查询的操作。而持久化则使用预写式日志（WAL：Write Ahead Log）进行记录存储。</p>
+<p>在 WAL 的体系中，所有的数据在提交之前都会进行日志记录。在 etcd 的持久化存储目录中，有两个子目录。一个是WAL，存储着所有事务的变化记录；另一个则是 snapshot，用于存储某一个时刻etcd所有目录的数据。通过 WAL 和 snapshot 相结合的方式，etcd 可以有效的进行数据存储和节点故障恢复等操作。</p>
+<p>既然有了WAL实时存储了所有的变更，为什么还需要 snapshot 呢？随着使用量的增加，WAL存储的数据会暴增，为了防止磁盘很快就爆满，etcd 默认每10000 条记录做一次 snapshot，经过 snapshot 以后的 WAL 文件就可以删除。而通过 API 可以查询的历史 etcd 操作默认为 1000 条。</p>
+<h2 id="四、关于客户端优化"><a href="#四、关于客户端优化" class="headerlink" title="四、关于客户端优化"></a>四、关于客户端优化</h2><p>etcd 的客户端应该避免一些频繁操作或者大对象操作，如：</p>
+<ul>
+<li>put 时避免大 value，精简再精简（例如 k8s 中 crd 使用）</li>
+<li>避免创建频繁变化的 kv（例如 k8s 中 node 信息汇报），如 node-lease</li>
+<li>避免创建大量 lease，尽量选择复用（例如 k8s 中 event 数据管理）</li>
+<li>合理利用 apiserver 中的缓存，避免大量请求打到 etcd上，如集群异常恢复后大量 pod 同步</li>
+</ul>
+<h2 id="五、关于版本升级"><a href="#五、关于版本升级" class="headerlink" title="五、关于版本升级"></a>五、关于版本升级</h2><p>你可能还看到过 lease revoke 、boltdb、内存优化等方式，这些已经合入了最新的 etcd 3.4版本，因此选择最新的 release 版本也是提高稳定性的一种方式。</p>
+<h2 id="六、关于压缩机制"><a href="#六、关于压缩机制" class="headerlink" title="六、关于压缩机制"></a>六、关于压缩机制</h2><blockquote>
+<p>🚩 etcd 作为 KV 存储，会为每个 key 都保留历史版本，比如用于发布回滚、配置历史等。</p>
+</blockquote>
+<h3 id="1、etcd-的-kv-操作"><a href="#1、etcd-的-kv-操作" class="headerlink" title="1、etcd 的 kv 操作"></a>1、etcd 的 kv 操作</h3><p>对 demo 写入值为 101，然后更为为 102，103。-w json 可以输出这次写入的 revision</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl put demo 101 -w json<br>etcdctl put demo 102 -w json<br>etcdctl put demo 103 -w json<br></code></pre></td></tr></table></figure>
+
+<p>返回类似:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;header&quot;</span>:&#123;<span class="hljs-attr">&quot;cluster_id&quot;</span>:<span class="hljs-number">4871617780647557296</span>,<span class="hljs-attr">&quot;member_id&quot;</span>:<span class="hljs-number">3135801277950388570</span>,<span class="hljs-attr">&quot;revision&quot;</span>:<span class="hljs-number">434841</span>,<span class="hljs-attr">&quot;raft_term&quot;</span>:<span class="hljs-number">2</span>&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p>取值：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl get demo 								# 默认 --rev=0即最新值=103如果要拿到历史值，需要制定 rev 版本<br>etcdctl get demo  --rev=434841	# 得到 102<br></code></pre></td></tr></table></figure>
+
+<p>观察 key的变化:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">etcdctl</span> watch  foo --rev=<span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<p>历史版本越多，存储空间越大，性能越差，直到etcd到达空间配额限制的时候，etcd 的写入将会被禁止变为只读，影响线上服务，因此这些历史版本需要进行压缩。</p>
+<p>数据压缩并不是清理现有数据，只是对给定版本之前的历史版本进行清理，清理后数据的历史版本将不能访问，但不会影响现有最新数据的访问。</p>
+<h3 id="2、数据压缩"><a href="#2、数据压缩" class="headerlink" title="2、数据压缩"></a>2、数据压缩</h3><h4 id="1）手动压缩"><a href="#1）手动压缩" class="headerlink" title="1）手动压缩"></a>1）手动压缩</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl compact 5<br></code></pre></td></tr></table></figure>
+
+<p>在 5 之前的所有版本都会被压缩，不可访问，如果执行 <code>etcdctl get --rev=4 demo</code>，会报错 <code>Error:  rpc error: code = 11 desc = etcdserver: mvcc: required revision has been compacted</code></p>
+<h4 id="2）自动压缩"><a href="#2）自动压缩" class="headerlink" title="2）自动压缩"></a>2）自动压缩</h4><h5 id="1-etcd-配置"><a href="#1-etcd-配置" class="headerlink" title="1. etcd 配置"></a>1. etcd 配置</h5><p>手动操作毕竟繁琐，Etcd 提供了启动参数 <code>–auto-compaction-retention</code> 支持自动压缩 key 的历史版本，以小时为单位</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcd --auto-compaction-retention=1 		# 代表 1 小时压缩一次<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>🚩 v3.3 之上的版本有这样一个规则：</p>
+<ul>
+<li>如果配置的值小于1小时，那么就严格按照这个时间来执行压缩</li>
+<li>如果配置的值大于1小时，会每小时执行压缩，但是采样还是按照保留的版本窗口依然按照用户指定的时间周期来定</li>
+</ul>
+</blockquote>
+<h5 id="2-k8s-配置"><a href="#2-k8s-配置" class="headerlink" title="2. k8s 配置"></a>2. k8s 配置</h5><p>k8s api-server 支持定期执行压缩操作，其参数里面有这样的配置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">– etcd-compaction-interval 						# 即默认 5 分钟一次<br></code></pre></td></tr></table></figure>
+
+<p>你可以在 etcd 中看到这样的压缩日志，5 分钟一次：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs go">Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">05</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: store.index: compact <span class="hljs-number">433912</span>Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">05</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: finished scheduled compaction at <span class="hljs-number">433912</span> (took <span class="hljs-number">1.068846</span>ms)Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">10</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: store.index: compact <span class="hljs-number">434487</span>Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">10</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: finished scheduled compaction at <span class="hljs-number">434487</span> (took <span class="hljs-number">1.019571</span>ms)Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">15</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: store.index: compact <span class="hljs-number">435063</span>Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">15</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: finished scheduled compaction at <span class="hljs-number">435063</span> (took <span class="hljs-number">1.659541</span>ms)Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">20</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: store.index: compact <span class="hljs-number">435637</span>Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">20</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: finished scheduled compaction at <span class="hljs-number">435637</span> (took <span class="hljs-number">1.676035</span>ms)Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">25</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: store.index: compact <span class="hljs-number">436211</span>Apr <span class="hljs-number">25</span> <span class="hljs-number">11</span>:<span class="hljs-number">25</span>:<span class="hljs-number">20</span>  etcd[<span class="hljs-number">2195</span>]: finished scheduled compaction at <span class="hljs-number">436211</span> (took <span class="hljs-number">1.17725</span>ms)<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、碎片整理"><a href="#3、碎片整理" class="headerlink" title="3、碎片整理"></a>3、碎片整理</h3><p>进行压缩操作之后，旧的 revision 被清理，会产生内部的碎片，内部碎片是指空闲状态的，能被 etcd 使用但是仍然消耗存储空间的磁盘空间，去碎片化实际上是将存储空间还给文件系统。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> defrag命令默认只对本机有效</span><br>etcdctl defrag<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 如果带参数 --endpoints，可以指定集群中的其他节点也做整理</span><br>etcdctl defrag --endpoints<br></code></pre></td></tr></table></figure>
+
+<p>etcdctl执行后的返回 <code>Finished defragmenting etcd member [https://127.0.0.1:2379]</code></p>
+<p>如果 etcd 没有运行，可以直接整理目录中 db 的碎片</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl defrag --data-dir &lt;path-to-etcd-data-dir&gt;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>注意:</strong></p>
+<ul>
+<li><p>碎片整理会阻塞对 etcd 的读写操作，因此偶尔一次大量数据的defrag最好逐台进行，以免影响集群稳定性。</p>
+</li>
+<li><p>配置 <code>auto-compaction-retention</code> 只会做碎片整理，不会实际减少空间大小，如果需要减少大小还是需要使用 <code>etcdctl compact</code> 和 s<code>etcdctl defrag</code> 清理空间</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="七、关于存储空间"><a href="#七、关于存储空间" class="headerlink" title="七、关于存储空间"></a>七、关于存储空间</h2><p>Etcd 的存储配额可保证集群操作的可靠性。如果没有存储配额，那么 Etcd 的性能就会因为存储空间的持续增长而严重下降，甚至有耗完集群磁盘空间导致不可预测集群行为的风险。</p>
+<p>一旦其中一个节点的后台数据库的存储空间超出了存储配额，Etcd 就会触发集群范围的告警，并将集群置于接受读 key 和删除 key 的维护模式。只有在释放足够的空间和消除后端数据库的碎片之后，清除存储配额告警，集群才能恢复正常操作。</p>
+<p>启动 etcd 时。<code>-quota-backend-bytes</code> 默认为 2G，2G 一般情况下是不够用的，</p>
+<p>你可以通过 <code>etcdctl endpoint status</code> 命令来查看当前的存储使用量</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 etcdctl endpoint status -w table<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211114220513569.png" srcset="/img/loading.gif" lazyload alt="image-20211114220513569"></p>
+<p>在 3.4 版本中，etcd 的存储容量得到了提高，你可以设置 100G 的存储空间，当然并不是越大越好，key 存储过多性能也会变差，根据集群规模适当调整。</p>
+<p>另外，<code>–max-request-bytes</code> 限制了请求的大小，默认值是 1572864，即 1.5M。在某些场景可能会出现请求过大导致无法写入的情况，可以调大到 10485760 即10M。</p>
+<p><strong>如果遇到空间不足，可以这样操作:</strong></p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs ruby"><span class="hljs-comment"># 获取当前版本号</span><br>rev=<span class="hljs-variable">$(</span>ETCDCTL_API=<span class="hljs-number">3</span> etcdctl  endpoint status --write-out=<span class="hljs-string">&quot;json&quot;</span> <span class="hljs-params">| egrep -o &#x27;&quot;revision&quot;:[0-9]*&#x27; |</span> egrep -o <span class="hljs-string">&#x27;[0-9]*&#x27;</span>)<br><br><span class="hljs-comment"># 压缩所有旧版本</span><br>ETCDCTL_API=<span class="hljs-number">3</span> etcdctl compact <span class="hljs-variable">$rev</span><br><br><span class="hljs-comment"># 去碎片化</span><br>ETCDCTL_API=<span class="hljs-number">3</span> etcdctl defrag<br><br><span class="hljs-comment"># 取消警报</span><br>ETCDCTL_API=<span class="hljs-number">3</span> etcdctl alarm disarm<br><br><span class="hljs-comment"># 测试通过</span><br>ETCDCTL_API=<span class="hljs-number">3</span> etcdctl put key0 <span class="hljs-number">1234</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="八、关于-learner-角色"><a href="#八、关于-learner-角色" class="headerlink" title="八、关于 learner 角色"></a>八、关于 learner 角色</h2><p><code>learner</code> 是 etcd 3.4 版本中增加的新角色，类似于<code> zookeeper</code> 的 <code>observer</code>, 不参与 <code>raft</code> 投票选举。通过这个新角色的引入，降低了加入新节点时给老集群的额外压力，增强了集群的稳定性。除此之外还可以使用它作为集群的热备或服务一些读请求。</p>
+<p>举例，如果 etcd 集群需要加入一个新节点，新加入的 etcd 成员因为没有任何数据，因此需要从 <code>leader</code> 那里同步数据，直到赶上领导者的日志为止。这样就会导致 leader 的网络过载，导致 <code>leader</code> 和 <code>member</code> 之间的心跳可能阻塞。然后就开始了新的 <code>leader</code> 选举，也就是说，具有新成员的集群更容易受到领导人选举的影响。领导者的选举以及随后向新成员的更新都容易导致一段时间的群集不可用，这种是不符合预期，风险也是很大的。</p>
+<p>因此为了解决这个问题，raft 4.2.1 论文中介绍了一种新的节点角色：<code>Learner</code>。加入集群的节点不参与投票选举，只接收 <code>leader</code> 的 <code>replication message</code>，直到与 leader 保持同步为止。</p>
+<p>learner 在网络分区等场景下的处理，可以详细参考：<a target="_blank" rel="noopener" href="https://etcd.io/docs/v3.4/learning/design-learner/">https://etcd.io/docs/v3.4/learning/design-learner/</a></p>
+<p><strong>具体操作:</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 增加一个节点作为 learner</span><br>member add --learner<br><span class="hljs-meta"></span><br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 当learner的日志赶上了leader的进度时，将learner提升为有投票权的成员，然后该成员将计入法定人数</span><br>member promote<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> etcd server 会验证 promote 请求以确保真实</span><br></code></pre></td></tr></table></figure>
+
+<p>在提升之前，<code>learner</code> 仅充当备用节点，<code>leader</code> 无法转移给 <code>learner</code>。<code>learner</code> 拒绝客户端读写（客户端平衡器不应将请求路由到<code>learner</code>）。</p>
+<p>另外，etcd 限制了集群可以拥有的 <code>learner</code> 总数，并避免了日志复制导致领导者过载。<code>learner</code> 永远不会自我提升。</p>
+<h2 id="九、关于-etcd-client-v3"><a href="#九、关于-etcd-client-v3" class="headerlink" title="九、关于 etcd client v3"></a>九、关于 etcd client v3</h2><p>Etcd client v3 是基于 <code>grpc</code> 实现的，而 <code>grpc</code> 又是基于 <code>http2.0</code> 实现的，借用了很多 <code>http2</code> 的优势如二进制通讯、多路复用等，因此整体上借用 <code>grpc</code> 的框架做地址管理、连接管理、负载均衡等，而底层对每个 Etcd 的 server 只需维持一个 <code>http2.0</code> 连接。</p>
+<p>Etcd client v3 实现了<code>grpc</code> 中的 <code>Resolver</code> 接口，用于 Etcd server 地址管理。当 client 初始化或者 server 集群地址发生变更（可以配置定时刷新地址）时，Resolver 解析出新的连接地址，通知 grpc ClientConn 来响应变更。</p>
+<p>client v3的原理解析可以看这篇文章：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/281b80ae619b">https://www.jianshu.com/p/281b80ae619b</a></p>
+<p>我们是用etcd client 做应用的选主操作，最早的时候以为 kubernetes 中的 scheduler、controller-manager是基于 etcd 做选主的，client拿来直接用很方便。后来发现不是，kubernetes 是用抢占 endpoint 资源的方式实现选主逻辑，不依赖外部 etcd，这么想来也合理，严格来讲，etcd 不是kubernetes的东西，不应该有太多依赖。</p>
+<h2 id="十、问题排查处理"><a href="#十、问题排查处理" class="headerlink" title="十、问题排查处理"></a>十、问题排查处理</h2><blockquote>
+<p>🚩 列几个常遇到的 etcd 问题，后面监控部分会提到如何监测、预防这类问题</p>
+</blockquote>
+<h3 id="1、一个节点宕机"><a href="#1、一个节点宕机" class="headerlink" title="1、一个节点宕机"></a>1、一个节点宕机</h3><p>一个节点宕机，并不会影响整个集群的正常工作，慢慢修复。</p>
+<ul>
+<li><p>移出该节点：etcdctl member remove xx</p>
+</li>
+<li><p>修复机器问题，删除旧的数据目录，重新启动 etcd 服务</p>
+</li>
+<li><p>因为 etcd 的证书需要签入所有节点 ip，因此这里的节点不能更改 ip，否则要全部重签证书，重启服务</p>
+</li>
+<li><p>重启启动 etcd 时，需要将配置中的 cluster_state改为：existing，因为是加入已有集群，不能用 new</p>
+</li>
+<li><p>加入 memeber：etcdctl member add xxx –peer-urls=<a target="_blank" rel="noopener" href="https://x.x.x.x:2380/">https://x.x.x.x:2380</a></p>
+</li>
+<li><p>验证：etcdctl endpoint status</p>
+</li>
+</ul>
+<h3 id="2、迁移数据"><a href="#2、迁移数据" class="headerlink" title="2、迁移数据"></a>2、迁移数据</h3><p>如果你的集群需要更换所有的机器，包括更换 IP，那就得通过快照恢复的方式了</p>
+<p>使用 <code>etcdctl snapshot save</code> 来保存现有数据，新集群更换后，使用 restore 命令恢复数据，在执行快照时会产生一个 hash 值，来标记快照内容后面恢复时用于校验，如果你是直接复制的数据文件，可以 <code>–skip-hash-check</code> 跳过这个检查。</p>
+<p>迁移集群会更换证书和端点，因此一定会影响上层服务，在迁移之前一定要做好新旧切换，如 apiserver 分批升级（会有部分数据不一致）、避免服务宕机时间过长等</p>
+<h3 id="3、failed-to-send-out-heartbeat-on-time"><a href="#3、failed-to-send-out-heartbeat-on-time" class="headerlink" title="3、failed to send out heartbeat on time"></a>3、failed to send out heartbeat on time</h3><p>这个前面已经提过，大概率是因为磁盘性能不足，导致心跳失败，更换 SSD 或者排查机器上高 IO 的进程</p>
+<p>详细可以查看这个：<a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd/blob/master/Documentation/faq.md#what-does-the-etcd-warning-failed-to-send-out-heartbeat-on-time-mean">https://github.com/etcd-io/etcd/blob/master/Documentation/faq.md#what-does-the-etcd-warning-failed-to-send-out-heartbeat-on-time-mean</a></p>
+<p><code>request ... took too long to execute</code> 这类报错也是同理</p>
+<h3 id="4、mvcc-database-space-exceeded"><a href="#4、mvcc-database-space-exceeded" class="headerlink" title="4、mvcc: database space exceeded"></a>4、mvcc: database space exceeded</h3><p>存储空间不足，参考上面提到的清理和恢复步骤，或者提高存储空间</p>
+<h3 id="5、endpoints问题"><a href="#5、endpoints问题" class="headerlink" title="5、endpoints问题"></a>5、endpoints问题</h3><p>尽量不要使用 lb 作为 etcd endpoints 配置，etcd client 是 grpc 访问，请使用默认的 全量list ,客户端做负载均衡的方式。详细内容可以参考 grpc 负载均衡场景解析</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/">Kubernetes</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Kubernetes/etcd/">etcd</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">问题解决方案</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/16/%E3%80%8ADevOps%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E5%B8%88%E8%A1%8C%E5%8A%A8%E6%8C%87%E5%8D%97%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E5%95%8A/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">《DevOps软件架构师行动指南》读书笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/14/Kubernetes-Etcd-%E9%9B%86%E7%BE%A4%E7%9B%91%E6%8E%A7%E6%96%B9%E6%A1%88/">
+                        <span class="hidden-mobile">Kubernetes Etcd 集群监控方案</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.3/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.1/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

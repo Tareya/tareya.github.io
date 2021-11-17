@@ -14,7 +14,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Kubernetes 二次调度解决方案我们知道，kube-scheduler 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，scheduler 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。">
+  <meta name="description" content="我们知道，kube-scheduler 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，scheduler 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。">
   <meta name="author" content="Tareya">
   <meta name="keywords" content="">
   
@@ -228,7 +228,7 @@
             <h1 style="display: none">Kubernetes 二次调度解决方案</h1>
             
             <div class="markdown-body">
-              <h1 id="Kubernetes-二次调度解决方案"><a href="#Kubernetes-二次调度解决方案" class="headerlink" title="Kubernetes 二次调度解决方案"></a>Kubernetes 二次调度解决方案</h1><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。</p>
+              <p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能使这些 Pod 再次调度 。我们可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。也就是 —— 二次调度。</p>
 <span id="more"></span>
 
 
@@ -236,8 +236,8 @@
 <h2 id="一、问题描述"><a href="#一、问题描述" class="headerlink" title="一、问题描述"></a>一、问题描述</h2><p>我们知道，<code>kube-scheduler</code> 在 Kubernetes 集群中负责调度的组件。但是默认的调度机制却并不那么友善，即使我们为 Node 配置了亲和或反亲和，仍然会出现某些节点负载高，某些节点则几乎空闲的情况。这是因为正常情况下，在 pod 创建运行后，<code>scheduler</code> 并不会再次尝试重新调度它，除非触发驱逐，才有可能是这些 Pod 再次调度 。</p>
 <p>在这个案例中国，我们的 K8S 在运行过程中，就碰到了这种情况。pod 的调度经常会出现倾斜的情况，大量副本积压在个别 node 节点上，将节点资源占用完（这里主要体现在内存方面），如下图的情况：</p>
 <p>Node15、Node16 内存资源使用率以100%了，但是空闲的节点内存使用率可能未超过 50%，这种分布的倾斜事实上是不健康的。</p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161447795.png" srcset="/img/loading.gif" lazyload alt="image-20211020161447795"></p>
-<p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211020161535235.png" srcset="/img/loading.gif" lazyload alt="image-20211020161535235"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211020161447795.png" srcset="/img/loading.gif" lazyload alt="image-20211020161447795"></p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211020161535235.png" srcset="/img/loading.gif" lazyload alt="image-20211020161535235"></p>
 <p>由于我们在 kubelet 中设置了 eviction，也就是驱逐机制，在节点资源紧张时，驱逐机制就会开启，以此来尝试回收节点资源。</p>
 <p>但是这种通过 kubelet 驱逐的方式是十分被动的，并不能及时的解决资源适应倾斜的问题。虽然 K8S 原始的调度提供了一些优先级调度和自定义调度的方法，但是这种方式并不灵活，有些也缺乏合理性，所以我们需要另一种方案去解决这类问题。</p>
 <p>事实上，我们并不需要再 Pod 初次调度时，就解决资源倾斜的问题，同样也可以在资源发生不平衡时触发 Pod 的再一次的调度，从而回收资源，这也能够解决倾斜问题。这也及时本方案所涉及的概念 —— 二次调度。</p>

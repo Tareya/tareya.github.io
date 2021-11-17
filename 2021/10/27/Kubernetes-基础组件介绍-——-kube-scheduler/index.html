@@ -14,7 +14,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Kubernetes 基础组件介绍 —— kube-scheduler在 K8S 的组件中，kube-scheduler 是专门用于处理调度的进程。其核心功能是持续监听 API Server 来获取PodSpec.NodeName 为空的 Pod，并对每个 Pod 创建 binding，然后根据特定的调度算法和调度策略将 Pod 调度到合适的 Node 节点上去，再将调度结果回写 API Serv">
+  <meta name="description" content="在 K8S 的组件中，kube-scheduler 是专门用于处理调度的进程。其核心功能是持续监听 API Server 来获取PodSpec.NodeName 为空的 Pod，并对每个 Pod 创建 binding，然后根据特定的调度算法和调度策略将 Pod 调度到合适的 Node 节点上去，再将调度结果回写 API Server。">
   <meta name="author" content="Tareya">
   <meta name="keywords" content="">
   
@@ -228,10 +228,10 @@
             <h1 style="display: none">Kubernetes 基础组件介绍 —— kube-scheduler</h1>
             
             <div class="markdown-body">
-              <h1 id="Kubernetes-基础组件介绍-——-kube-scheduler"><a href="#Kubernetes-基础组件介绍-——-kube-scheduler" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-scheduler"></a>Kubernetes 基础组件介绍 —— kube-scheduler</h1><p>在 K8S 的组件中，<code>kube-scheduler</code> 是专门用于处理调度的进程。其核心功能是持续监听 <code>API Server</code> 来获取<code>PodSpec.NodeName</code> 为空的 Pod，并对每个 Pod 创建 binding，然后根据特定的调度算法和调度策略将 Pod 调度到合适的 Node 节点上去，再将调度结果回写 <code>API Server</code>。</p>
+              <p>在 K8S 的组件中，<code>kube-scheduler</code> 是专门用于处理调度的进程。其核心功能是持续监听 <code>API Server</code> 来获取<code>PodSpec.NodeName</code> 为空的 Pod，并对每个 Pod 创建 binding，然后根据特定的调度算法和调度策略将 Pod 调度到合适的 Node 节点上去，再将调度结果回写 <code>API Server</code>。</p>
 <span id="more"></span>
 
-<h2 id="一、K8S-调度原理和调度策略"><a href="#一、K8S-调度原理和调度策略" class="headerlink" title="一、K8S 调度原理和调度策略"></a>一、K8S 调度原理和调度策略</h2><blockquote>
+<h1 id="Kubernetes-基础组件介绍-——-kube-scheduler"><a href="#Kubernetes-基础组件介绍-——-kube-scheduler" class="headerlink" title="Kubernetes 基础组件介绍 —— kube-scheduler"></a>Kubernetes 基础组件介绍 —— kube-scheduler</h1><h2 id="一、K8S-调度原理和调度策略"><a href="#一、K8S-调度原理和调度策略" class="headerlink" title="一、K8S 调度原理和调度策略"></a>一、K8S 调度原理和调度策略</h2><blockquote>
 <p>🚩 Kube-scheduler 是 Kubernetes 的默认调度器，是集群整体控制面的一部分。kube-scheduler 在设计上允许自定义一个调度组件来替换它，所以只要清楚的了解了 K8S 中调度的原理，我们就可以自定义一个调度器。</p>
 </blockquote>
 <h3 id="1、Kube-Scheduler-的工作原理"><a href="#1、Kube-Scheduler-的工作原理" class="headerlink" title="1、Kube-Scheduler 的工作原理"></a>1、Kube-Scheduler 的工作原理</h3><h4 id="1）调度流程"><a href="#1）调度流程" class="headerlink" title="1）调度流程"></a>1）调度流程</h4><h5 id="1-流程概述"><a href="#1-流程概述" class="headerlink" title="1. 流程概述"></a>1. 流程概述</h5><ul>
@@ -248,7 +248,7 @@
 <li>经过上阶段选择得分最高的 Node 节点与Pod 进步 binding，并通知 API Server 将结果回写 etcd</li>
 <li>最后由被选择出来的 Node 节点上的 kubelet 去执行创建 Pod 的相关操作，创建和启动容器</li>
 </ul>
-<h5 id="2-具体过程图"><a href="#2-具体过程图" class="headerlink" title="2. 具体过程图"></a>2. 具体过程图</h5><p><img src="http://uniondrug-devops.oss-cn-hangzhou.aliyuncs.com/blog_images/image-20211026100220906.png" srcset="/img/loading.gif" lazyload alt="image-20211026100220906"></p>
+<h5 id="2-具体过程图"><a href="#2-具体过程图" class="headerlink" title="2. 具体过程图"></a>2. 具体过程图</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211026100220906.png" srcset="/img/loading.gif" lazyload alt="image-20211026100220906"></p>
 <h3 id="2、调度策略"><a href="#2、调度策略" class="headerlink" title="2、调度策略"></a>2、调度策略</h3><h4 id="1）断言-——-Predicates"><a href="#1）断言-——-Predicates" class="headerlink" title="1）断言 —— Predicates"></a>1）断言 —— <em>Predicates</em></h4><blockquote>
 <p>🚩 调度器通过断言的方式实现了过滤接口，以此实现节点的预选阶段。</p>
 </blockquote>
