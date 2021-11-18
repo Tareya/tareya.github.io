@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.5k 字
+      6.7k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      24
+      97
        分钟
     </span>
   
@@ -233,27 +233,525 @@
 
 
 
-<h1 id="Kubernetes-基础组件介绍-——-Etcd集群"><a href="#Kubernetes-基础组件介绍-——-Etcd集群" class="headerlink" title="Kubernetes 基础组件介绍 —— Etcd集群"></a>Kubernetes 基础组件介绍 —— Etcd集群</h1><h2 id="一、Etcd-概述"><a href="#一、Etcd-概述" class="headerlink" title="一、Etcd 概述"></a>一、Etcd 概述</h2><h3 id="1、Etcd-简介"><a href="#1、Etcd-简介" class="headerlink" title="1、Etcd 简介"></a>1、Etcd 简介</h3><h3 id="2、Etcd-的特性"><a href="#2、Etcd-的特性" class="headerlink" title="2、Etcd 的特性"></a>2、Etcd 的特性</h3><h4 id="1）高可用实现"><a href="#1）高可用实现" class="headerlink" title="1）高可用实现"></a>1）高可用实现</h4><p>Etcd 是基于 raft 算法的分布式键值数据库，生来就为集群化而设计的，由于Raft算法在做决策时需要超半数节点的投票，所以etcd集群一般推荐奇数节点，如3、5或者7个节点构成一个集群。</p>
-<h4 id="2）选主过程"><a href="#2）选主过程" class="headerlink" title="2）选主过程"></a>2）选主过程</h4><h4 id="3）节点数必须是奇数吗？"><a href="#3）节点数必须是奇数吗？" class="headerlink" title="3）节点数必须是奇数吗？"></a>3）节点数必须是奇数吗？</h4><h4 id="4）机器越多越好吗？"><a href="#4）机器越多越好吗？" class="headerlink" title="4）机器越多越好吗？"></a>4）机器越多越好吗？</h4><h4 id="5）关于脑裂"><a href="#5）关于脑裂" class="headerlink" title="5）关于脑裂"></a>5）关于脑裂</h4><h4 id="6）关于数据一致性"><a href="#6）关于数据一致性" class="headerlink" title="6）关于数据一致性"></a>6）关于数据一致性</h4><h2 id="二、Etcd-集群部署"><a href="#二、Etcd-集群部署" class="headerlink" title="二、Etcd 集群部署"></a>二、Etcd 集群部署</h2><blockquote>
+<h1 id="Kubernetes-基础组件介绍-——-Etcd集群"><a href="#Kubernetes-基础组件介绍-——-Etcd集群" class="headerlink" title="Kubernetes 基础组件介绍 —— Etcd集群"></a>Kubernetes 基础组件介绍 —— Etcd集群</h1><h2 id="一、Etcd-概述"><a href="#一、Etcd-概述" class="headerlink" title="一、Etcd 概述"></a>一、Etcd 概述</h2><h3 id="1、Etcd-简介"><a href="#1、Etcd-简介" class="headerlink" title="1、Etcd 简介"></a>1、Etcd 简介</h3><h4 id="1）什么是-Etcd？"><a href="#1）什么是-Etcd？" class="headerlink" title="1）什么是 Etcd？"></a>1）什么是 Etcd？</h4><p>Etcd 是 CoreOS 团队于2013年6月发起的开源项目，基于Go语言实现。它的目标是构建一个高可用的分布式键值数据库。内部采用 <code>raft</code> 协议作为一致性算法。</p>
+<p>Etcd 官网地址: <a target="_blank" rel="noopener" href="https://etcd.io/">https://etcd.io/</a></p>
+<p>Etcd 官方 github 地址：<a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=https://github.com/coreos/etcd/">https://github.com/coreos/etcd/</a></p>
+<p>官方介绍如下:</p>
+<blockquote>
+<p><strong>etcd</strong> is a strongly consistent, distributed key-value store that provides a reliable way to store data that needs to be accessed by a distributed system or cluster of machines. It gracefully handles leader elections during network partitions and can tolerate machine failure, even in the leader node. </p>
+<p>—— Etcd是一种高度一致的分布式键值存储方式，它提供了一种可靠的方式来存储需要被分布式系统或计算机集群访问的数据。它可以在网络分区期间优雅地处理leader选举，并且可以容忍机器故障，即使是leader节点。</p>
+</blockquote>
+<h4 id="2）Etcd-的使用场景"><a href="#2）Etcd-的使用场景" class="headerlink" title="2）Etcd 的使用场景"></a>2）Etcd 的使用场景</h4><p>Etcd 最常用的使用场景还是用于作服务发现，例如 Kubernetes。它作为服务发现系统，有以下的特点：</p>
+<ul>
+<li>简单：安装配置简单，而且提供了HTTP API进行交互，使用也很简单</li>
+<li>安全：支持SSL证书验证</li>
+<li>快速：根据官方提供的benchmark数据，单实例支持每秒2k+读操作</li>
+<li>可靠：采用raft算法，实现分布式系统数据的可用性和一致性</li>
+</ul>
+<h4 id="3）Etcd-的服务发现"><a href="#3）Etcd-的服务发现" class="headerlink" title="3）Etcd 的服务发现"></a>3）Etcd 的服务发现</h4><p>服务发现（Service Discovery）的目的在于解决分布式系统中最常见的问题之一，即在同一个分布式集群中的服务如何才能找到彼此并建立连接。从本质上说，服务发现就是要了解集群中是否有进程在监听upd或者tcp端口，并且通过名字就可以进行查找和链接。</p>
+<p>要解决这个问题，需要满足下面三种机制，缺一不可:</p>
+<ul>
+<li>一个强一致性、高可用的服务存储目录</li>
+<li>一种注册服务和服务健康状况的机制</li>
+<li>一种查找和连接服务的机制</li>
+</ul>
+<p>针对这三种机制，etcd 的实现是:</p>
+<ul>
+<li><p>基于 Ralf 算法 和 WAL 机制实现数据的强一致性和高可用的服务存储目录。</p>
+</li>
+<li><p>用户可以在 etcd 中注册服务，并且对注册的服务配置 key TTL，然后通过 watch 定时保持服务的心跳以达到监控健康状态的效果，以此来满足服务注册和健康检查</p>
+</li>
+<li><p>通过 etcd 指定的主题下注册的服务也能在对应的主题下查找到。etcd 通过 HTTP API的形式进行连接，甚至为了确保连接，我们可以在每个服务机器上都部署一个proxy 模式的 etcd，这样就可以确保访问 etcd 集群的服务都能够互相连接。</p>
+</li>
+</ul>
+<h3 id="2、Etcd-的特性"><a href="#2、Etcd-的特性" class="headerlink" title="2、Etcd 的特性"></a>2、Etcd 的特性</h3><h4 id="1）高可用实现"><a href="#1）高可用实现" class="headerlink" title="1）高可用实现"></a>1）高可用实现</h4><p>Etcd 是基于 raft 算法的分布式键值数据库，生来就为集群化而设计的，由于Raft算法在做决策时需要超半数节点的投票，所以etcd集群一般推荐奇数节点，如3、5或者7个节点构成一个集群。</p>
+<h4 id="2）选主过程"><a href="#2）选主过程" class="headerlink" title="2）选主过程"></a>2）选主过程</h4><p>etcd 从设计之初就是高可用的，允许部分机器故障，以标准的3节点 etcd 集群，最大容忍1台机器宕机，下面以最简单的 leader 宕机为例，演示一下 raft 的投票逻辑，以实际的运行日志来验证并理解。</p>
+<blockquote>
+<p>🚩 <strong>演示场景:</strong> 正常运行的三台 etcd，<code>192.168.3.206</code>、<code>192.168.3.33</code>、<code>192.168.3.38</code>。当前任期为 2，leader 为 <code>192.168.3.38</code>。</p>
+</blockquote>
+<p>执行如下命令查看集群角色情况:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl -w table  --endpoints=https://192.168.3.206:2379,https://192.168.3.33:2379,https://192.168.3.38:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint status<br></code></pre></td></tr></table></figure>
+
+<p>返回如下:</p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211118141828633.png" srcset="/img/loading.gif" lazyload alt="image-20211118141828633"></p>
+<p>关闭 <code>192.168.3.38</code> 节点的 etcd，模拟宕机情况。再次查看集群角色情况，返回如下:</p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211118142320270.png" srcset="/img/loading.gif" lazyload alt="image-20211118142320270"></p>
+<p><code>192.168.3.33</code> 成为新的 leader，任期提升了1，此时只剩2个节点，但是总数为3</p>
+<p>日志记录信息如下:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.993+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:1355&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 [term 2] received MsgTimeoutNow from 9b69c00e80e79009 and starts an election to get leadership.&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.994+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:713&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 became candidate at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.994+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:824&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 received MsgVoteResp from 1eaefc6199fd6c67 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.994+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:811&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 [logterm: 2, index: 11] sent MsgVote request to 9b69c00e80e79009 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.994+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:811&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 [logterm: 2, index: 11] sent MsgVote request to 9c2cd7b04087bdd5 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.994+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/node.go:331&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;raft.node: 1eaefc6199fd6c67 lost leader 9b69c00e80e79009 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.998+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:824&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 received MsgVoteResp from 9c2cd7b04087bdd5 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.998+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:1302&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 has received 2 MsgVoteResp votes and 0 vote rejections&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.998+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/raft.go:765&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67 became leader at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;info&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:10.998+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;raft/node.go:325&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;raft.node: 1eaefc6199fd6c67 elected leader 1eaefc6199fd6c67 at term 3&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;level&quot;</span>:<span class="hljs-string">&quot;warn&quot;</span>,<span class="hljs-attr">&quot;ts&quot;</span>:<span class="hljs-string">&quot;2021-11-18T14:22:11.245+0800&quot;</span>,<span class="hljs-attr">&quot;caller&quot;</span>:<span class="hljs-string">&quot;rafthttp/stream.go:436&quot;</span>,<span class="hljs-attr">&quot;msg&quot;</span>:<span class="hljs-string">&quot;lost TCP streaming connection with remote peer&quot;</span>,<span class="hljs-attr">&quot;stream-reader-type&quot;</span>:<span class="hljs-string">&quot;stream MsgApp v2&quot;</span>,<span class="hljs-attr">&quot;local-member-id&quot;</span>:<span class="hljs-string">&quot;1eaefc6199fd6c67&quot;</span>,<span class="hljs-attr">&quot;remote-peer-id&quot;</span>:<span class="hljs-string">&quot;9b69c00e80e79009&quot;</span>,<span class="hljs-attr">&quot;error&quot;</span>:<span class="hljs-string">&quot;EOF&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>具体过程如下:</p>
+<ul>
+<li><p>3.38 停止了 etcd 的运行（宕机）</p>
+</li>
+<li><p>3.33（1eaefc6199fd6c67）收到消息，发现 3.38（9b69c00e80e79009）心跳超时，于是发起新一轮选举，任期为 2+1=3</p>
+<blockquote>
+<p>1eaefc6199fd6c67 [term 2] received MsgTimeoutNow from 9b69c00e80e79009 and starts an election to get leadership.</p>
+</blockquote>
+</li>
+<li><p>3.33（1eaefc6199fd6c67）成为新一任候选人，然后自己给自己投一票，获得1票</p>
+<blockquote>
+<p>1eaefc6199fd6c67 became candidate at term 3</p>
+<p>1eaefc6199fd6c67 received MsgVoteResp from 1eaefc6199fd6c67 at term 3</p>
+</blockquote>
+</li>
+<li><p>3.33（1eaefc6199fd6c67）发送给 挂掉的101 和 另一个100，希望他们也投给自己</p>
+<blockquote>
+<p>1eaefc6199fd6c67 [logterm: 2, index: 11] sent MsgVote request to 9b69c00e80e79009 at term 3</p>
+<p>1eaefc6199fd6c67 [logterm: 2, index: 11] sent MsgVote request to 9c2cd7b04087bdd5 at term 3</p>
+</blockquote>
+</li>
+<li><p>3.33 肯定收不到 3.38 的响应，因为 3.38 已经挂掉了</p>
+<blockquote>
+<p>raft.node: 1eaefc6199fd6c67 lost leader 9b69c00e80e79009 at term 3</p>
+</blockquote>
+</li>
+<li><p>3.206（9c2cd7b04087bdd5）收到了 3.33 的拉票信息，因为任期 3 大于当前 3.206 主机的任期 2，因此知道发起了新一轮的选举，因此回应 3.33，我给你投票。这里任期 term是关键，也就是说，3.206 和 3.33 谁先感受到 3.38 宕机，发起投票，谁就是新的 leader，这个也和进程初始的启动时间有关。</p>
+<blockquote>
+<p>1eaefc6199fd6c67 received MsgVoteResp from 9c2cd7b04087bdd5 at term 3</p>
+<p>1eaefc6199fd6c67 has received 2 MsgVoteResp votes and 0 vote rejections</p>
+<p>1eaefc6199fd6c67 became leader at term 3</p>
+</blockquote>
+</li>
+<li><p>3.33 获得了 2 票，一票是自己，一票是 3.206，超过半数，成为新的 leader。任期为 3</p>
+<blockquote>
+<p>raft.node: 1eaefc6199fd6c67 elected leader 1eaefc6199fd6c67 at term 3</p>
+</blockquote>
+</li>
+<li><p>leader 更换完成</p>
+</li>
+</ul>
+<h4 id="3）节点数必须是奇数吗？"><a href="#3）节点数必须是奇数吗？" class="headerlink" title="3）节点数必须是奇数吗？"></a>3）节点数必须是奇数吗？</h4><p>etcd 官方推荐3、5、7个节点，虽然 raft 算法也是半数以上投票才能有leader，但奇数只是推荐 ，其实偶数也是可以的。如2、4、8个节点，分情况说明:</p>
+<ul>
+<li>1个节点: 即单实例，没有集群概念，不多做讨论</li>
+<li>2个节点: 可以启动集群模式，但是无法正常触发选举模式，无法满足高可用的基础</li>
+<li>3个节点: 标准3节点的集群，可以容忍1个节点宕机，能够正常触发选举机制，如果挂掉2台，就无法再选出 leader</li>
+<li>4个节点: 最大容忍1节点宕机</li>
+<li>5个节点: 最大容忍2节点宕机</li>
+<li>6个节点: 最大容忍2节点宕机</li>
+</ul>
+<p>机制如下图:</p>
+<table>
+<thead>
+<tr>
+<th>Cluster Size</th>
+<th>Majority</th>
+<th>Failure Tolerance</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3</td>
+<td>1</td>
+</tr>
+<tr>
+<td>5</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr>
+<td>7</td>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr>
+<td>8</td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr>
+<td>9</td>
+<td>5</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>事实上，偶数节点只会徒劳的耗费资源，却不能增加容错能力。并且，由于 etcd 是通过复制数据给所有节点来达到一致性，因此偶数的多一台机器增加不了性能，反而会拉低写入速度。</p>
+<h4 id="4）机器越多越好吗？"><a href="#4）机器越多越好吗？" class="headerlink" title="4）机器越多越好吗？"></a>4）机器越多越好吗？</h4><blockquote>
+<p>🚩 etcd 绝对不是堆机器就能够解决问题。</p>
+</blockquote>
+<p>etcd 集群是一个 Raft Group，没有 shared。所以它的极限有两部分，一是单机的容量限制，内存和磁盘；二是网络开销，每次 Raft 操作需要所有节点参与，每一次写操作需要集群中大多数节点将日志落盘成功后，Leader 节点才能修改内部状态机，并将结果返回给客户端。因此节点越多性能越低，所以扩展很多 etcd 节点是没有意义的，一般是 3、5、7， 最多7 个也足够了。</p>
+<p>在 k8s 中一般是 3个 master 节点做高可用，也就是 3 节点的 etcd。也有人将 etcd独立于 k8s集群之外，来更好地扩展 etcd 集群，或者根据 k8s 的资源来拆分 etcd，如 events 放在单独的 etcd 集群中。不同的副本数视业务规模而定，3，5，7 都可以。</p>
+<h4 id="5）关于脑裂"><a href="#5）关于脑裂" class="headerlink" title="5）关于脑裂"></a>5）关于脑裂</h4><p>集群化的软件总会提到脑裂问题，如ElasticSearch、Zookeeper 集群，脑裂就是同一个集群中的不同节点，对于集群的状态有了不一样的理解。那么 etcd 中有没有脑裂问题？</p>
+<p>官方给出的答案是: 没有</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">The majority side becomes the available cluster <span class="hljs-keyword">and</span> the minority side <span class="hljs-keyword">is</span> unavailable; there <span class="hljs-keyword">is</span> no “split-brain” <span class="hljs-keyword">in</span> etcd.<br></code></pre></td></tr></table></figure>
+
+<p>以网络分区导致脑裂为例，一开始有5个节点, Node 5 为 Leader</p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211118150638183.png" srcset="/img/loading.gif" lazyload alt="image-20211118150638183"></p>
+<p>由于出现网络故障，124 成为一个分区，35 成为一个分区， Node 5 的 leader 任期还没结束的一段时间内，仍然认为自己是当前leader，但是此时另外一边的分区，因为124 无法连接 5，于是选出了新的 leader 1，网络分区形成。</p>
+<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211118151024114.png" srcset="/img/loading.gif" lazyload alt="image-20211118151024114"></p>
+<p>那么 35 分区是否可用呢？如果写入了 1 而读取了 5，是否会读取旧数据（stale read）？</p>
+<p>答案还是不会。35 分区属于少数派，被认为是异常节点，无法执行写操作。写入 1 的可以成功，并在网络分区恢复后，35 因为任期旧，会自动成为 follower，异常期间的新数据也会从 1 同步给 35。</p>
+<p>而 5 的读请求也会失败，etcd 通过 ReadIndex、Lease read 保证线性一致读，即节点 5 在处理读请求时，首先需要与集群多数节点确认自己依然是 Leader 并查询 commit index，5 做不到多数节点确认，因此读失败。</p>
+<h4 id="6）关于数据一致性"><a href="#6）关于数据一致性" class="headerlink" title="6）关于数据一致性"></a>6）关于数据一致性</h4><p>对于 etcd 集群的每一个节点来说，数据都是强一致的。上面谈到了 etcd 集群的读写线性一致，意思就是说需要在所有节点都走一遍确认，这就会导致查询速度的降低，要开启线性一致性读，在不同的 client 是有所区别的:</p>
+<ul>
+<li>V2 版本: 通过 sdk访问时，quorum=true 的时候，读取是线性一致的，通过 etcdctl 访问时，该参数默认为true。</li>
+<li>V3 版本: 通过 sdk访问时，WithSerializable=true 的时候读取是线性一致的，通过 etcdctl 访问时 consistency=”l” 表示线性（默认为 l，非线性为 s）</li>
+</ul>
+<p>为了保证线性一致性读，早期的 etcd（_etcd v3.0 _）对所有的读写请求都会走一遍 Raft 协议来满足强一致性。然而通常在现实使用中，读请求占了 etcd 所有请求中的绝大部分，如果每次读请求都要走一遍 raft 协议落盘，etcd 性能将非常差。</p>
+<p>因此在 etcd v3.1 版本中优化了读请求，使用的方法满足一个简单的策略：每次读操作时记录此时集群的 commit index，当状态机的 apply index 大于或者等于 commit index 时即可返回数据。由于此时状态机已经把读请求所要读的 commit index 对应的日志进行了 apply 操作，符合线性一致读的要求，便可返回此时读到的结果。</p>
+<p>并且在 v3.4 版本中对存储容量做了提升，降低了读写的延迟，所以在选择版本时，建议使用 v3.4 及以上版本。</p>
+<h3 id="3、etcdctl-常用命令"><a href="#3、etcdctl-常用命令" class="headerlink" title="3、etcdctl 常用命令"></a>3、etcdctl 常用命令</h3><blockquote>
+<p>🌈 etcd 版本为 3.4，可以ETCDCTL_API=3，或 ETCDCTL_API=2，默认情况下用的就是 V3 了，可以不用声明ETCDCTL_API</p>
+</blockquote>
+<p>由于一般在集群模式下都会配置证书，所以我们在执行命令时也都需要带上证书访问，如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> V3 版本</span><br>ETCDCTL_API=3 ./etcdctl --endpoints=https://$&#123;etcd-1&#125;:2379,https://$&#123;etcd-2&#125;:2379,https://$&#123;etcd-3&#125;:2379 --cacert /data/applications/etcd/ssl/ca.pem --cert /data/applications/etcd/ssl/server.pem --key /data/applications/etcd/ssl/server-key.pem endpoint health<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> V2 版本</span><br>ETCDCTL_API=2 /data/applications/etcd/bin/etcdctl  --endpoints=https://192.168.3.206:2379,https://192.168.3.33:2379,https://192.168.3.38:2379 --ca-file=/data/applications/etcd/ssl/ca.pem --cert-file=/data/applications/etcd/ssl/server.pem --key-file=/data/applications/etcd/ssl/server-key.pem cluster-health<br></code></pre></td></tr></table></figure>
+
+<h4 id="1）常用命令说明"><a href="#1）常用命令说明" class="headerlink" title="1）常用命令说明"></a>1）常用命令说明</h4><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+<th>API 版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>version</td>
+<td>查看版本信息</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>member list</td>
+<td>查看集群节点信息，learner 信息</td>
+<td>V2/V3</td>
+</tr>
+<tr>
+<td>endpoint status</td>
+<td>查看集群 endpoint 情况，learner 情况</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>endpoint health</td>
+<td>查看集群 endpoint 健康状况和访问耗时</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>alarm list</td>
+<td>查看警告信息，如存储满时会切换为只读，产生 alarm</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>alarm disarm</td>
+<td>清楚所有警告信息</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>set app 111</td>
+<td>写入 kv 信息</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>put app 111</td>
+<td>写入 kv 信息</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>get app</td>
+<td>获取 key <code>app</code> 的值</td>
+<td>V2/V3</td>
+</tr>
+<tr>
+<td>update app 222</td>
+<td>更新 key <code>app</code> 的值成 222</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>rm app</td>
+<td>删除一个 key 或着一个目录</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>mkdir demo</td>
+<td>创建一个新目录</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>rmdir demo</td>
+<td>删除一个空目录或空kv对</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>backup</td>
+<td>备份</td>
+<td>V2</td>
+</tr>
+<tr>
+<td>snapshot save</td>
+<td>快照数据备份</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>snapshot restore</td>
+<td>数据恢复</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>compaction</td>
+<td>数据压缩</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>defrag</td>
+<td>碎片清理</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>watch key</td>
+<td>监测 key 的变化</td>
+<td>V2/V3</td>
+</tr>
+<tr>
+<td>get / –prefix –keys-only</td>
+<td>查看所有 key</td>
+<td>V3</td>
+</tr>
+<tr>
+<td>–write-out= tables</td>
+<td>可以用表格形式输出更清晰，注意有些输出并不支持tables</td>
+<td>V3</td>
+</tr>
+</tbody></table>
+<h3 id="4、Etcd-的参数配置"><a href="#4、Etcd-的参数配置" class="headerlink" title="4、Etcd 的参数配置"></a>4、Etcd 的参数配置</h3><blockquote>
+<p>🌈 etcd 的配置参数有很多，如果你觉得自己的etcd遇到了瓶颈，先不要急着提 issue 改代码，先看下这些参数的含义，也许调一下配置就能解决。</p>
+</blockquote>
+<h4 id="1）代理功能"><a href="#1）代理功能" class="headerlink" title="1）代理功能"></a>1）代理功能</h4><ul>
+<li>etcd gateway</li>
+<li>etcd grpc-proxy</li>
+</ul>
+<p>每个访问 etcd 的应用都要有 etcd 集群的 endpoints。如果在同一台服务器上的多个应用访问同一个 etcd 集群，大家都得配置一样的endpoints。如果这个时候 etcd 集群更换了集群或者 ip，每个应用都需要更新它的终端列表，这种重新配置是繁琐且容易出错的。</p>
+<p>这里提一下，etcd 的 client 使用的是 grpc 访问，client会根据传入的 endpoints 做客户端负载均衡。</p>
+<p>etcd gateway 就是一个典型的转发代理，屏蔽掉后面的 endpoints 信息。不过需要注意的是，etcd gateway 在 TCP 层，不支持 https 类型的 endpoints。</p>
+<h4 id="2）成员配置"><a href="#2）成员配置" class="headerlink" title="2）成员配置"></a>2）成员配置</h4><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>–data-dir</td>
+<td>数据保存目录</td>
+</tr>
+<tr>
+<td>–wal-dir</td>
+<td>wal日志保存目录</td>
+</tr>
+<tr>
+<td>–snapshot-count</td>
+<td>最大快照次数，默认10万次</td>
+</tr>
+<tr>
+<td>–heartbeat-interval</td>
+<td>心跳周期，默认 100ms</td>
+</tr>
+<tr>
+<td>–election-timeout</td>
+<td>选举超时时间，默认 1s</td>
+</tr>
+<tr>
+<td>–max-snapshots</td>
+<td>最大保留快照数，默认 5 个</td>
+</tr>
+<tr>
+<td>–quota-backend-bytes</td>
+<td>DB 数据大小，比如 10G，50G。</td>
+</tr>
+<tr>
+<td>–auto-compaction-retention</td>
+<td>自动压缩，默认为 0 不开启，k8s中 apiserver 会开启这个压缩，5 分钟一次。如果你的 etcd 还被其他人使用，这里也可以设置下时间</td>
+</tr>
+<tr>
+<td>–enable-pprof</td>
+<td>开启pprof分析</td>
+</tr>
+<tr>
+<td>–metrics</td>
+<td>默认为basic模式，extensive代表暴露histogram类型 metric</td>
+</tr>
+<tr>
+<td>–log-level</td>
+<td>日志等级。info, warn, error, panic, or fatal</td>
+</tr>
+</tbody></table>
+<h4 id="3）证书配置"><a href="#3）证书配置" class="headerlink" title="3）证书配置"></a>3）证书配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell">--client-cert-auth=true \<br>--cert-file=/data/applications/etcd/ssl/server.pem \<br>--key-file=/data/applications/etcd/ssl/server-key.pem \<br>--peer-cert-file=/data/applications/etcd/ssl/server.pem \<br>--peer-key-file=/data/applications/etcd/ssl/server-key.pem \<br>--trusted-ca-file=/data/applications/etcd/ssl/ca.pem \<br>--peer-trusted-ca-file=/data/applications/etcd/ssl/ca.pem \<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）集群配置"><a href="#4）集群配置" class="headerlink" title="4）集群配置"></a>4）集群配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">--peer-trusted-ca-file=/data/applications/etcd/ssl/ca.pem \<br>--initial-advertise-peer-urls https://$&#123;etcd-1&#125;:2380 \<br>--listen-peer-urls https://$&#123;etcd-1&#125;:2380 \<br>--listen-client-urls https://$&#123;etcd-1&#125;:2379,https://127.0.0.1:2379 \<br>--advertise-client-urls https://$&#123;etcd-1&#125;:2379 \<br>--initial-cluster-token etcd-cluster \<br>--initial-cluster etcd-0=https://$&#123;etcd-1&#125;:2380,etcd-1=https://$&#123;etcd-2&#125;:2380,etcd-2=https://$&#123;etcd-3&#125;:2380 \<br>--initial-cluster-state new \<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、Etcd-集群部署"><a href="#二、Etcd-集群部署" class="headerlink" title="二、Etcd 集群部署"></a>二、Etcd 集群部署</h2><blockquote>
 <p>🌈 Etcd 从 3.4 版本开始会自动通过配置文件加载环境变量参数，EnvironmentFile 文件中有的参数不需要在 systems unit 的 ExecStart 中添加了，可以更加的精简化配置，所以我们这里我们选用 3.4 版本的 etcd。方便后期统一的配置管理。</p>
 </blockquote>
-<h3 id="1、下载-etcd-二进制文件"><a href="#1、下载-etcd-二进制文件" class="headerlink" title="1、下载 etcd 二进制文件"></a>1、下载 etcd 二进制文件</h3><blockquote>
+<h3 id="1、生成证书"><a href="#1、生成证书" class="headerlink" title="1、生成证书"></a>1、生成证书</h3><h4 id="1）前期准备"><a href="#1）前期准备" class="headerlink" title="1）前期准备"></a>1）前期准备</h4><h5 id="1-安装-cfssl-工具"><a href="#1-安装-cfssl-工具" class="headerlink" title="1. 安装 cfssl 工具"></a>1. 安装 cfssl 工具</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell">export CFSSL_URL=&quot;https://pkg.cfssl.org/R1.2&quot;<br>wget &quot;$&#123;CFSSL_URL&#125;/cfssl_linux-amd64&quot; -O /usr/bin/cfssl<br>wget &quot;$&#123;CFSSL_URL&#125;/cfssljson_linux-amd64&quot; -O /usr/bin/cfssljson<br>wget &quot;$&#123;CFSSL_URL&#125;/cfssl-certinfo_linux-amd64&quot; -O /usr/bin/cfssl-certinfo<br>chmod +x /usr/bin/cfssl*<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-创建-etcd相关组件、证书、配置文件统一管理目录（由此分发至正式目录）"><a href="#2-创建-etcd相关组件、证书、配置文件统一管理目录（由此分发至正式目录）" class="headerlink" title="2. 创建 etcd相关组件、证书、配置文件统一管理目录（由此分发至正式目录）"></a>2. 创建 etcd相关组件、证书、配置文件统一管理目录（由此分发至正式目录）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p ~/etcd/&#123;bin,ssl,cfg,systemd&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="3-批量创建-etcd-程序目录"><a href="#3-批量创建-etcd-程序目录" class="headerlink" title="3. 批量创建 etcd 程序目录"></a>3. 批量创建 etcd 程序目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible etcd-cluster -S -R root -m shell -a &quot;mkdir -p /data/applications/etcd/&#123;bin,cfg,ssl,logs&#125;&quot;<br></code></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）生成-ca-根证书"><a href="#2）生成-ca-根证书" class="headerlink" title="2）生成 ca 根证书"></a>2）生成 ca 根证书</h4><blockquote>
+<p>🚩 <strong>提示：</strong></p>
+<p>ca 证书是集群所有节点可以共享的，所以只需要创建一个 ca 证书即可，后续创建的所有证书都由其签发。</p>
+</blockquote>
+<h5 id="1-创建-ca-配置文件"><a href="#1-创建-ca-配置文件" class="headerlink" title="1. 创建 ca 配置文件"></a>1. 创建 ca 配置文件</h5><blockquote>
+<p>🌈  ca 配置文件用于配置根证书的使用场景（profile） 和具体参数 (usages，过期时间、服务端认证、客户端认证、加密等)，后续在签名其它证书时需要指定特定场景。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/etcd/ssl/ca-config.json &lt;&lt;EOF<br>&#123;<br>  &quot;signing&quot;: &#123;<br>    &quot;default&quot;: &#123;<br>      &quot;expiry&quot;: &quot;87600h&quot;<br>    &#125;,<br>    &quot;profiles&quot;: &#123;<br>      &quot;etcd&quot;: &#123;<br>        &quot;usages&quot;: [<br>            &quot;signing&quot;,<br>            &quot;key encipherment&quot;,<br>            &quot;server auth&quot;,<br>            &quot;client auth&quot;<br>        ],<br>        &quot;expiry&quot;: &quot;87600h&quot;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br>EOF<br></code></pre></td></tr></table></figure>
+
+<h6 id="配置参数说明"><a href="#配置参数说明" class="headerlink" title="配置参数说明:"></a>配置参数说明:</h6><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>signing</td>
+<td>表示该证书可用于签名其他证书，生成的 ca.pem 证书中 CA=TRUE</td>
+</tr>
+<tr>
+<td>server auth</td>
+<td>表示 client 可以通过该证书对 server 提供的证书进行验证</td>
+</tr>
+<tr>
+<td>client auth</td>
+<td>表示 server 可以通过该证书对 client 提供的证书进行验证</td>
+</tr>
+<tr>
+<td>expiry</td>
+<td>过期时间，默认情况下为 8760h，即1年</td>
+</tr>
+</tbody></table>
+<h5 id="2-创建-ca-证书签名请求文件"><a href="#2-创建-ca-证书签名请求文件" class="headerlink" title="2. 创建 ca 证书签名请求文件"></a>2. 创建 ca 证书签名请求文件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/etcd/ssl/ca-csr.json &lt;&lt;EOF<br>&#123;<br>  &quot;CN&quot;: &quot;etcd&quot;,<br>  &quot;key&quot;: &#123;<br>    &quot;algo&quot;: &quot;rsa&quot;,<br>    &quot;size&quot;: 2048<br>  &#125;,<br>  &quot;names&quot;: [<br>    &#123;<br>      &quot;C&quot;: &quot;CN&quot;,<br>      &quot;ST&quot;: &quot;BeiJing&quot;,<br>      &quot;L&quot;: &quot;BeiJing&quot;,<br>      &quot;O&quot;: &quot;etcd&quot;,<br>      &quot;OU&quot;: &quot;system&quot;<br>    &#125;<br>  ],<br>  &quot;ca&quot;: &#123;<br>      &quot;expiry&quot;: &quot;87600h&quot;<br>  &#125;<br>&#125;<br>EOF<br></code></pre></td></tr></table></figure>
+
+<h6 id="配置参数说明-1"><a href="#配置参数说明-1" class="headerlink" title="配置参数说明:"></a>配置参数说明:</h6><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CN</td>
+<td>Common Name，kube-apiserver 会从证书中提取该字段作为请求的用户名（User Name）、浏览器使用该字段验证网站的合法性</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Country，国家</td>
+</tr>
+<tr>
+<td>L</td>
+<td>Locality，地区，城市</td>
+</tr>
+<tr>
+<td>ST</td>
+<td>State，洲，省</td>
+</tr>
+<tr>
+<td>O</td>
+<td>Organization，组织名称，公司名称，kube-apiserver 会从证书中提取该字段作为用户所属的组（Group）</td>
+</tr>
+<tr>
+<td>OU</td>
+<td>Organization Unit，组织单位名称，公司部门</td>
+</tr>
+</tbody></table>
+<h5 id="3-生成-CA-证书和私钥"><a href="#3-生成-CA-证书和私钥" class="headerlink" title="3. 生成 CA 证书和私钥"></a>3. 生成 CA 证书和私钥</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ~/etcd/ssl &amp;&amp; \<br>cfssl gencert -initca ca-csr.json | cfssljson -bare ca<br></code></pre></td></tr></table></figure>
+
+<h5 id="4-证书文件说明"><a href="#4-证书文件说明" class="headerlink" title="4. 证书文件说明"></a>4. 证书文件说明</h5><table>
+<thead>
+<tr>
+<th>证书路径</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>~/etcd/ssl/ca.csr</td>
+<td>ca 证书的签名请求文件</td>
+</tr>
+<tr>
+<td>~/etcd/ssl/ca.pem</td>
+<td>ca 证书文件，即后面 K8S 组件使用的 RootCA</td>
+</tr>
+<tr>
+<td>~/etcd/ssl/ca-key.pem</td>
+<td>ca 证书的私钥文件</td>
+</tr>
+</tbody></table>
+<h4 id="3）生成-server-证书"><a href="#3）生成-server-证书" class="headerlink" title="3）生成 server 证书"></a>3）生成 server 证书</h4><h5 id="1-创建-server-书签名请求文件"><a href="#1-创建-server-书签名请求文件" class="headerlink" title="1. 创建 server 书签名请求文件"></a>1. 创建 server 书签名请求文件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/etcd/ssl/server-csr.json &lt;&lt;EOF<br>&#123;<br>    &quot;CN&quot;: &quot;etcd&quot;,<br>    &quot;hosts&quot;: [<br>      &quot;127.0.0.1&quot;,<br>      &quot;192.168.3.206&quot;,<br>      &quot;192.168.3.33&quot;,<br>      &quot;192.168.3.38&quot;<br>    ],<br>    &quot;key&quot;: &#123;<br>        &quot;algo&quot;: &quot;rsa&quot;,<br>        &quot;size&quot;: 2048<br>    &#125;,<br>    &quot;names&quot;: [<br>        &#123;<br>            &quot;C&quot;: &quot;CN&quot;,<br>            &quot;L&quot;: &quot;BeiJing&quot;,<br>            &quot;ST&quot;: &quot;BeiJing&quot;,<br>            &quot;O&quot;: &quot;etcd&quot;,<br>            &quot;OU&quot;: &quot;system&quot;<br>        &#125;<br>    ]<br>&#125;<br>EOF<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-生成-server-证书和私钥"><a href="#2-生成-server-证书和私钥" class="headerlink" title="2. 生成 server 证书和私钥"></a>2. 生成 server 证书和私钥</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ~/etcd/ssl &amp;&amp; \<br>cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=etcd server-csr.json | cfssljson -bare server<br></code></pre></td></tr></table></figure>
+
+
+
+<h5 id="3-证书文件说明"><a href="#3-证书文件说明" class="headerlink" title="3. 证书文件说明"></a>3. 证书文件说明</h5><table>
+<thead>
+<tr>
+<th>证书路径</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>~/etcd/ssl/server.csr</td>
+<td>server 证书的签名请求文件</td>
+</tr>
+<tr>
+<td>~/etcd/ssl/server.pem</td>
+<td>server 证书，为 etcd 使用</td>
+</tr>
+<tr>
+<td>~/etcd/ssl/server-key.pem</td>
+<td>server 证书的私钥文件</td>
+</tr>
+</tbody></table>
+<h5 id="4-批量分发证书文件"><a href="#4-批量分发证书文件" class="headerlink" title="4. 批量分发证书文件"></a>4. 批量分发证书文件</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 ca 证书、私钥</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/ssl/ca.pem dest=/data/applications/etcd/ssl/ca.pem owner=root group=root mode=0644&quot; <br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/ssl/ca-key.pem dest=/data/applications/etcd/ssl/ca-key.pem owner=root group=root mode=0600&quot; <br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 server 证书（etcd 所有节点）</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/ssl/server.pem dest=/data/applications/etcd/ssl/server.pem owner=root group=root mode=0644&quot; <br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 server 证书私钥，为了安全性，权限设置他人无权限（etcd 所有节点）</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/ssl/server-key.pem dest=/data/applications/etcd/ssl/server-key.pem owner=root group=root mode=0600&quot; <br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="2、部署集群"><a href="#2、部署集群" class="headerlink" title="2、部署集群"></a>2、部署集群</h3><h4 id="1）下载-etcd-二进制文件"><a href="#1）下载-etcd-二进制文件" class="headerlink" title="1）下载 etcd 二进制文件"></a>1）下载 etcd 二进制文件</h4><blockquote>
 <p><a target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd/releases">官方下载地址</a></p>
 </blockquote>
-<h4 id="1）下载解压-3-4-14-etcd-客户端和服务端二进制包"><a href="#1）下载解压-3-4-14-etcd-客户端和服务端二进制包" class="headerlink" title="1）下载解压 3.4.14 etcd 客户端和服务端二进制包"></a>1）下载解压 3.4.14 etcd 客户端和服务端二进制包</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd ~ &amp;&amp; \<br>wget -c https://github.com/coreos/etcd/releases/download/v3.4.14/etcd-v3.4.14-linux-amd64.tar.gz &amp;&amp; \<br>tar xf etcd-v3.4.14-linux-amd64.tar.gz<br></code></pre></td></tr></table></figure>
+<h5 id="1-下载解压-3-4-14-etcd-客户端和服务端二进制包"><a href="#1-下载解压-3-4-14-etcd-客户端和服务端二进制包" class="headerlink" title="1. 下载解压 3.4.14 etcd 客户端和服务端二进制包"></a>1. 下载解压 3.4.14 etcd 客户端和服务端二进制包</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd  ~/etcd/bin/ &amp;&amp; \<br>wget -c https://github.com/coreos/etcd/releases/download/v3.4.14/etcd-v3.4.14-linux-amd64.tar.gz &amp;&amp; \<br>tar xf etcd-v3.4.14-linux-amd64.tar.gz<br></code></pre></td></tr></table></figure>
 
-<h5 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd etcd-v3.4.14-linux-amd64 &amp;&amp; ./etcdctl version<br></code></pre></td></tr></table></figure>
+<p>验证:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd etcd-v3.4.14-linux-amd64 &amp;&amp; ./etcdctl version<br></code></pre></td></tr></table></figure>
 
 <p>正常返回如下:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">etcdctl version: 3.4.14<br>API version: 3.4<br></code></pre></td></tr></table></figure>
 
 
 
-<h3 id="2、分发-etcd-至各-master-节点"><a href="#2、分发-etcd-至各-master-节点" class="headerlink" title="2、分发 etcd 至各 master 节点"></a>2、分发 etcd 至各 master 节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 etcd server 端</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/etcd-v3.4.14-linux-amd64/etcd dest=/data/applications/etcd/bin/etcd owner=root group=root mode=0755&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd client 工具</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/etcd-v3.4.14-linux-amd64/etcdctl dest=/data/applications/etcd/bin/etcdctl owner=root group=root mode=0755&quot;<br></code></pre></td></tr></table></figure>
+<h4 id="2）分发-etcd-至各-master-节点"><a href="#2）分发-etcd-至各-master-节点" class="headerlink" title="2）分发 etcd 至各 master 节点"></a>2）分发 etcd 至各 master 节点</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 etcd server 端</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/bin/etcd-v3.4.14-linux-amd64/etcd dest=/data/applications/etcd/bin/etcd owner=root group=root mode=0755&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd client 工具</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/bin/etcd-v3.4.14-linux-amd64/etcdctl dest=/data/applications/etcd/bin/etcdctl owner=root group=root mode=0755&quot;<br></code></pre></td></tr></table></figure>
 
 
 
-<h3 id="3、创建配置文件"><a href="#3、创建配置文件" class="headerlink" title="3、创建配置文件"></a>3、创建配置文件</h3><h4 id="1）新建-etcd-配置文件-etcd-conf"><a href="#1）新建-etcd-配置文件-etcd-conf" class="headerlink" title="1）新建 etcd 配置文件 etcd.conf"></a>1）新建 etcd 配置文件 <code>etcd.conf</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/kubernetes/etcd/cfg/etcd.conf &lt;&lt; EOF<br><span class="hljs-meta">#</span><span class="bash">[Member]</span><br>ETCD_NAME=&quot;etcd-1&quot;<br>ETCD_DATA_DIR=&quot;/data/applications/etcd/data&quot;<br>ETCD_WAL_DIR=&quot;/data/applications/etcd/wal&quot;<br>ETCD_LISTEN_PEER_URLS=&quot;https://192.168.3.231:2380&quot;<br>ETCD_LISTEN_CLIENT_URLS=&quot;https://192.168.3.231:2379,http://127.0.0.1:2379&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Clustering]</span><br>ETCD_INITIAL_ADVERTISE_PEER_URLS=&quot;https://192.168.3.231:2380&quot;<br>ETCD_ADVERTISE_CLIENT_URLS=&quot;https://192.168.3.231:2379&quot;<br>ETCD_INITIAL_CLUSTER=&quot;etcd-1=https://192.168.3.231:2380,etcd-2=https://192.168.3.232:2380,etcd-3=https://192.168.3.233:2380&quot;<br>ETCD_INITIAL_CLUSTER_TOKEN=&quot;etcd-cluster-0&quot;<br>ETCD_INITIAL_CLUSTER_STATE=&quot;new&quot;<br>ETCD_ENABLE_V2=&quot;true&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Security]</span><br>ETCD_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_CLIENT_CERT_AUTH=&quot;true&quot;<br>ETCD_PEER_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_PEER_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_PEER_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_PEER_CLIENT_CERT_AUTH=&quot;true&quot;<br><br>EOF<br></code></pre></td></tr></table></figure>
+<h4 id="3）创建配置文件"><a href="#3）创建配置文件" class="headerlink" title="3）创建配置文件"></a>3）创建配置文件</h4><h5 id="1-新建-etcd-配置文件-etcd-conf"><a href="#1-新建-etcd-配置文件-etcd-conf" class="headerlink" title="1. 新建 etcd 配置文件 etcd.conf"></a>1. 新建 etcd 配置文件 <code>etcd.conf</code></h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/etcd/cfg/etcd.conf.template &lt;&lt; EOF<br><span class="hljs-meta">#</span><span class="bash">[Member]</span><br>ETCD_NAME=&quot;etcd-1&quot;<br>ETCD_DATA_DIR=&quot;/data/applications/etcd/data&quot;<br>ETCD_WAL_DIR=&quot;/data/applications/etcd/wal&quot;<br>ETCD_LISTEN_PEER_URLS=&quot;https://192.168.3.206:2380&quot;<br>ETCD_LISTEN_CLIENT_URLS=&quot;https://192.168.3.206:2379,http://127.0.0.1:2379&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Clustering]</span><br>ETCD_INITIAL_ADVERTISE_PEER_URLS=&quot;https://192.168.3.206:2380&quot;<br>ETCD_ADVERTISE_CLIENT_URLS=&quot;https://192.168.3.206:2379&quot;<br>ETCD_INITIAL_CLUSTER=&quot;etcd-1=https://192.168.3.206:2380,etcd-2=https://192.168.3.33:2380,etcd-3=https://192.168.3.38:2380&quot;<br>ETCD_INITIAL_CLUSTER_TOKEN=&quot;etcd-cluster-0&quot;<br>ETCD_INITIAL_CLUSTER_STATE=&quot;new&quot;<br>ETCD_ENABLE_V2=&quot;true&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash">[Security]</span><br>ETCD_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_CLIENT_CERT_AUTH=&quot;true&quot;<br>ETCD_PEER_CERT_FILE=&quot;/data/applications/etcd/ssl/server.pem&quot;<br>ETCD_PEER_KEY_FILE=&quot;/data/applications/etcd/ssl/server-key.pem&quot;<br>ETCD_PEER_TRUSTED_CA_FILE=&quot;/data/applications/etcd/ssl/ca.pem&quot;<br>ETCD_PEER_CLIENT_CERT_AUTH=&quot;true&quot;<br><br>EOF<br></code></pre></td></tr></table></figure>
 
 <blockquote>
 <p>⚠️ <strong>注意:</strong></p>
@@ -261,9 +759,9 @@
 <p>3.4 版本的 etcd 默认使用的是 v3 版本的API，并默认关闭了 v2 版本API的使用，如果要继续使用的话，可以在配置文件中设置 <code>ETCD_ENABLE_V2=&quot;true&quot;</code>，或者在使用命令行时设置 <code>ETCDCTL_API</code> 环境变量，如<code>ETCDCTL_API=2 etcdctl</code>。</p>
 <p>flannel 操作 etcd 使用的是 v2 的API， kubernetes 操作 etcd 使用的 v3 的API，calico 3.x 版本也使用 v3 的 API。</p>
 </blockquote>
-<h4 id="2）新建-systemd-unit-配置-etcd-service"><a href="#2）新建-systemd-unit-配置-etcd-service" class="headerlink" title="2）新建 systemd unit 配置 etcd.service"></a>2）新建 systemd unit 配置 <code>etcd.service</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/kubernetes/etcd/systemd/etcd.service &lt;&lt; EOF<br>[Unit]<br>Description=Etcd Server<br>After=network.target<br>After=network-online.target<br>Wants=network-online.target<br>Documentation=https://github.com/coreos<br>   <br>[Service]<br>Type=notify<br>EnvironmentFile=/data/applications/etcd/cfg/etcd.conf<br>ExecStart=/data/applications/etcd/bin/etcd \<br>--auto-compaction-mode=periodic \<br>--auto-compaction-retention=1 \<br>--max-request-bytes=33554432 \<br>--quota-backend-bytes=6442450944 \<br>--heartbeat-interval=250 \<br>--election-timeout=2000 \<br>--logger=zap<br>Restart=on-failure<br>RestartSec=5<br>LimitNOFILE=65536<br>   <br>[Install]<br>WantedBy=multi-user.target<br><br>EOF<br></code></pre></td></tr></table></figure>
+<h5 id="2-新建-systemd-unit-配置-etcd-service"><a href="#2-新建-systemd-unit-配置-etcd-service" class="headerlink" title="2. 新建 systemd unit 配置 etcd.service"></a>2. 新建 systemd unit 配置 <code>etcd.service</code></h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat &gt; ~/etcd/systemd/etcd.service &lt;&lt; EOF<br>[Unit]<br>Description=Etcd Server<br>After=network.target<br>After=network-online.target<br>Wants=network-online.target<br>Documentation=https://github.com/coreos<br>   <br>[Service]<br>Type=notify<br>EnvironmentFile=/data/applications/etcd/cfg/etcd.conf<br>ExecStart=/data/applications/etcd/bin/etcd \<br>--auto-compaction-mode=periodic \<br>--auto-compaction-retention=1 \<br>--max-request-bytes=33554432 \<br>--quota-backend-bytes=6442450944 \<br>--heartbeat-interval=250 \<br>--election-timeout=2000 \<br>--logger=zap<br>Restart=on-failure<br>RestartSec=5<br>LimitNOFILE=65536<br>   <br>[Install]<br>WantedBy=multi-user.target<br><br>EOF<br></code></pre></td></tr></table></figure>
 
-<h5 id="重要配置参数说明"><a href="#重要配置参数说明" class="headerlink" title="重要配置参数说明:"></a>重要配置参数说明:</h5><table>
+<h6 id="重要参数说明"><a href="#重要参数说明" class="headerlink" title="重要参数说明:"></a>重要参数说明:</h6><table>
 <thead>
 <tr>
 <th>重要参数</th>
@@ -291,32 +789,23 @@
 <td>签发 peer 证书的 ca 证书，用于验证 peer 证书，可以和 client 证书使用同一套，也可以使用不同的；</td>
 </tr>
 </tbody></table>
-<h3 id="4、分发配置文件"><a href="#4、分发配置文件" class="headerlink" title="4、分发配置文件"></a>4、分发配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 systemd unit 配置文件</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/kubernetes/etcd/systemd/etcd.service dest=/usr/lib/systemd/system/etcd.service owner=root group=root mode=0644&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd 配置文件</span><br>ansible k8s-master -S -R root -m copy -a &quot;src=~/kubernetes/etcd/cfg/etcd.conf dest=/data/applications/etcd/cfg/etcd.conf owner=root group=root mode=0644&quot;<br></code></pre></td></tr></table></figure>
+<h4 id="4）分发配置文件"><a href="#4）分发配置文件" class="headerlink" title="4）分发配置文件"></a>4）分发配置文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 分发 systemd unit 配置文件</span><br>ansible etcd-cluster -S -R root -m copy -a &quot;src=~/etcd/systemd/etcd.service dest=/usr/lib/systemd/system/etcd.service owner=root group=root mode=0644&quot;<br><span class="hljs-meta"></span><br><span class="hljs-meta">#</span><span class="bash"> 分发 etcd 配置文件</span><br>ansible 192.168.3.206 -S -R root -m copy -a &quot;src=~/etcd/cfg/etcd.conf-206 dest=/data/applications/etcd/cfg/etcd.conf owner=root group=root mode=0644&quot;<br>ansible 192.168.3.33 -S -R root -m copy -a &quot;src=~/etcd/cfg/etcd.conf-33 dest=/data/applications/etcd/cfg/etcd.conf owner=root group=root mode=0644&quot;<br>ansible 192.168.3.38 -S -R root -m copy -a &quot;src=~/etcd/cfg/etcd.conf-38 dest=/data/applications/etcd/cfg/etcd.conf owner=root group=root mode=0644&quot;<br></code></pre></td></tr></table></figure>
 
 
 
-<h3 id="5、启动集群"><a href="#5、启动集群" class="headerlink" title="5、启动集群"></a>5、启动集群</h3><h4 id="1）批量启动-etcd"><a href="#1）批量启动-etcd" class="headerlink" title="1）批量启动 etcd"></a>1）批量启动 etcd</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible k8s-master -S -R root -m shell -a &quot;systemctl daemon-reload&quot;<br>ansible k8s-master -S -R root -m shell -a &quot;systemctl enable etcd.service&quot;<br>ansible k8s-master -S -R root -m shell -a &quot;systemctl start etcd.service&quot;<br></code></pre></td></tr></table></figure>
+<h4 id="5）启动集群"><a href="#5）启动集群" class="headerlink" title="5）启动集群"></a>5）启动集群</h4><h5 id="1-批量启动-etcd"><a href="#1-批量启动-etcd" class="headerlink" title="1. 批量启动 etcd"></a>1. 批量启动 etcd</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible etcd-cluster -S -R root -m shell -a &quot;systemctl daemon-reload&quot;<br>ansible etcd-cluster -S -R root -m shell -a &quot;systemctl enable etcd.service&quot;<br>ansible etcd-cluster -S -R root -m shell -a &quot;systemctl start etcd.service&quot;<br></code></pre></td></tr></table></figure>
+
+<h5 id="2-验证服务状态"><a href="#2-验证服务状态" class="headerlink" title="2. 验证服务状态"></a>2. 验证服务状态</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible etcd-cluster -S -R root -m shell -a &quot;ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl  --endpoints=http://127.0.0.1:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint health&quot;<br></code></pre></td></tr></table></figure>
+
+<h6 id="正常返回结果"><a href="#正常返回结果" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 均返回 healthy 时，集群状态未正常</span><br>192.168.3.233 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.802973ms<br><br>192.168.3.231 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.426585ms<br><br>192.168.3.232 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 3.491516ms<br></code></pre></td></tr></table></figure>
 
 
 
-<h4 id="2）验证服务状态"><a href="#2）验证服务状态" class="headerlink" title="2）验证服务状态"></a>2）验证服务状态</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ansible k8s-master -S -R root -m shell -a &quot;ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl  --endpoints=http://127.0.0.1:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint health&quot;<br></code></pre></td></tr></table></figure>
+<h3 id="3、查看集群-leader"><a href="#3、查看集群-leader" class="headerlink" title="3、查看集群 leader"></a>3、查看集群 leader</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl -w table  --endpoints=https://192.168.3.206:2379,https://192.168.3.33:2379,https://192.168.3.38:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint status<br></code></pre></td></tr></table></figure>
 
-<h5 id="正常返回结果"><a href="#正常返回结果" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 均返回 healthy 时，集群状态未正常</span><br>192.168.3.233 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.802973ms<br><br>192.168.3.231 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 2.426585ms<br><br>192.168.3.232 | CHANGED | rc=0 &gt;&gt;<br>http://127.0.0.1:2379 is healthy: successfully committed proposal: took = 3.491516ms<br></code></pre></td></tr></table></figure>
-
-
-
-<h4 id="3）查看集群-leader"><a href="#3）查看集群-leader" class="headerlink" title="3）查看集群 leader"></a>3）查看集群 leader</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 /data/applications/etcd/bin/etcdctl -w table  --endpoints=https://192.168.3.231:2379,https://192.168.3.232:2379,https://192.168.3.233:2379 --cacert=/data/applications/etcd/ssl/ca.pem --cert=/data/applications/etcd/ssl/server.pem --key=/data/applications/etcd/ssl/server-key.pem endpoint status<br></code></pre></td></tr></table></figure>
-
-<h5 id="正常返回结果-1"><a href="#正常返回结果-1" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 当前 etcd raft leader 为 192.168.3.231</span><br><br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>| https://192.168.3.231:2379 | e7d52edc2101ab48 |  3.4.14 |   20 kB |      true |      false |         5 |         28 |                 28 |        |<br>| https://192.168.3.232:2379 | a191bc097f41b735 |  3.4.14 |   20 kB |     false |      false |         5 |         28 |                 28 |        |<br>| https://192.168.3.233:2379 | 307ec828b6239718 |  3.4.14 |   20 kB |     false |      false |         5 |         28 |                 28 |        |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br></code></pre></td></tr></table></figure>
+<h5 id="正常返回结果-1"><a href="#正常返回结果-1" class="headerlink" title="正常返回结果:"></a>正常返回结果:</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 当前 etcd raft leader 为 192.168.3.38</span><br><br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br>| https://192.168.3.206:2379 | 9c2cd7b04087bdd5 |  3.4.14 |   20 kB |     false |      false |         2 |          8 |                  8 |        |<br>|  https://192.168.3.33:2379 | 1eaefc6199fd6c67 |  3.4.14 |   20 kB |     false |      false |         2 |          8 |                  8 |        |<br>|  https://192.168.3.38:2379 | 9b69c00e80e79009 |  3.4.14 |   20 kB |      true |      false |         2 |          8 |                  8 |        |<br>+----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+<br><br></code></pre></td></tr></table></figure>
 
 
-
-
-
-<h2 id="三、etcdctl-常用命令"><a href="#三、etcdctl-常用命令" class="headerlink" title="三、etcdctl 常用命令"></a>三、etcdctl 常用命令</h2><blockquote>
-<p>🌈 etcd 版本为 3.4，可以ETCDCTL_API=3，或ETCDCTL_API=2，默认情况下用的就是v3了，可以不用声明ETCDCTL_API</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ETCDCTL_API=3 ./etcdctl --endpoints=https://$&#123;node1&#125;:2379,https://$&#123;node2&#125;:2379,https://$&#123;node3&#125;:2379 --cacert /data/applications/etcd/ssl/ca.pem --cert /data/applications/etcd/ssl/server.pem --key /data/applications/etcd/ssl/server-key.pem endpoint status --write-out=table<br></code></pre></td></tr></table></figure>
 
 
 
@@ -355,6 +844,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/11/18/%E5%85%B3%E4%BA%8E%E6%9C%89%E7%8A%B6%E6%80%81%E6%9C%8D%E5%8A%A1%E5%92%8C%E6%97%A0%E7%8A%B6%E6%80%81%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">关于有状态服务和无状态服务的一些思考</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
