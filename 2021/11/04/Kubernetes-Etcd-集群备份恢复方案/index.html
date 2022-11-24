@@ -279,7 +279,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ETCDCTL_API=3 etcdctl --cacert=/data/application/etcd/ssl/ca.pem --cert=/data/application/etcd/ssl/server.pem --key=/data/application/etcd/ssl/server-key.pem --endpoints=https://192.168.3.151:2379 snapshot save /data/backup/etcd/snapshot-`date +%Y%m%d`.db<br></code></pre></td></tr></table></figure>
 
 <p>正常备份返回如下:</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211107210929929.png" srcset="/img/loading.gif" lazyload alt="image-20211107210929929"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20211107210929929.png" srcset="/img/loading.gif" lazyload alt="image-20211107210929929"></p>
 <h4 id="3）将备份文件拷贝到其他-etcd-节点"><a href="#3）将备份文件拷贝到其他-etcd-节点" class="headerlink" title="3）将备份文件拷贝到其他 etcd 节点"></a>3）将备份文件拷贝到其他 etcd 节点</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@T-KuberM-001 ~]# ansible t-k8s-master -S -R root -m copy -a &quot;src=/data/backup/etcd/snapshot-20211030.db dest=/data/backup/etcd/ owner=root group=root&quot;<br></code></pre></td></tr></table></figure>
 
 
@@ -409,9 +409,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/11/10/%E5%85%B3%E4%BA%8E-DevOps-%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">
+                      <a href="/2021/11/12/%E5%85%B3%E4%BA%8E%E4%BA%91%E5%8E%9F%E7%94%9F%E7%9A%84%E4%B8%80%E4%BA%9B%E6%80%9D%E8%80%83/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">关于 DevOps 的一些思考</span>
+                        <span class="hidden-mobile">关于云原生的一些思考</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     

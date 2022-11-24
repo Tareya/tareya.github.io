@@ -267,12 +267,12 @@
 
 
 <h3 id="4、APISIX-版本选择"><a href="#4、APISIX-版本选择" class="headerlink" title="4、APISIX 版本选择"></a>4、APISIX 版本选择</h3><h4 id="1）场景介绍"><a href="#1）场景介绍" class="headerlink" title="1）场景介绍"></a>1）场景介绍</h4><p>使用 Nacos 作为服务注册中心，并通过 APISIX 的 nacos discovery 实现服务注册节点的动态获取。原本安装版本为 2.6.0，对于 nacos 值支持尚处于开发阶段。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903103018772.png" srcset="/img/loading.gif" lazyload alt="image-20210903103018772"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903103018772.png" srcset="/img/loading.gif" lazyload alt="image-20210903103018772"></p>
 <h4 id="2）版本选择"><a href="#2）版本选择" class="headerlink" title="2）版本选择"></a>2）版本选择</h4><p>根据官方发布的服务 changelog，2.7.0 之后的版本对于 nacos discovery 有了一定的升级，故选择的版本需时 2.7.0 之后的版本。</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/apache/apisix/blob/release/2.9/CHANGELOG.md#270"><strong>CHANGELOG</strong></a></p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903103359426.png" srcset="/img/loading.gif" lazyload alt="image-20210903103359426"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903103359426.png" srcset="/img/loading.gif" lazyload alt="image-20210903103359426"></p>
 <p>目前官方 dockerhub 提供的最新稳定版本镜像为 2.8.0 ，故本次版本，选择使用 2.8.0 的版本，当然也可以使用官方提供的方式编译最新版本的镜像，看个人需求。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903104639074.png" srcset="/img/loading.gif" lazyload alt="image-20210903104639074"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903104639074.png" srcset="/img/loading.gif" lazyload alt="image-20210903104639074"></p>
 <p><a target="_blank" rel="noopener" href="https://hub.docker.com/r/apache/apisix">apisix 官方镜像</a></p>
 <p><a target="_blank" rel="noopener" href="https://hub.docker.com/r/apache/apisix-dashboard">apisix-dashboard 官方镜像</a></p>
 <p><a target="_blank" rel="noopener" href="https://hub.docker.com/r/apache/apisix-ingress-controller">apisix-ingress-controller 官方镜像</a></p>
@@ -281,14 +281,14 @@
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm search repo apisix<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903105314277.png" srcset="/img/loading.gif" lazyload alt="image-20210903105314277"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903105314277.png" srcset="/img/loading.gif" lazyload alt="image-20210903105314277"></p>
 <h2 id="二、部署-APISIX"><a href="#二、部署-APISIX" class="headerlink" title="二、部署 APISIX"></a>二、部署 APISIX</h2><h3 id="1、准备-chart"><a href="#1、准备-chart" class="headerlink" title="1、准备 chart"></a>1、准备 chart</h3><h4 id="1）拉取官方-chart"><a href="#1）拉取官方-chart" class="headerlink" title="1）拉取官方 chart"></a>1）拉取官方 chart</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm pull apisix/apisix <br></code></pre></td></tr></table></figure>
 
 <h4 id="2）解压-chart-包"><a href="#2）解压-chart-包" class="headerlink" title="2）解压 chart 包"></a>2）解压 chart 包</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">tar xf apisix-0.4.0.tgz<br></code></pre></td></tr></table></figure>
 
 <h4 id="3）chart-的目录结构"><a href="#3）chart-的目录结构" class="headerlink" title="3）chart 的目录结构"></a>3）chart 的目录结构</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">tree -L 3 apisix<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903110331471.png" srcset="/img/loading.gif" lazyload alt="image-20210903110331471"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903110331471.png" srcset="/img/loading.gif" lazyload alt="image-20210903110331471"></p>
 <h4 id="4）识别依赖组件"><a href="#4）识别依赖组件" class="headerlink" title="4）识别依赖组件"></a>4）识别依赖组件</h4><p>从官方 chart 的的目录结构可以看出，部署 apisix 同时还会有 <code>etcd</code>、<code>dashboard</code>、<code>ingress-controller</code> 三个依赖组件，基本和非容器化部署是一样的。etcd 作为数据存储，dashboard 提供 UI 界面，而 ingress-controller 则相当于 openresty。</p>
 <h5 id="1-etcd集群"><a href="#1-etcd集群" class="headerlink" title="1. etcd集群"></a>1. etcd集群</h5><p>etcd 只是作为数据存储来说，它的版本其实并不需要过多考虑，我们不需要对其进行更改。当然，也可以使用 K8S 本身的 etcd 集群，但是不推荐这么做。</p>
 <h5 id="2-apisix-dashboard"><a href="#2-apisix-dashboard" class="headerlink" title="2. apisix-dashboard"></a>2. apisix-dashboard</h5><p>dashboard 根据上文可知，最新的镜像版本为 2.7.1 ，这是我们需要更改的。</p>
@@ -361,7 +361,7 @@
 
 
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210903180828420.png" srcset="/img/loading.gif" lazyload alt="image-20210903180828420"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210903180828420.png" srcset="/img/loading.gif" lazyload alt="image-20210903180828420"></p>
 
             </div>
             <hr>

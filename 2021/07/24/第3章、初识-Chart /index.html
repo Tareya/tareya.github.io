@@ -243,21 +243,21 @@
 <h4 id="1）搜索所有公开可用的-charts"><a href="#1）搜索所有公开可用的-charts" class="headerlink" title="1）搜索所有公开可用的 charts"></a>1）搜索所有公开可用的 <code>charts</code></h4><p>执行以下命令从 <code>Artifact Hub</code> 中搜索所有的 <code>wordpress</code> charts：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm search hub &lt;chart_name&gt;</span> <br>helm search hub wordpress<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210629102731888.png" srcset="/img/loading.gif" lazyload alt="image-20210629102731888"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210629102731888.png" srcset="/img/loading.gif" lazyload alt="image-20210629102731888"></p>
 <h4 id="2）搜索本地-stable-源中可用的-charts"><a href="#2）搜索本地-stable-源中可用的-charts" class="headerlink" title="2）搜索本地 stable 源中可用的 charts"></a>2）搜索本地 <code>stable</code> 源中可用的 <code>charts</code></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm search repo &lt;repo_name&gt;</span><br>helm search repo stable<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210628152107519.png" srcset="/img/loading.gif" lazyload alt="image-20210628152107519"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210628152107519.png" srcset="/img/loading.gif" lazyload alt="image-20210628152107519"></p>
 <h4 id="3）模糊匹配搜索"><a href="#3）模糊匹配搜索" class="headerlink" title="3）模糊匹配搜索"></a>3）模糊匹配搜索</h4><p>Helm 的搜素使用模糊字符串匹配算法，只需要输入名字的一部分就可以从本地仓库记录中进行搜索，如下搜索 <code>word</code>：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm search repo &lt;string&gt;</span><br>helm search repo word<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210629103454469.png" srcset="/img/loading.gif" lazyload alt="image-20210629103454469"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210629103454469.png" srcset="/img/loading.gif" lazyload alt="image-20210629103454469"></p>
 <h3 id="2、安装-Chart"><a href="#2、安装-Chart" class="headerlink" title="2、安装 Chart"></a>2、安装 Chart</h3><blockquote>
 <p>使用 <code>helm search</code> 找到你想要安装的 helm包后，就可以使用 <code>helm install</code> 来进行安装。最简单使用方案只需要传入两个参数：<code>release的名字</code> 和 <code>chart的名称</code>。</p>
 </blockquote>
 <h4 id="1）安装helm包"><a href="#1）安装helm包" class="headerlink" title="1）安装helm包"></a>1）安装helm包</h4><p>执行以下命令，即创建了一个新的 <code>release</code> 对象，命名为 <code>happy-panda</code> ，如果想要自动生成一名名称，可以使用<code>--generate-name</code> 参数:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm install &lt;release_name&gt; &lt;chart_name&gt; （chart名称须具体，如 bitnami/wordpress。不能只是关键字）</span><br>helm install happy-panda bitnami/wordpress<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210629104631960.png" srcset="/img/loading.gif" lazyload alt="image-20210629104631960"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210629104631960.png" srcset="/img/loading.gif" lazyload alt="image-20210629104631960"></p>
 <h4 id="2）查看运行状态"><a href="#2）查看运行状态" class="headerlink" title="2）查看运行状态"></a>2）查看运行状态</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm list<br></code></pre></td></tr></table></figure>
 
 <p>返回如下：</p>
@@ -275,10 +275,10 @@
 </blockquote>
 <h4 id="1）下载"><a href="#1）下载" class="headerlink" title="1）下载"></a>1）下载</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm pull &lt;chart_name&gt; （chart名称须具体，如 bitnami/kong。不能只是关键字）</span><br>helm pull bitnami/kong<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210701103804465.png" srcset="/img/loading.gif" lazyload alt="image-20210701103804465"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210701103804465.png" srcset="/img/loading.gif" lazyload alt="image-20210701103804465"></p>
 <h4 id="2）解压"><a href="#2）解压" class="headerlink" title="2）解压"></a>2）解压</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">tar xf kong-3.7.5.tgz <br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210701103958115.png" srcset="/img/loading.gif" lazyload alt="image-20210701103958115"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210701103958115.png" srcset="/img/loading.gif" lazyload alt="image-20210701103958115"></p>
 <h4 id="3）目录结构"><a href="#3）目录结构" class="headerlink" title="3）目录结构"></a>3）目录结构</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs shell">kong<br>├── Chart.lock<br>├── charts						# kong 的 chart 依赖的其他 chart，数据库<br>│   ├── cassandra<br>│   ├── common<br>│   └── postgresql<br>├── Chart.yaml				# 包含了chart信息的YAML文件<br>├── ci<br>│   ├── values-editing-containers.yaml<br>│   ├── values-external-cassandra.yaml<br>│   ├── values-external-postgresql.yaml<br>│   ├── values-ingress.yaml<br>│   └── values-metrics-hpa-pdb.yaml<br>├── crds							# 自定义资源<br>│   └── custom-resource-definitions.yaml<br>├── README.md<br>├── templates					# 资源模版，配置 values 进行渲染，生产有效的 K8s manifest<br>│   ├── dep-ds.yaml<br>│   ├── external-database-secret.yaml<br>│   ├── extra-list.yaml<br>│   ├── _helpers.tpl<br>│   ├── hpa.yaml<br>│   ├── ingress-controller-rbac.yaml<br>│   ├── ingress.yaml<br>│   ├── kong-prometheus-rolebinding.yaml<br>│   ├── kong-prometheus-role.yaml<br>│   ├── kong-script-configmap.yaml<br>│   ├── metrics-exporter-configmap.yaml<br>│   ├── metrics-script-configmap.yaml<br>│   ├── metrics-service.yaml<br>│   ├── migrate-job.yaml<br>│   ├── NOTES.txt<br>│   ├── pdb.yaml<br>│   ├── servicemonitor.yaml<br>│   ├── service.yaml<br>│   └── tls-secrets.yaml<br>└── values.yaml				# chart 默认的配置值<br><br></code></pre></td></tr></table></figure>
 
 
@@ -289,23 +289,23 @@
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm create &lt;chart_name&gt;</span><br>helm create test_chart<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210701180328092.png" srcset="/img/loading.gif" lazyload alt="image-20210701180328092"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210701180328092.png" srcset="/img/loading.gif" lazyload alt="image-20210701180328092"></p>
 <h3 id="5、检查-Chart"><a href="#5、检查-Chart" class="headerlink" title="5、检查 Chart"></a>5、检查 Chart</h3><blockquote>
 <p>Helm 自动了语法检查工具，其作用类似 <code>nginx -t</code>，会对 chart 的格式或者一些信息进行自检，并返回检查结果，在发布前，进行语法检查是很好的选择。</p>
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm lint &lt;chart_name&gt;</span><br>helm lint test_chart<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705142216832.png" srcset="/img/loading.gif" lazyload alt="image-20210705142216832"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705142216832.png" srcset="/img/loading.gif" lazyload alt="image-20210705142216832"></p>
 <h3 id="6、上传-Chart"><a href="#6、上传-Chart" class="headerlink" title="6、上传 Chart"></a>6、上传 Chart</h3><h4 id="1）打包-Chart"><a href="#1）打包-Chart" class="headerlink" title="1）打包 Chart"></a>1）打包 Chart</h4><blockquote>
 <p>在上面的一系列操作中我们知道，Helm 仓库中存放的是一个个的 tar 包，而不是目录，因此如果你想上传自建的 chart，就需要将其先行打包。Helm 提供了这样一个命名来将你自建的 chart 打包出 Helm 可识别的格式。</p>
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm package &lt;chart_name&gt;</span><br>helm package test_chart<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210701111357599.png" srcset="/img/loading.gif" lazyload alt="image-20210701111357599"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210701111357599.png" srcset="/img/loading.gif" lazyload alt="image-20210701111357599"></p>
 <blockquote>
 <p>🚩 <strong>为什么版本是 0.1.0？</strong></p>
 <p>这是由 Chart.yaml 中的 <code>version</code> 字段决定的。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210701111524833.png" srcset="/img/loading.gif" lazyload alt="image-20210701111524833"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210701111524833.png" srcset="/img/loading.gif" lazyload alt="image-20210701111524833"></p>
 </blockquote>
 <h4 id="2）上传至私有仓库"><a href="#2）上传至私有仓库" class="headerlink" title="2）上传至私有仓库"></a>2）上传至私有仓库</h4><blockquote>
 <p><strong>四个步骤：</strong></p>
@@ -353,9 +353,9 @@
 
 <h6 id="3⃣️-更新依赖"><a href="#3⃣️-更新依赖" class="headerlink" title="3⃣️ 更新依赖"></a>3⃣️ 更新依赖</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm dependency update<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210702105136710.png" srcset="/img/loading.gif" lazyload alt="image-20210702105136710"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210702105136710.png" srcset="/img/loading.gif" lazyload alt="image-20210702105136710"></p>
 <p>依赖的 chart 包 会被下载到 <code>charts/</code> 目录下：</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210702105157112.png" srcset="/img/loading.gif" lazyload alt="image-20210702105157112"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210702105157112.png" srcset="/img/loading.gif" lazyload alt="image-20210702105157112"></p>
 <h4 id="2）通过-charts-目录手动管理依赖"><a href="#2）通过-charts-目录手动管理依赖" class="headerlink" title="2）通过 charts/ 目录手动管理依赖"></a>2）通过 charts/ 目录手动管理依赖</h4><p>Helm 提供了两种管理依赖的方式，一种是如上所述的 <code>dependencies</code> 表达式，它会遵循语法原则，自动的管理依赖，依赖包会被下载到 <code>charts/</code> 中；另一种方式就是通过 <code>charts/</code> 目录来手动管理依赖，这种方式可以对依赖的 chart 做更多的自定义设置。</p>
 <h5 id="1-基本原则-1"><a href="#1-基本原则-1" class="headerlink" title="1. 基本原则"></a>1. 基本原则</h5><blockquote>
 <ul>

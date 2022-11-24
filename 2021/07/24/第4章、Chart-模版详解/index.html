@@ -256,28 +256,28 @@
 <h4 id="2）发布-chart"><a href="#2）发布-chart" class="headerlink" title="2）发布 chart"></a>2）发布 chart</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p>返回值如下：</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705160256966.png" srcset="/img/loading.gif" lazyload alt="image-20210705160256966"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705160256966.png" srcset="/img/loading.gif" lazyload alt="image-20210705160256966"></p>
 <p>查看发布:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm list<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705161041080.png" srcset="/img/loading.gif" lazyload alt="image-20210705161041080"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705161041080.png" srcset="/img/loading.gif" lazyload alt="image-20210705161041080"></p>
 <h4 id="3）查看-manifest"><a href="#3）查看-manifest" class="headerlink" title="3）查看 manifest"></a>3）查看 manifest</h4><blockquote>
 <p>执行 <code>helm get manifest</code> 可以打印出 <code>release</code> 已经上传到 <code>api server</code> 的资源。每个文件都会以 <code>---</code> `开头，并自动生成注释。</p>
 </blockquote>
 <p>我们可以发现模版中的 <code>&#123;&#123; .Release.Name &#125;&#125;</code> 调用已经渲染成了 Release 的名称。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 命令: helm get manifest &lt;release_name&gt;</span><br>helm get manifest test-chart<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705160402893.png" srcset="/img/loading.gif" lazyload alt="image-20210705160402893"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705160402893.png" srcset="/img/loading.gif" lazyload alt="image-20210705160402893"></p>
 <h4 id="4）查看渲染效果（不发布）"><a href="#4）查看渲染效果（不发布）" class="headerlink" title="4）查看渲染效果（不发布）"></a>4）查看渲染效果（不发布）</h4><h5 id="1-卸载应用"><a href="#1-卸载应用" class="headerlink" title="1. 卸载应用"></a>1. 卸载应用</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm uninstall test-chart<br></code></pre></td></tr></table></figure>
 
 <h5 id="2-渲染测试"><a href="#2-渲染测试" class="headerlink" title="2. 渲染测试"></a>2. 渲染测试</h5><h6 id="1⃣️-dry-run"><a href="#1⃣️-dry-run" class="headerlink" title="1⃣️ --dry-run"></a>1⃣️ <code>--dry-run</code></h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p>返回如下:</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705162015141.png" srcset="/img/loading.gif" lazyload alt="image-20210705162015141"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705162015141.png" srcset="/img/loading.gif" lazyload alt="image-20210705162015141"></p>
 <h6 id="2⃣️-debug"><a href="#2⃣️-debug" class="headerlink" title="2⃣️ --debug"></a>2⃣️ <code>--debug</code></h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run --debug test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p>返回如下：</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210705161728732.png" srcset="/img/loading.gif" lazyload alt="image-20210705161728732"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210705161728732.png" srcset="/img/loading.gif" lazyload alt="image-20210705161728732"></p>
 <h3 id="3、Values-的使用"><a href="#3、Values-的使用" class="headerlink" title="3、Values 的使用"></a>3、Values 的使用</h3><p>确切的说，<code>Values</code> 是一个对象，它提供了对于传递到 chart 模版的值的访问方法。其内容的主要来源如下:</p>
 <blockquote>
 <ul>
@@ -301,7 +301,7 @@
 <h5 id="3-渲染模版"><a href="#3-渲染模版" class="headerlink" title="3. 渲染模版"></a>3. 渲染模版</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p><strong>渲染结果如下：</strong></p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210707143605000.png" srcset="/img/loading.gif" lazyload alt="image-20210707143605000"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210707143605000.png" srcset="/img/loading.gif" lazyload alt="image-20210707143605000"></p>
 <h4 id="3）多结构化表达式"><a href="#3）多结构化表达式" class="headerlink" title="3）多结构化表达式"></a>3）多结构化表达式</h4><h5 id="1-创建-values-yaml-1"><a href="#1-创建-values-yaml-1" class="headerlink" title="1. 创建 values.yaml"></a>1. 创建 values.yaml</h5><p>文件路径：<code>mychart/other_values.yaml</code>，添加以下内容：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">person:</span><br>  <span class="hljs-attr">name:</span> <span class="hljs-string">Tareya</span><br>  <span class="hljs-attr">gender:</span> <span class="hljs-string">male</span><br>  <span class="hljs-attr">age:</span> <span class="hljs-number">18</span><br></code></pre></td></tr></table></figure>
 
@@ -312,13 +312,13 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install -f mychart/other_values.yaml --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p><strong>渲染结果如下：</strong></p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210707145708150.png" srcset="/img/loading.gif" lazyload alt="image-20210707145708150"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210707145708150.png" srcset="/img/loading.gif" lazyload alt="image-20210707145708150"></p>
 <p>可以发现，渲染结果不但读取了默认的 <code>values.yaml</code> ，还读取了我们指定的 <code>other_values.yaml</code>。</p>
 <h4 id="4）使用-set-指定配置参数"><a href="#4）使用-set-指定配置参数" class="headerlink" title="4）使用 --set 指定配置参数"></a>4）使用 <code>--set</code> 指定配置参数</h4><p>还记得我们上面说的 Values 的优先级吗？我们在这边做个简单的验证，上面我们已经在 <code>values.yaml</code> 中设置了 <code>aaa</code> 的值为 <code>bbb</code>，接下来，让我们执行如下命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm install --set aaa=abcdefg --dry-run test-chart ./mychart<br></code></pre></td></tr></table></figure>
 
 <p>渲染结果如下：</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210707144128673.png" srcset="/img/loading.gif" lazyload alt="image-20210707144128673"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210707144128673.png" srcset="/img/loading.gif" lazyload alt="image-20210707144128673"></p>
 <p>可以发现，原本 <code>values.yaml</code> 中的默认配置被我们命令行指定的配置覆盖了。</p>
 <h4 id="5）通过设置-null-删除默认配置"><a href="#5）通过设置-null-删除默认配置" class="headerlink" title="5）通过设置 null 删除默认配置"></a>5）通过设置 <code>null</code> 删除默认配置</h4><p>我们知道 <code>Values</code> 的配置其实就是一个 Key:Vaule 对，所以如果要从默认的 <code>Values</code> 中删除配置，其实只要将 Key 设置为 <code>null</code>，Helm 在进行渲染的过程中，就会合并并删除对应的 Key。</p>
 <h5 id="示例说明"><a href="#示例说明" class="headerlink" title="示例说明"></a>示例说明</h5><p>下面我们用一个示例来说明。比如，稳定的 <code>Drupal</code> chart 允许在配置自定义镜像时配置动态探针，默认值如下：</p>

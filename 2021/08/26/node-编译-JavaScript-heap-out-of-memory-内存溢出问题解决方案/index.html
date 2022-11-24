@@ -233,7 +233,7 @@
 
 
 <h2 id="一、背景介绍"><a href="#一、背景介绍" class="headerlink" title="一、背景介绍"></a>一、背景介绍</h2><p>最近在使用node编译项目时，遇到了这样的错误，按照字面意思理解，就是内存溢出了。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825172156810.png" srcset="/img/loading.gif" lazyload alt="image-20210825172156810"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210825172156810.png" srcset="/img/loading.gif" lazyload alt="image-20210825172156810"></p>
 <h2 id="二、根因追溯"><a href="#二、根因追溯" class="headerlink" title="二、根因追溯"></a>二、根因追溯</h2><blockquote>
 <p><a target="_blank" rel="noopener" href="https://github.com/nodejs/node/wiki/FAQ">官方FAQ</a></p>
 <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">What <span class="hljs-keyword">is</span> the memory <span class="hljs-keyword">limit</span> <span class="hljs-keyword">on</span> a node process?Currently, <span class="hljs-keyword">by</span> <span class="hljs-keyword">default</span> v8 has a memory <span class="hljs-keyword">limit</span> <span class="hljs-keyword">of</span> <span class="hljs-number">512</span>MB <span class="hljs-keyword">on</span> <span class="hljs-number">32</span>-<span class="hljs-type">bit</span> systems, <span class="hljs-keyword">and</span> <span class="hljs-number">1.4</span>GB <span class="hljs-keyword">on</span> <span class="hljs-number">64</span>-<span class="hljs-type">bit</span> systems. The <span class="hljs-keyword">limit</span> can be raised <span class="hljs-keyword">by</span> setting <span class="hljs-comment">--max_old_space_size to a maximum of ~1024 (~1 GB) (32-bit) and ~4096 (~4GB) (64-bit), but it is recommended that you split your single process into several workers if you are hitting memory limits.</span><br></code></pre></td></tr></table></figure>
@@ -255,7 +255,7 @@
 
 <h4 id="3）运行修复内存限制任务"><a href="#3）运行修复内存限制任务" class="headerlink" title="3）运行修复内存限制任务"></a>3）运行修复内存限制任务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">npm run fix-memory-limit<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825171914179.png" srcset="/img/loading.gif" lazyload alt="image-20210825171914179"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210825171914179.png" srcset="/img/loading.gif" lazyload alt="image-20210825171914179"></p>
 <p>可以看出，这个包实际上就是自动处理方案一的过程。</p>
 
             </div>

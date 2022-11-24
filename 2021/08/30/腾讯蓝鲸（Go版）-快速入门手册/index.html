@@ -230,7 +230,7 @@
             <div class="markdown-body">
               <h1 id="腾讯蓝鲸（Go版）-快速入门手册"><a href="#腾讯蓝鲸（Go版）-快速入门手册" class="headerlink" title="腾讯蓝鲸（Go版） 快速入门手册"></a>腾讯蓝鲸（Go版） 快速入门手册</h1><span id="more"></span>
 
-<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p><img src="https://gitee.com/Tareya/blog_images/raw/master/bk-cmdb.png" srcset="/img/loading.gif" lazyload alt="bk-cmdb"></p>
+<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p><img src="https://blog-images.tareya.cn/blog_images/bk-cmdb.png" srcset="/img/loading.gif" lazyload alt="bk-cmdb"></p>
 <p><a target="_blank" rel="noopener" href="https://bk.tencent.com/">蓝鲸官网</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb">官方github</a></p>
 <h3 id="1、蓝鲸简介"><a href="#1、蓝鲸简介" class="headerlink" title="1、蓝鲸简介"></a>1、蓝鲸简介</h3><p>蓝鲸配置平台（蓝鲸CMDB）是一个面向资产及应用的企业级配置管理平台。</p>
@@ -245,7 +245,7 @@
 <li>通用权限管理：灵活的基于用户组的权限管理</li>
 <li>操作审计：用户操作行为的审计与回溯</li>
 </ul>
-<h3 id="3、架构设计"><a href="#3、架构设计" class="headerlink" title="3、架构设计"></a>3、架构设计</h3><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826102802263.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸架构设计"></p>
+<h3 id="3、架构设计"><a href="#3、架构设计" class="headerlink" title="3、架构设计"></a>3、架构设计</h3><p><img src="https://blog-images.tareya.cn/blog_images/image-20210826102802263.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸架构设计"></p>
 <h3 id="4、服务进程清单"><a href="#4、服务进程清单" class="headerlink" title="4、服务进程清单"></a>4、服务进程清单</h3><table>
 <thead>
 <tr>
@@ -310,7 +310,7 @@
 <td>场景层服务，异步任务管理服务</td>
 </tr>
 </tbody></table>
-<h3 id="5、代码结构"><a href="#5、代码结构" class="headerlink" title="5、代码结构"></a>5、代码结构</h3><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826103025159.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸代码结构"></p>
+<h3 id="5、代码结构"><a href="#5、代码结构" class="headerlink" title="5、代码结构"></a>5、代码结构</h3><p><img src="https://blog-images.tareya.cn/blog_images/image-20210826103025159.png" srcset="/img/loading.gif" lazyload alt="Go蓝鲸代码结构"></p>
 <h4 id="目录结构说明："><a href="#目录结构说明：" class="headerlink" title="目录结构说明："></a>目录结构说明：</h4><table>
 <thead>
 <tr>
@@ -376,7 +376,7 @@
 
 <h5 id="3-安装-cnpm"><a href="#3-安装-cnpm" class="headerlink" title="3. 安装 cnpm"></a>3. 安装 cnpm</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">npm install -g cnpm --registry=https://registry.npm.taobao.org<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825165451698.png" srcset="/img/loading.gif" lazyload alt="image-20210825165451698"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210825165451698.png" srcset="/img/loading.gif" lazyload alt="image-20210825165451698"></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">ln -s /data/applications/node/bin/cnpm /usr/local/bin/<br></code></pre></td></tr></table></figure>
 
 <p>验证:</p>
@@ -407,7 +407,7 @@
 </blockquote>
 <h5 id="支持-Linux-平台编译"><a href="#支持-Linux-平台编译" class="headerlink" title="支持 Linux 平台编译"></a>支持 Linux 平台编译</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd $GOPATH/src/configcenter/src &amp;&amp; \<br>export GOPATH=~/go &amp;&amp; \<br>make linux NPM=cnpm<br></code></pre></td></tr></table></figure>
 
-<h5 id="问题记录-解决环境变量识别问题"><a href="#问题记录-解决环境变量识别问题" class="headerlink" title="问题记录: 解决环境变量识别问题"></a>问题记录: 解决环境变量识别问题</h5><h6 id="错误信息："><a href="#错误信息：" class="headerlink" title="错误信息："></a>错误信息：</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825172030664.png" srcset="/img/loading.gif" lazyload alt="image-20210825172030664"></p>
+<h5 id="问题记录-解决环境变量识别问题"><a href="#问题记录-解决环境变量识别问题" class="headerlink" title="问题记录: 解决环境变量识别问题"></a>问题记录: 解决环境变量识别问题</h5><h6 id="错误信息："><a href="#错误信息：" class="headerlink" title="错误信息："></a>错误信息：</h6><p><img src="https://blog-images.tareya.cn/blog_images/image-20210825172030664.png" srcset="/img/loading.gif" lazyload alt="image-20210825172030664"></p>
 <h6 id="问题原因"><a href="#问题原因" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>在官方提供的 Makefile 中，路径是写死的，所以如果路径不一致，会无法读取到对应的文件</p>
 <h6 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案:"></a>解决方案:</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">export GOPATH=~/go<br></code></pre></td></tr></table></figure>
 
@@ -419,7 +419,7 @@
 
 <h4 id="4）前端编译（可选）"><a href="#4）前端编译（可选）" class="headerlink" title="4）前端编译（可选）"></a>4）前端编译（可选）</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">make ui NPM=cnpm<br></code></pre></td></tr></table></figure>
 
-<h5 id="问题记录-解决node编译oom问题"><a href="#问题记录-解决node编译oom问题" class="headerlink" title="问题记录: 解决node编译oom问题"></a>问题记录: 解决node编译oom问题</h5><h6 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息:"></a>错误信息:</h6><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210825172156810.png" srcset="/img/loading.gif" lazyload alt="image-20210825172156810"></p>
+<h5 id="问题记录-解决node编译oom问题"><a href="#问题记录-解决node编译oom问题" class="headerlink" title="问题记录: 解决node编译oom问题"></a>问题记录: 解决node编译oom问题</h5><h6 id="错误信息"><a href="#错误信息" class="headerlink" title="错误信息:"></a>错误信息:</h6><p><img src="https://blog-images.tareya.cn/blog_images/image-20210825172156810.png" srcset="/img/loading.gif" lazyload alt="image-20210825172156810"></p>
 <h6 id="问题原因-1"><a href="#问题原因-1" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>该问题是由于前端代码问题导致的 node 编译 OOM ，旧版本暂时没有此类问题，故推荐使用 release <a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb/releases/tag/release-v3.9.5">v3.9.5</a> 的源码</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/Tencent/bk-cmdb/issues/5341">官方 github issue 记录</a></p>
 <p><a href="https://tareya.github.io/2021/08/26/node-%E7%BC%96%E8%AF%91-JavaScript-heap-out-of-memory-%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">类似问题解决方法</a></p>
@@ -624,23 +624,23 @@
 
 <h5 id="2-连接-mongo"><a href="#2-连接-mongo" class="headerlink" title="2. 连接 mongo"></a>2. 连接 mongo</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mongo<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826165034092.png" srcset="/img/loading.gif" lazyload alt="image-20210826165034092"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826165034092.png" srcset="/img/loading.gif" lazyload alt="image-20210826165034092"></p>
 <blockquote>
 <p>⚠️ <strong>注意:</strong> </p>
 <p>在启动 mongo 容器中，我们注释掉了 auth 认证，这是为了创建管理用户，否则我们无法进行认证，但是这种情况会导致风险报警，所以在创建完管理用户后，要将认证配置打开。</p>
 </blockquote>
 <h5 id="3-创建管理员用户"><a href="#3-创建管理员用户" class="headerlink" title="3. 创建管理员用户"></a>3. 创建管理员用户</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接 mongo 后，执行</span><br>use admin<br>db.createUser(&#123;user:&#x27;admin&#x27;, pwd:&#x27;admin&#x27;, roles:[&#123;role:&#x27;root&#x27;,db:&#x27;admin&#x27;&#125;]&#125;)<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826165251592.png" srcset="/img/loading.gif" lazyload alt="image-20210826165251592"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826165251592.png" srcset="/img/loading.gif" lazyload alt="image-20210826165251592"></p>
 <h5 id="4-打开-auth-配置"><a href="#4-打开-auth-配置" class="headerlink" title="4. 打开 auth 配置"></a>4. 打开 auth 配置</h5><p>文件路径: <code>/data/bk-cmdb/mongodb/conf/mongod.conf.orig</code>，取消 auth 的注释:</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> ...</span><br><br>security:<br>  authorization: enabled<br><span class="hljs-meta">  </span><br><span class="hljs-meta">#</span><span class="bash"> ...</span><br></code></pre></td></tr></table></figure>
 
 <h5 id="5-重启mongo容器"><a href="#5-重启mongo容器" class="headerlink" title="5. 重启mongo容器"></a>5. 重启mongo容器</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker restart mongodb<br></code></pre></td></tr></table></figure>
 
-<h5 id="6-再次进入容器并连接-mongo，并认证"><a href="#6-再次进入容器并连接-mongo，并认证" class="headerlink" title="6. 再次进入容器并连接 mongo，并认证"></a>6. 再次进入容器并连接 mongo，并认证</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826161721885.png" srcset="/img/loading.gif" lazyload alt="image-20210826161721885"></p>
+<h5 id="6-再次进入容器并连接-mongo，并认证"><a href="#6-再次进入容器并连接-mongo，并认证" class="headerlink" title="6. 再次进入容器并连接 mongo，并认证"></a>6. 再次进入容器并连接 mongo，并认证</h5><p><img src="https://blog-images.tareya.cn/blog_images/image-20210826161721885.png" srcset="/img/loading.gif" lazyload alt="image-20210826161721885"></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">use admin<br>db.auth(&#x27;admin&#x27;,&#x27;admin&#x27;)<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826165917027.png" srcset="/img/loading.gif" lazyload alt="image-20210826165917027"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826165917027.png" srcset="/img/loading.gif" lazyload alt="image-20210826165917027"></p>
 <h4 id="2）配置-mongo-副本集"><a href="#2）配置-mongo-副本集" class="headerlink" title="2）配置 mongo 副本集"></a>2）配置 mongo 副本集</h4><blockquote>
 <p>⚠️ <strong>注意:</strong></p>
 <p>如果 mongo 是以副本集的方式启动的，需要对副本集进行初始化</p>
@@ -648,12 +648,12 @@
 </blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br><span class="hljs-meta">#</span><span class="bash"> _id 即使用 replSetName, host 为实例的 IP:Port</span><br>rs.initiate(&#123; _id : &quot;es&quot;,members: [&#123; _id: 0, host: &quot;192.168.3.206:27017&quot; &#125;]&#125;)<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826171334054.png" srcset="/img/loading.gif" lazyload alt="image-20210826171334054"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826171334054.png" srcset="/img/loading.gif" lazyload alt="image-20210826171334054"></p>
 <h4 id="3）创建-cmdb-库和用户"><a href="#3）创建-cmdb-库和用户" class="headerlink" title="3）创建 cmdb 库和用户"></a>3）创建 cmdb 库和用户</h4><h5 id="1-不使用-es-做全文检索"><a href="#1-不使用-es-做全文检索" class="headerlink" title="1. 不使用 es 做全文检索"></a>1. 不使用 es 做全文检索</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br>use cmdb<br>db.createUser(&#123;user: &quot;cc&quot;,pwd: &quot;cc&quot;,roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cmdb&quot; &#125; ]&#125;)<br></code></pre></td></tr></table></figure>
 
 <h5 id="2-使用-mongo-monstache-es-做全文检索（本文选择）"><a href="#2-使用-mongo-monstache-es-做全文检索（本文选择）" class="headerlink" title="2. 使用 mongo + monstache + es 做全文检索（本文选择）"></a>2. 使用 mongo + monstache + es 做全文检索（本文选择）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 进入容器并连接mongo，并认证后执行</span><br>use cmdb<br>db.createUser(&#123;user: &quot;cc&quot;,pwd: &quot;cc&quot;,roles: [ &#123; role: &quot;readWrite&quot;, db: &quot;cmdb&quot; &#125;,&#123; role: &quot;readWrite&quot;, db: &quot;monstache&quot; &#125; ]&#125;)<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826170838042.png" srcset="/img/loading.gif" lazyload alt="image-20210826170838042"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826170838042.png" srcset="/img/loading.gif" lazyload alt="image-20210826170838042"></p>
 <h3 id="6、部署-Elasticsearch（可选）"><a href="#6、部署-Elasticsearch（可选）" class="headerlink" title="6、部署 Elasticsearch（可选）"></a>6、部署 Elasticsearch（可选）</h3><h4 id="1）环境准备-3"><a href="#1）环境准备-3" class="headerlink" title="1）环境准备"></a>1）环境准备</h4><h5 id="1-拉取镜像-（官方推荐-7-0-0-版本）"><a href="#1-拉取镜像-（官方推荐-7-0-0-版本）" class="headerlink" title="1. 拉取镜像 （官方推荐 7.0.0 版本）"></a>1. 拉取镜像 （官方推荐 7.0.0 版本）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull elasticsearch:7.0.0<br></code></pre></td></tr></table></figure>
 
 <h5 id="2-创建持久化目录-3"><a href="#2-创建持久化目录-3" class="headerlink" title="2. 创建持久化目录"></a>2. 创建持久化目录</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">mkdir -p /data/bk-cmdb/elasticsearch/&#123;conf,data,log,plugins&#125;<br></code></pre></td></tr></table></figure>
@@ -810,9 +810,9 @@
 
 <h4 id="2）初始化配置"><a href="#2）初始化配置" class="headerlink" title="2）初始化配置"></a>2）初始化配置</h4><h5 id="1-初始化"><a href="#1-初始化" class="headerlink" title="1. 初始化"></a>1. 初始化</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell">python init.py  \<br>      --discovery          192.168.3.206:2181 \<br>      --database           cmdb \<br>      --redis_ip           192.168.3.206 \<br>      --redis_port         6379 \<br>      --redis_pass         PassWord@123 \<br>      --mongo_ip           192.168.3.206 \<br>      --mongo_port         27017 \<br>      --mongo_user         cc \<br>      --mongo_pass         cc \<br>      --rs_name            es \<br>      --blueking_cmdb_url  http://bk-cmdb.example.com:80 \<br>      --listen_port        8083 \<br>      --auth_scheme        internal \<br>      --auth_enabled       false \<br>      --auth_sync_workers  1 \<br>      --auth_sync_interval_minutes  45 \<br>      --full_text_search   on \<br>      --es_url             http://192.168.3.206:9200 \<br>      --es_user            cc \<br>      --es_pass            cc \<br>      --log_level          3 \<br>      --register_ip        192.168.3.206 \<br>      --user_info          admin:admin<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826175509596.png" srcset="/img/loading.gif" lazyload alt="image-20210826175509596"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826175509596.png" srcset="/img/loading.gif" lazyload alt="image-20210826175509596"></p>
 <p>生成的配置文件如下:</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210826175651688.png" srcset="/img/loading.gif" lazyload alt="image-20210826175651688"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210826175651688.png" srcset="/img/loading.gif" lazyload alt="image-20210826175651688"></p>
 <h5 id="2-init-py-参数详解："><a href="#2-init-py-参数详解：" class="headerlink" title="2. init.py 参数详解："></a>2. init.py 参数详解：</h5><table>
 <thead>
 <tr>
@@ -961,11 +961,11 @@
 <h4 id="3）启动服务"><a href="#3）启动服务" class="headerlink" title="3）启动服务"></a>3）启动服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./start.sh<br></code></pre></td></tr></table></figure>
 
 <h5 id="问题记录-adminserver-redis-认证问题"><a href="#问题记录-adminserver-redis-认证问题" class="headerlink" title="问题记录: adminserver redis 认证问题"></a>问题记录: adminserver redis 认证问题</h5><h6 id="错误信息-1"><a href="#错误信息-1" class="headerlink" title="错误信息:"></a>错误信息:</h6><p>启动服务时，部分服务无法正常启动，特别是管理配置的 adminserver</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210827130549678.png" srcset="/img/loading.gif" lazyload alt="image-20210827130549678"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210827130549678.png" srcset="/img/loading.gif" lazyload alt="image-20210827130549678"></p>
 <p>查看日志后，问题的原因在于 redis 的认证上</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210827130612873.png" srcset="/img/loading.gif" lazyload alt="image-20210827130612873"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210827130612873.png" srcset="/img/loading.gif" lazyload alt="image-20210827130612873"></p>
 <h6 id="问题原因-2"><a href="#问题原因-2" class="headerlink" title="问题原因:"></a>问题原因:</h6><p>redis 开启认证后，在内存中并没有确实的生成对应的key，导致程序在加载配置时，无法正确加载认证配置（程序读取的是本地 redis 的 config 中的 key <code>requirepass</code>）</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210827130902618.png" srcset="/img/loading.gif" lazyload alt="image-20210827130902618"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210827130902618.png" srcset="/img/loading.gif" lazyload alt="image-20210827130902618"></p>
 <h6 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案:"></a>解决方案:</h6><p>因此只要将 key 对应的值（也就是我们设置的密码） set 到 redis 中，即可</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">CONFIG SET requirepass myPassword<br></code></pre></td></tr></table></figure>
 
@@ -977,13 +977,13 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./init_db.sh<br></code></pre></td></tr></table></figure>
 
 <p>返回值中返回 <code>migrate_success</code>，即数据库初始化成功</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210827131349118.png" srcset="/img/loading.gif" lazyload alt="image-20210827131349118"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210827131349118.png" srcset="/img/loading.gif" lazyload alt="image-20210827131349118"></p>
 <h4 id="5）停止服务"><a href="#5）停止服务" class="headerlink" title="5）停止服务"></a>5）停止服务</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares/cmdb &amp;&amp; \<br>./stop.sh<br></code></pre></td></tr></table></figure>
 
 
 
 <h2 id="四、效果展示"><a href="#四、效果展示" class="headerlink" title="四、效果展示"></a>四、效果展示</h2><p><strong>打开浏览器:</strong> 输入 cmdb_webserver 监听的地址，如本文档中示例服务监听的地址: <a target="_blank" rel="noopener" href="http://bk-cmdb.example.com/">http://bk-cmdb.example.com</a></p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210827141908936.png" srcset="/img/loading.gif" lazyload alt="image-20210827141908936"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210827141908936.png" srcset="/img/loading.gif" lazyload alt="image-20210827141908936"></p>
 
             </div>
             <hr>

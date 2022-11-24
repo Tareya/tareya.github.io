@@ -234,16 +234,16 @@
 
 
 
-<h2 id="一、K8s-yaml-安装-kube-state-metrics"><a href="#一、K8s-yaml-安装-kube-state-metrics" class="headerlink" title="一、K8s yaml 安装 kube-state-metrics"></a>一、K8s yaml 安装 kube-state-metrics</h2><h3 id="1、版本选择"><a href="#1、版本选择" class="headerlink" title="1、版本选择"></a>1、版本选择</h3><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210816153327662.png" srcset="/img/loading.gif" lazyload alt="image-20210816153327662"></p>
+<h2 id="一、K8s-yaml-安装-kube-state-metrics"><a href="#一、K8s-yaml-安装-kube-state-metrics" class="headerlink" title="一、K8s yaml 安装 kube-state-metrics"></a>一、K8s yaml 安装 kube-state-metrics</h2><h3 id="1、版本选择"><a href="#1、版本选择" class="headerlink" title="1、版本选择"></a>1、版本选择</h3><p><img src="https://blog-images.tareya.cn/blog_images/image-20210816153327662.png" srcset="/img/loading.gif" lazyload alt="image-20210816153327662"></p>
 <blockquote>
 <p>⚠️ <strong>注意:</strong></p>
 <p>根据官方版本的提示，当前最新版的 metrics 版本<code>(v2.0.0+)</code>支持的为 <code>V1.17</code> 和 <code>V1.18</code> 以后的 k8s 版本，如果是之前的 k8s 版本则选用 <code>v1.9.8</code> 的 metrics 版本，并且当前 1.9.x 的发布版本已经升级到了最新的 v1.9.8 的最新版本了。</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kube-state-metrics/tree/release-1.9/examples/standard">yaml 文件下载地址</a></p>
 <p>由于本文所属 k8s 版本为 <code>V1.15</code> ， <code>v1.9.8</code> 的 kube-state-metrics，对于其并不能兼容，因为 v1.15 版本中使用的某些 API 尚属于 Beta 版本，例如: <strong><code>admissionregistration</code></strong> </p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823162144898.png" srcset="/img/loading.gif" lazyload alt="v1.9.7版本的概念"></p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823145521128.png" srcset="/img/loading.gif" lazyload alt="image-20210823145521128"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210823162144898.png" srcset="/img/loading.gif" lazyload alt="v1.9.7版本的概念"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210823145521128.png" srcset="/img/loading.gif" lazyload alt="image-20210823145521128"></p>
 <p>而 v1.9.8 调用时使用的是正式版本，因此就就会导致问题，因此需要对该API进行一定的修改，以兼容 1.15 老版本的 K8S API。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823145901994.png" srcset="/img/loading.gif" lazyload alt="kube-state-metrics 1.9.8 源码"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210823145901994.png" srcset="/img/loading.gif" lazyload alt="kube-state-metrics 1.9.8 源码"></p>
 <p><strong>笔者修改完后的docker 镜像地址:</strong></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">docker pull tareya/kube-state-metrics:v1.9.8-for-k8s1.15<br></code></pre></td></tr></table></figure>
 </blockquote>
@@ -296,10 +296,10 @@
 <h3 id="5、grafana-面板集成"><a href="#5、grafana-面板集成" class="headerlink" title="5、grafana 面板集成"></a>5、grafana 面板集成</h3><blockquote>
 <p>Create ==&gt; Import ==&gt; 8588</p>
 </blockquote>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823152852054.png" srcset="/img/loading.gif" lazyload alt="image-20210823152852054"></p>
-<h4 id="1）整体使用率和-node、pod-CPU-使用情况"><a href="#1）整体使用率和-node、pod-CPU-使用情况" class="headerlink" title="1）整体使用率和 node、pod CPU 使用情况"></a>1）整体使用率和 node、pod CPU 使用情况</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823153053012.png" srcset="/img/loading.gif" lazyload alt="image-20210823153053012"></p>
-<h4 id="2）node、pod-内存使用情况"><a href="#2）node、pod-内存使用情况" class="headerlink" title="2）node、pod 内存使用情况"></a>2）node、pod 内存使用情况</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823153252971.png" srcset="/img/loading.gif" lazyload alt="image-20210823153252971"></p>
-<h4 id="3）node、pod-网络-I-O-使用情况"><a href="#3）node、pod-网络-I-O-使用情况" class="headerlink" title="3）node、pod 网络 I/O 使用情况"></a>3）node、pod 网络 I/O 使用情况</h4><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210823155409078.png" srcset="/img/loading.gif" lazyload alt="image-20210823155409078"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210823152852054.png" srcset="/img/loading.gif" lazyload alt="image-20210823152852054"></p>
+<h4 id="1）整体使用率和-node、pod-CPU-使用情况"><a href="#1）整体使用率和-node、pod-CPU-使用情况" class="headerlink" title="1）整体使用率和 node、pod CPU 使用情况"></a>1）整体使用率和 node、pod CPU 使用情况</h4><p><img src="https://blog-images.tareya.cn/blog_images/image-20210823153053012.png" srcset="/img/loading.gif" lazyload alt="image-20210823153053012"></p>
+<h4 id="2）node、pod-内存使用情况"><a href="#2）node、pod-内存使用情况" class="headerlink" title="2）node、pod 内存使用情况"></a>2）node、pod 内存使用情况</h4><p><img src="https://blog-images.tareya.cn/blog_images/image-20210823153252971.png" srcset="/img/loading.gif" lazyload alt="image-20210823153252971"></p>
+<h4 id="3）node、pod-网络-I-O-使用情况"><a href="#3）node、pod-网络-I-O-使用情况" class="headerlink" title="3）node、pod 网络 I/O 使用情况"></a>3）node、pod 网络 I/O 使用情况</h4><p><img src="https://blog-images.tareya.cn/blog_images/image-20210823155409078.png" srcset="/img/loading.gif" lazyload alt="image-20210823155409078"></p>
 <h2 id="二、Helm3-安装-kube-state-metrics"><a href="#二、Helm3-安装-kube-state-metrics" class="headerlink" title="二、Helm3 安装 kube-state-metrics"></a>二、Helm3 安装 kube-state-metrics</h2><p><a target="_blank" rel="noopener" href="https://github.com/Tareya/kube-state-metrics-helm">chart github地址</a></p>
 <h3 id="1、自定义-chart"><a href="#1、自定义-chart" class="headerlink" title="1、自定义 chart"></a>1、自定义 chart</h3><h4 id="1）创建-chart"><a href="#1）创建-chart" class="headerlink" title="1）创建 chart"></a>1）创建 chart</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd /data/softwares &amp;&amp; \<br>helm create kube-state-metrics<br></code></pre></td></tr></table></figure>
 
@@ -341,10 +341,10 @@
 
 <h4 id="2）查看发布版本"><a href="#2）查看发布版本" class="headerlink" title="2）查看发布版本"></a>2）查看发布版本</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">helm list -n kube-system<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210824141007622.png" srcset="/img/loading.gif" lazyload alt="image-20210824141007622"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210824141007622.png" srcset="/img/loading.gif" lazyload alt="image-20210824141007622"></p>
 <h4 id="3）检查容器情况"><a href="#3）检查容器情况" class="headerlink" title="3）检查容器情况"></a>3）检查容器情况</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">kubectl describe pod -n kube-system `kubectl get pod -n kube-system|awk &#x27;NR&gt;1&#123;print $1&#125;&#x27;|grep kube-state-metrics`<br></code></pre></td></tr></table></figure>
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20210824141436622.png" srcset="/img/loading.gif" lazyload alt="image-20210824141436622"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/image-20210824141436622.png" srcset="/img/loading.gif" lazyload alt="image-20210824141436622"></p>
 
             </div>
             <hr>

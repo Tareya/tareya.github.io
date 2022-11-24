@@ -248,7 +248,7 @@
 <li>经过上阶段选择得分最高的 Node 节点与Pod 进步 binding，并通知 API Server 将结果回写 etcd</li>
 <li>最后由被选择出来的 Node 节点上的 kubelet 去执行创建 Pod 的相关操作，创建和启动容器</li>
 </ul>
-<h5 id="2-具体过程图"><a href="#2-具体过程图" class="headerlink" title="2. 具体过程图"></a>2. 具体过程图</h5><p><img src="https://gitee.com/Tareya/blog_images/raw/master/image-20211026100220906.png" srcset="/img/loading.gif" lazyload alt="image-20211026100220906"></p>
+<h5 id="2-具体过程图"><a href="#2-具体过程图" class="headerlink" title="2. 具体过程图"></a>2. 具体过程图</h5><p><img src="https://blog-images.tareya.cn/blog_images/image-20211026100220906.png" srcset="/img/loading.gif" lazyload alt="image-20211026100220906"></p>
 <h3 id="2、调度策略"><a href="#2、调度策略" class="headerlink" title="2、调度策略"></a>2、调度策略</h3><h4 id="1）断言-——-Predicates"><a href="#1）断言-——-Predicates" class="headerlink" title="1）断言 —— Predicates"></a>1）断言 —— <em>Predicates</em></h4><blockquote>
 <p>🚩 调度器通过断言的方式实现了过滤接口，以此实现节点的预选阶段。</p>
 </blockquote>

@@ -231,7 +231,7 @@
               <h1 id="第1章、Helm-简介"><a href="#第1章、Helm-简介" class="headerlink" title="第1章、Helm 简介"></a>第1章、Helm 简介</h1><span id="more"></span>
 
 
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/helm3.jpg" srcset="/img/loading.gif" lazyload alt="helm logo"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/helm3.jpg" srcset="/img/loading.gif" lazyload alt="helm logo"></p>
 <p><a target="_blank" rel="noopener" href="https://helm.sh/">Helm 官网</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/helm/helm">Helm 官方GitHub</a></p>
 <h2 id="一、什么是-Helm？"><a href="#一、什么是-Helm？" class="headerlink" title="一、什么是 Helm？"></a>一、什么是 Helm？</h2><p>就像 Java 使用 maven；node 使用 npm；python 使用 pip；Linux 使用 yum 或 Apt 一样，不管是什么样的工作，技术人员都会希望有一种资源管理器/包管理器，以此来方便得查找、下载、安装、使用和分发软件包。</p>
@@ -279,7 +279,7 @@
 <p>但是从 Kubernetes 1.6 开始，考虑到安全性，集群默认会开启角色访问控制（<code>RBAC</code>），这使得管理和配置Tiller会变得非常复杂，因为可能的安全策略数量太多了。为了简化安全模型实现方式，并使管理员/SRE不需要去深入研究 Kubernetes 的安全组件，helm 提供了一个不需要太过关注安全规则的默认配置，但是这又会使得授权变得宽松，这反而会导致安全隐患。</p>
 <p>因此在 Helm3 中干脆移除了 Tiller，而是选择从 Kubernetes API Server 中获取信息来渲染 Charts 客户端，并在 Kubernetes 中存在安装记录，这些过程既是没有 Tiller 也可以实现。</p>
 <p>Helm3 可以支持所有的 Kubernetes 认证及鉴权等全部安全特性。Helm和本地的 kubeconfig flie 中的配置使用一致的权限。管理员可以按照自己认为合适的粒度来管理用户权限。</p>
-<p><img src="https://gitee.com/Tareya/blog_images/raw/master/helm3%E5%8F%98%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="helm3变化"></p>
+<p><img src="https://blog-images.tareya.cn/blog_images/helm3%E5%8F%98%E5%8C%96.png" srcset="/img/loading.gif" lazyload alt="helm3变化"></p>
 <h4 id="2）Chart-仓库升级"><a href="#2）Chart-仓库升级" class="headerlink" title="2）Chart 仓库升级"></a>2）Chart 仓库升级</h4><p>在 Helm3 中，<code>helm search</code> 除了支持本地 repository 搜索外，还支持 <code>helm search hub</code> 搜索 Artifact Hub 中所有公开的 charts。</p>
 <h4 id="3）改进升级策略：使用三路策略合并补丁"><a href="#3）改进升级策略：使用三路策略合并补丁" class="headerlink" title="3）改进升级策略：使用三路策略合并补丁"></a>3）改进升级策略：使用三路策略合并补丁</h4><p>在 Helm2 中，使用了双路策略合并补丁，简单来说就是在使用 <code>helm upgrade</code> 更新过程中，会比对本次发布的 chart manifest 和 最近一次发布的 chart manifest  的差异，以此来决定哪些更改被应用到 Kubernetes 的资源中去。并且，Helm 只会将最后一次应用的 chart manifest 作为 release 的当前状态，如果 chart 状态没有更改，资源的活动状态就不会更改，也就是说使用诸如 <code>kubectl edit</code> 、<code>kubectl scale</code> 这种外部方式进行的修改不会被 Helm 识别的，这种情况下如果发生回滚操作，Helm 会由于 chart 并没有发生变化而导致回滚失败。</p>
 <p>而在 Helm3 中，这种策略被升级成了三路策略合并，Helm 在生成一个补丁时，也会考虑之前老的 manifest 的活动状态。也就是说，在使用老的 chart manifest 生成新的补丁时，Helm 还会考虑当前的活动状态，并将其与之前老的 manifest 进行比对，并再比对新的 manifest 是否有改动，并进行自动补全，以此来生成最终的更新补丁。</p>
